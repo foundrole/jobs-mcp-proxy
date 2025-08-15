@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "🔍 Storing uncommitted changes..."
 STASH_NAME="pre-commit-$(date +%s)"

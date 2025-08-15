@@ -1,15 +1,15 @@
 # jobs-mcp-proxy
 
-This MCP stdio proxy server connects AI clients to a hosted job search service.
+This is a basic MCP stdio server that provides a foundation for building MCP applications.
 
-🔧 **For developers**: Lightweight proxy enabling seamless forwarding of all MCP client requests for efficient AI toolchain integration.
+🔧 **For developers**: Basic MCP server foundation enabling efficient AI toolchain integration and extensible MCP application development.
 
-👔 **For job seekers**: Easy-to-use server allowing straightforward access to a powerful job search MCP service, making job discovery simple and efficient.
+👔 **For job seekers**: Foundation server that can be extended to provide powerful job search MCP services, making job discovery simple and efficient.
 
 ## Features
 
-- **Lightweight stdio proxy**: Minimal overhead MCP proxy server
-- **Seamless forwarding**: All client requests are transparently forwarded to hosted HTTP MCP server
+- **Basic MCP stdio server**: Minimal overhead MCP server foundation
+- **Extensible architecture**: Ready for extending with tools, resources, and custom functionality
 - **Easy integration**: Simple setup for AI toolchains and applications
 - **TypeScript support**: Full type safety and modern development experience
 
@@ -20,10 +20,10 @@ This MCP stdio proxy server connects AI clients to a hosted job search service.
 yarn install
 
 # Run in development mode
-yarn run dev
+yarn dev
 
 # Build for production
-yarn run build
+yarn build
 
 # Start production server
 yarn start
@@ -33,13 +33,13 @@ yarn start
 
 ```bash
 # Type checking
-yarn run type-check
+yarn type-check
 
 # Linting
-yarn run lint
-yarn run lint:fix
+yarn lint
+yarn lint:fix
 
 # Code formatting
-yarn run prettier:check
-yarn run prettier:write
+yarn prettier:check
+yarn prettier:write
 ```

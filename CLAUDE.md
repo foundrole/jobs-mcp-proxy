@@ -4,16 +4,16 @@ This document defines the comprehensive rules and guidelines for working with th
 
 ## Project Overview
 
-The jobs-mcp-proxy project is a **lightweight MCP stdio proxy server** that seamlessly forwards all client requests to a hosted Streamable HTTP MCP server for efficient AI toolchain integration. It's designed as a simple, efficient proxy with minimal overhead:
+The jobs-mcp-proxy project is a **basic MCP stdio server** that provides a foundation for building MCP (Model Context Protocol) applications with efficient AI toolchain integration. It's designed as a simple, extensible server with minimal overhead:
 
-- **MCP SDK Version**: 1.17.2 with mcp-proxy package
-- **Transport**: stdio proxy forwarding to HTTP MCP server
-- **Primary Function**: Transparent request forwarding
-- **Architecture**: Minimal proxy server with TypeScript support
+- **MCP SDK Version**: @modelcontextprotocol/sdk@1.17.3
+- **Transport**: stdio server transport
+- **Primary Function**: Basic MCP server foundation ready for extension
+- **Architecture**: Simple MCP server with TypeScript support
 - **Code Quality**: Strict TypeScript, comprehensive linting, and modern development tooling
 - **Development**: Hot reload and comprehensive development environment
 
-The proxy server connects AI clients to a hosted job search service through seamless forwarding of all MCP client requests.
+The server provides a basic MCP stdio server that can be extended to connect AI clients to various services.
 
 ## Table of Contents
 
@@ -25,7 +25,7 @@ The proxy server connects AI clients to a hosted job search service through seam
 6. [TypeScript Configuration](#typescript-configuration)
 7. [Import/Export Standards](#importexport-standards)
 8. [JSON Formatting Rules](#json-formatting-rules)
-9. [MCP Proxy Development](#mcp-proxy-development)
+9. [MCP Server Development](#mcp-server-development)
 10. [Environment Setup](#environment-setup)
 11. [Build and Deployment](#build-and-deployment)
 12. [Git Workflow](#git-workflow)
@@ -88,6 +88,16 @@ yarn prettier:write
 yarn type-check
 ```
 
+### Pull Request Commands
+
+```bash
+# Create a pull request with auto-generated title and body from last commit
+yarn pr:create
+
+# Open the current branch's pull request in browser
+yarn pr:open
+```
+
 ## Development Workflow
 
 ### Starting Development
@@ -137,6 +147,8 @@ yarn build
 4. Test your changes
 5. Run linting and formatting
 6. Commit with descriptive messages
+7. Create pull request: `yarn pr:create`
+8. Open pull request in browser: `yarn pr:open`
 
 ## Code Quality Standards
 
@@ -274,7 +286,7 @@ The project uses path mapping for clean imports:
 ```typescript
 // ✅ Correct - Using path mapping
 import { config } from "~/config";
-import type { ProxyOptions } from "~/types";
+import type { ServerOptions } from "~/types";
 
 // ❌ Incorrect - Relative imports for project files
 import { config } from "../config";
@@ -318,11 +330,14 @@ Always use `import type` for type-only imports:
 
 ```typescript
 // ✅ Correct
-import type { McpProxy } from "mcp-proxy";
-import { createProxy } from "mcp-proxy";
+import type { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
 // ❌ Incorrect
-import { McpProxy, createProxy } from "mcp-proxy";
+import {
+  Server,
+  StdioServerTransport,
+} from "@modelcontextprotocol/sdk/server/index.js";
 ```
 
 ### Export Sorting
@@ -359,7 +374,7 @@ This project enforces strict JSON formatting rules using `eslint-plugin-jsonc`:
 ```json
 // ✅ Correct
 {
-  "description": "A lightweight MCP proxy",
+  "description": "A basic MCP stdio server",
   "name": "jobs-mcp-proxy",
   "version": "1.0.0"
 }
@@ -367,73 +382,105 @@ This project enforces strict JSON formatting rules using `eslint-plugin-jsonc`:
 // ❌ Incorrect
 {
   "version": "1.0.0",
-  "name": "jobs-mcp-proxy", "description": "A lightweight MCP proxy"
+  "name": "jobs-mcp-proxy", "description": "A basic MCP stdio server"
 }
 ```
 
-## MCP Proxy Development
+## MCP Server Development
 
-This project implements a lightweight MCP stdio proxy that forwards all client requests to a hosted Streamable HTTP MCP server.
+This project implements a basic MCP stdio server using the @modelcontextprotocol/sdk that provides a foundation for building MCP applications.
 
-### MCP Proxy Architecture
+### MCP Server Architecture
 
 #### Core Components
 
-1. **Main Entry Point** (`src/index.ts`) - Proxy initialization and startup
-2. **mcp-proxy Package** - Handles stdio to HTTP forwarding
-3. **Environment Configuration** - Target URL configuration
+1. **Main Entry Point** (`src/index.ts`) - MCP server initialization and startup
+2. **@modelcontextprotocol/sdk** - Official MCP SDK for server implementation
+3. **Environment Configuration** - Basic server configuration
 
-#### MCP Proxy Implementation
+#### MCP Server Implementation
 
-Use the mcp-proxy package for seamless forwarding:
+The current implementation provides a basic MCP server using the official SDK:
 
 ```typescript
-import { McpProxy } from "mcp-proxy";
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
-// ✅ Correct - Simple proxy setup
-const proxy = new McpProxy({
-  targetUrl: process.env.MCP_TARGET_URL || "http://localhost:3002/mcp",
-  stdio: true,
-});
+// ✅ Current implementation - Basic MCP server
+const server = new Server(
+  {
+    name: "jobs-mcp-proxy",
+    version: "1.0.0",
+  },
+  {
+    capabilities: {
+      tools: {},
+    },
+  }
+);
 
-await proxy.start();
+const transport = new StdioServerTransport();
+await server.connect(transport);
 ```
 
 ### Configuration
 
 #### Environment Variables
 
-- **MCP_TARGET_URL**: The URL of the hosted MCP server to forward requests to
+- **MCP_TARGET_URL**: Currently logged but not used in implementation
 - Default: `http://localhost:3002/mcp`
 
-#### Proxy Options
+#### Server Options
 
 ```typescript
-interface ProxyOptions {
-  targetUrl: string; // Target MCP server URL
-  stdio: boolean; // Use stdio transport
+interface ServerInfo {
+  name: string; // Server name
+  version: string; // Server version
+}
+
+interface ServerCapabilities {
+  tools: {}; // Tool capabilities (empty in basic implementation)
 }
 ```
 
-### Best Practices
+### Extending the Server
 
-#### 1. Keep It Simple
+#### 1. Adding Tools
 
-- Minimal configuration and setup
-- Focus on transparent forwarding
-- Avoid unnecessary complexity
+To extend this basic server with actual MCP tools:
 
-#### 2. Error Handling
+```typescript
+// Add tool registration
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
+  // Tool implementation logic
+  return {
+    content: [
+      {
+        type: "text",
+        text: "Tool response",
+      },
+    ],
+  };
+});
+```
 
-- Handle proxy startup errors gracefully
+#### 2. Adding Resources
+
+```typescript
+server.setRequestHandler(ListResourcesRequestSchema, async () => {
+  return {
+    resources: [
+      // Resource definitions
+    ],
+  };
+});
+```
+
+#### 3. Error Handling
+
+- Handle server startup errors gracefully
 - Log connection issues appropriately
 - Exit cleanly on failure
-
-#### 3. Environment Configuration
-
-- Use environment variables for configuration
-- Provide sensible defaults
-- Validate configuration on startup
 
 #### 4. Development
 
@@ -444,7 +491,7 @@ interface ProxyOptions {
 ### Development Commands
 
 ```bash
-# Start development proxy
+# Start development server
 yarn dev
 
 # Start with debugging
@@ -453,51 +500,50 @@ yarn dev:debug
 # Build for production
 yarn build
 
-# Start production proxy
+# Start production server
 yarn start
 ```
 
-### Testing the Proxy
+### Testing the Server
 
-Test your proxy with MCP clients:
+Test your MCP server with MCP clients:
 
 ```bash
-# Set target URL
-export MCP_TARGET_URL=http://your-hosted-mcp-server.com/mcp
-
-# Start proxy
+# Start the server
 yarn dev
 
-# Connect MCP client to the proxy stdio interface
+# Connect MCP client to the server stdio interface
+# The server will accept MCP protocol messages via stdin/stdout
 ```
 
-### Troubleshooting Proxy Issues
+### Troubleshooting Server Issues
 
 #### Common Problems
 
-1. **Connection Refused**: Check if target MCP server is running
-2. **Invalid Target URL**: Verify MCP_TARGET_URL environment variable
-3. **stdio Issues**: Ensure client is connecting to proxy stdio interface
-4. **Forwarding Errors**: Check network connectivity to target server
+1. **Server Startup Errors**: Check TypeScript compilation and dependencies
+2. **Transport Issues**: Ensure stdio transport is properly configured
+3. **Client Connection**: Verify client is using MCP protocol correctly
+4. **Message Handling**: Check request/response message formatting
 
 #### Debug Logging
 
-Enable debug logging for proxy operations:
+Enable debug logging for server operations:
 
 ```typescript
-console.error("Failed to start MCP proxy:", error);
+console.error(`Starting MCP stdio proxy, forwarding to: ${targetUrl}`);
+console.error("MCP proxy server started successfully");
 ```
 
 #### Health Checks
 
-Monitor proxy connectivity:
+Monitor server status:
 
 ```bash
-# Check if target server is accessible
-curl $MCP_TARGET_URL
-
-# Verify proxy startup
+# Verify server startup
 yarn dev
+
+# Check server process
+ps aux | grep node
 ```
 
 ## Environment Setup
@@ -516,7 +562,7 @@ yarn dev
 
 - Use `.env` file for environment variables (ignored by git)
 - Never commit sensitive information
-- Set `MCP_TARGET_URL` for the hosted MCP server
+- Set `MCP_TARGET_URL` if extending the server for proxy functionality
 
 ## Build and Deployment
 
@@ -589,8 +635,7 @@ yarn start
 
 ### Core Dependencies
 
-- **@modelcontextprotocol/sdk@1.17.2** - MCP protocol implementation
-- **mcp-proxy@^1.0.0** - MCP stdio to HTTP proxy package
+- **@modelcontextprotocol/sdk@1.17.3** - Official MCP protocol implementation
 
 ### Development Dependencies
 
@@ -609,7 +654,7 @@ yarn start
 
 ## Important Reminders
 
-**Lightweight MCP stdio proxy** for seamless forwarding to hosted HTTP MCP servers.
+**Basic MCP stdio server** foundation for building MCP applications.
 
 ### Development Standards
 
@@ -617,7 +662,7 @@ yarn start
 2. **Run comprehensive quality checks** - Always run linting, formatting, and type checking before committing
 3. **Follow TypeScript strict mode** - Provide explicit types and handle null/undefined cases
 4. **Use path mapping** - Import using `~/*` instead of relative paths for consistency
-5. **Keep it simple** - Focus on transparent proxy functionality
+5. **Keep it simple** - Focus on basic MCP server functionality
 
 ### Code Standards and Formatting
 
@@ -625,12 +670,12 @@ yarn start
 7. **Sort JSON keys** - All JSON objects must have alphabetically sorted keys
 8. **Use consistent formatting** - Follow Prettier rules for 80-character lines and 2-space indentation
 
-### Proxy Development Requirements
+### MCP Server Development Requirements
 
-9. **Configure target URL** - Always set MCP_TARGET_URL environment variable
-10. **Handle errors gracefully** - Implement proper error handling for proxy operations
-11. **Maintain simplicity** - Keep proxy logic minimal and focused on forwarding
-12. **Test connectivity** - Verify target server accessibility during development
+9. **Handle errors gracefully** - Implement proper error handling for server operations
+10. **Maintain simplicity** - Keep server logic minimal and focused on core functionality
+11. **Follow MCP protocol** - Ensure compliance with MCP specification
+12. **Test server functionality** - Verify server startup and basic protocol handling
 
 ## Quality Assurance Checklist
 
@@ -650,11 +695,11 @@ Before committing any changes, ensure:
 - [ ] TypeScript strict mode compliance (no implicit any)
 - [ ] Proper error handling and logging
 
-### Proxy Requirements
+### MCP Server Requirements
 
-- [ ] Target URL configuration is properly set
-- [ ] Proxy startup and error handling tested
-- [ ] Environment variable validation implemented
-- [ ] Connection to target server verified
+- [ ] Server startup and error handling tested
+- [ ] MCP protocol compliance verified
+- [ ] Server capabilities properly defined
+- [ ] Environment variable configuration documented
 
-Always follow these workflows to maintain code quality, simplicity, and reliable proxy functionality.
+Always follow these workflows to maintain code quality, simplicity, and reliable MCP server functionality.
