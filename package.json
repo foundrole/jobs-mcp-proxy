@@ -33,6 +33,18 @@
     "start": "node dist/src/index.js",
     "type-check": "tsc --noEmit"
   },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{json,jsonc}": [
+      "prettier --write"
+    ],
+    "*.md": [
+      "prettier --write"
+    ]
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.17.3",
     "mcp-proxy": "5.5.4"

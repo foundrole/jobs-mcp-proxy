@@ -96,6 +96,7 @@ export default [
   },
   {
     files: ["**/*.json", "**/*.json5", "**/*.jsonc"],
+    ignores: ["package.json"], // Let Prettier handle package.json formatting
     languageOptions: {
       parser: jsoncParser,
     },
@@ -111,12 +112,6 @@ export default [
   },
   prettier,
   {
-    ignores: [
-      "dist/**/*",
-      "node_modules/**/*",
-      "package.json",
-      "tsconfig.json",
-      "coverage/**/*",
-    ],
+    ignores: ["dist/**/*", "node_modules/**/*", "coverage/**/*"],
   },
 ];
