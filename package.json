@@ -1,26 +1,32 @@
 {
-  "name": "jobs-mcp-proxy",
+  "name": "@foundrole/ai-job-search-mcp",
   "version": "1.0.0",
-  "description": "A lightweight MCP stdio proxy server that seamlessly forwards all client requests to a hosted Streamable HTTP MCP server for efficient AI toolchain integration",
+  "description": "Easy-to-use MCP proxy server that connects AI assistants like Claude to job search services. Simply run with npx for instant job search capabilities in your AI conversations.",
   "keywords": [
     "mcp",
     "proxy",
-    "stdio",
     "jobs",
-    "ai-toolchain"
+    "job-search",
+    "ai-assistant",
+    "claude",
+    "foundrole",
+    "career"
   ],
-  "homepage": "https://github.com/bkbhub/jobs-mcp-proxy#readme",
+  "homepage": "https://github.com/foundrole/jobs-mcp-proxy#readme",
   "bugs": {
-    "url": "https://github.com/bkbhub/jobs-mcp-proxy/issues"
+    "url": "https://github.com/foundrole/jobs-mcp-proxy/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bkbhub/jobs-mcp-proxy.git"
+    "url": "git+https://github.com/foundrole/jobs-mcp-proxy.git"
   },
   "license": "ISC",
-  "author": "",
+  "author": "FoundRole <dev@foundrole.com>",
   "type": "module",
-  "main": "dist/src/index.js",
+  "main": "dist/index.js",
+  "bin": {
+    "ai-job-search-mcp": "./bin/ai-job-search-mcp.js"
+  },
   "scripts": {
     "build": "tsc && tsc-alias",
     "dev": "nodemon --exec \"node --import=tsx/esm src/index.ts\"",
@@ -28,8 +34,10 @@
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "prepare": "husky",
+    "prepublishOnly": "yarn build",
     "prettier:check": "prettier . --check",
     "prettier:write": "prettier . --write",
+    "publish:npm": "npm publish --access public",
     "start": "node dist/src/index.js",
     "type-check": "tsc --noEmit"
   },
