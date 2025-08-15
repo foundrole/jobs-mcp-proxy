@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+echo "🔍 Storing uncommitted changes..."
+STASH_NAME="pre-commit-$(date +%s)"
+# Check both tracked and untracked files, excluding .git directory
+if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --others --exclude-standard)" ]; then
+  git stash push -q --include-untracked --keep-index -m "$STASH_NAME" -- ':!:.git/*'
+fi
+
+# define a function to restore the stash
+restore_and_exit() {
+  local exit_code=$1
+  echo "♻️  Restoring stashed changes..."
+  if [ -n "$(git stash list | grep "$STASH_NAME")" ]; then
+    git stash pop -q
+  fi
+  exit $exit_code
+}
+
+# trap Ctrl+C and any script exit
+trap 'restore_and_exit $?' EXIT
+trap 'echo ""; echo "⚠️  Interrupt detected..."' INT
+
+echo "🚀 Running pre-commit checks..."
+
+echo ""; echo "🔧 Running TypeScript check..."
+yarn type-check || { echo "❌ TypeScript check failed"; exit 1; }
+
+echo ""; echo "💄 Checking code formatting..."
+yarn prettier:check || { echo "❌ Prettier check failed"; exit 1; }
+
+echo ""; echo "🔍 Running linter..."
+yarn lint || { echo "❌ Linter check failed"; exit 1; }
+
+echo ""; echo "🏗️  Checking build..."
+yarn build || { echo "❌ Build check failed"; exit 1; }
+
+echo ""; echo "✅ All checks passed"
+exit 0

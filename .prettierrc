@@ -1,0 +1,8 @@
+{
+  "plugins": ["prettier-plugin-packagejson"],
+  "printWidth": 80,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "bracketSameLine": true,
+  "endOfLine": "lf"
+}
