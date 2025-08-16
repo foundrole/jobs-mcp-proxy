@@ -154,7 +154,7 @@ yarn test:coverage
 yarn test:watch
 
 # Run specific test file
-yarn test tests/simple.test.ts
+yarn test tests/basic.test.ts
 ```
 
 **Test Coverage:**
