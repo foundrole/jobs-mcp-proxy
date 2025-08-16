@@ -32,6 +32,9 @@ yarn prettier:check || { echo "❌ Prettier check failed"; exit 1; }
 echo ""; echo "🔍 Running linter..."
 yarn lint || { echo "❌ Linter check failed"; exit 1; }
 
+echo ""; echo "🧪 Running tests..."
+yarn test || { echo "❌ Tests failed"; exit 1; }
+
 echo ""; echo "🏗️  Checking build..."
 yarn build || { echo "❌ Build check failed"; exit 1; }
 

@@ -137,7 +137,47 @@ Once you have job search working in your AI assistant:
 3. **Get application help** - Use your AI to tailor resumes and cover letters
 4. **Interview preparation** - Practice with AI-generated questions based on job descriptions
 
-## 🚀 For Developers - Publishing
+## 🚀 For Developers
+
+### Testing
+
+The project includes comprehensive testing with coverage reporting:
+
+```bash
+# Run all tests
+yarn test
+
+# Run tests with coverage
+yarn test:coverage
+
+# Run tests in watch mode (during development)
+yarn test:watch
+
+# Run specific test file
+yarn test tests/simple.test.ts
+```
+
+**Test Coverage:**
+
+- Unit tests for configuration handling
+- Integration tests for CLI functionality
+- Environment variable testing
+- Package validation tests
+
+### Code Quality
+
+Before committing, run the full quality check:
+
+```bash
+# Run all quality checks (auto-runs in pre-commit hook)
+yarn type-check  # TypeScript validation
+yarn prettier:write  # Code formatting
+yarn lint:fix  # ESLint fixes
+yarn test  # Test suite
+yarn build  # Compilation check
+```
+
+### Publishing
 
 To publish this package to npm:
 
@@ -149,7 +189,7 @@ npm login
 yarn publish:npm
 
 # Or manually:
-yarn build
+yarn test && yarn build
 npm publish --access public
 ```
 

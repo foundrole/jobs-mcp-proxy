@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "../src",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "paths": {
+      "~/*": ["./*"]
+    },
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ES2022",
+    "typeRoots": ["../node_modules/@types", "./types"],
+    "types": ["node", "jest"]
+  },
+  "exclude": [],
+  "include": ["**/*", "../src/**/*", "./types/**/*"]
+}
