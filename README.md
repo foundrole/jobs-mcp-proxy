@@ -113,7 +113,7 @@ Once connected, you can ask your AI assistant questions like:
 
 **"Command not found" error:**
 
-- Make sure you have Node.js installed (version 18 or higher)
+- Make sure you have Node.js installed (version 22.17.0 or higher)
 - Try: `npm install -g @foundrole/ai-job-search-mcp` then `ai-job-search-mcp`
 
 **Claude Desktop not detecting the server:**
