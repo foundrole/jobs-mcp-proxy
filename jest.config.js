@@ -46,5 +46,4 @@ export default {
   // Enhanced error handling and debugging
   errorOnDeprecated: true,
   detectOpenHandles: true,
-  forceExit: true,
 };

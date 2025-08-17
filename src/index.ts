@@ -7,11 +7,11 @@ export interface ProxyConfig {
 
 export function getProxyConfig(): ProxyConfig {
   const envTargetUrl = process.env.MCP_TARGET_URL;
-  const targetUrl =
-    envTargetUrl && envTargetUrl.trim() !== ""
-      ? envTargetUrl
-      : "https://www.foundrole.com/mcp";
-  const debugMode = Boolean(envTargetUrl && envTargetUrl.trim() !== "");
+  const hasCustomUrl = !!(envTargetUrl && envTargetUrl.trim());
+  const targetUrl = hasCustomUrl
+    ? envTargetUrl
+    : "https://www.foundrole.com/mcp";
+  const debugMode = hasCustomUrl;
 
   return {
     debugMode,
