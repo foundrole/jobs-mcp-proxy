@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 // Find package.json by trying multiple search strategies
-function findPackageJson(): string {
+export function findPackageJson(): string {
   // Strategy 1: Try current working directory (works for local development)
   const cwdPath = path.resolve(process.cwd(), "package.json");
   if (fs.existsSync(cwdPath)) {
@@ -36,12 +36,22 @@ function findPackageJson(): string {
   throw new Error("package.json not found - using fallback values");
 }
 
-function getPackageInfo(): { name: string; version: string } {
+export function getPackageInfo(): { name: string; version: string } {
   try {
     const pkgJsonPath = findPackageJson();
-    return JSON.parse(fs.readFileSync(pkgJsonPath, "utf-8")) as {
-      name: string;
-      version: string;
+    const pkg = JSON.parse(fs.readFileSync(pkgJsonPath, "utf-8")) as any;
+
+    // Return only name and version, fall back to defaults if missing
+    if (!pkg.name || !pkg.version) {
+      return {
+        name: "@foundrole/ai-job-search-mcp",
+        version: "1.0.0",
+      };
+    }
+
+    return {
+      name: pkg.name,
+      version: pkg.version,
     };
   } catch {
     // Fallback to hardcoded values when package.json cannot be found
