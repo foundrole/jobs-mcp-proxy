@@ -1,6 +1,6 @@
 {
   "name": "@foundrole/ai-job-search-mcp",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Easy-to-use MCP proxy server that connects AI assistants like Claude to job search services. Simply run with npx for instant job search capabilities in your AI conversations.",
   "keywords": [
     "mcp",
@@ -27,6 +27,10 @@
   "bin": {
     "ai-job-search-mcp": "bin/ai-job-search-mcp.js"
   },
+  "files": [
+    "bin",
+    "dist"
+  ],
   "scripts": {
     "build": "tsc && tsc-alias",
     "dev": "nodemon --exec \"node --import=tsx/esm src/cli.ts\"",

@@ -97,7 +97,7 @@ describe("client-detector Tests", () => {
         version: "1.0.0",
       });
       expect(console.error).toHaveBeenCalledWith(
-        "[CLIENT-DETECTOR] Parent process 12345 not found"
+        "[CLIENT-DETECTOR] Process 12345 not found at depth 0"
       );
     });
 
@@ -258,7 +258,7 @@ describe("client-detector Tests", () => {
         version: "1.0.0",
       });
       expect(console.error).toHaveBeenCalledWith(
-        "[CLIENT-DETECTOR] Error looking up parent process: Error: Process lookup failed"
+        "[CLIENT-DETECTOR] Error during traversal at depth 0: Error: Process lookup failed"
       );
     });
   });
