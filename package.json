@@ -27,6 +27,10 @@
   "bin": {
     "ai-job-search-mcp": "bin/ai-job-search-mcp.js"
   },
+  "files": [
+    "bin",
+    "dist"
+  ],
   "scripts": {
     "build": "tsc && tsc-alias",
     "dev": "nodemon --exec \"node --import=tsx/esm src/cli.ts\"",

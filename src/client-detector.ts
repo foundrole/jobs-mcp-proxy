@@ -225,6 +225,134 @@ async function identifyClientFromProcess(
 }
 
 /**
+ * Checks if a process is likely an intermediary (package manager, runtime, shell, etc.)
+ * that we should skip when looking for the real MCP client
+ */
+function isIntermediaryProcess(process: ProcessInfo): boolean {
+  const { cmd, name } = process;
+
+  // Common intermediary process names
+  const intermediaryNames = [
+    "npm",
+    "npx",
+    "yarn",
+    "pnpm",
+    "bun",
+    "node",
+    "deno",
+    "sh",
+    "bash",
+    "zsh",
+    "fish",
+    "launchd",
+    "systemd",
+    "init",
+    "exec",
+    "spawn",
+  ];
+
+  // Check process name
+  const lowerName = name.toLowerCase();
+  if (intermediaryNames.some((inter) => lowerName.includes(inter))) {
+    return true;
+  }
+
+  // Check command line for package manager patterns
+  const lowerCmd = cmd.toLowerCase();
+  if (
+    lowerCmd.includes("npm exec") ||
+    lowerCmd.includes("npx ") ||
+    lowerCmd.includes("yarn exec") ||
+    lowerCmd.includes("pnpm exec")
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Traverses up the process tree to find the real MCP client,
+ * skipping intermediary processes like npm, npx, node, etc.
+ */
+async function findRealClient(
+  currentPid: number,
+  depth: number = 0
+): Promise<ClientInfo> {
+  const MAX_DEPTH = 5; // Prevent infinite traversal
+
+  if (depth >= MAX_DEPTH) {
+    console.error(
+      `[CLIENT-DETECTOR] Reached max traversal depth ${MAX_DEPTH}, using fallback`
+    );
+    return {
+      name: PROXY_NAME,
+      version: PROXY_VERSION,
+    };
+  }
+
+  try {
+    console.error(
+      `[CLIENT-DETECTOR] Traversing process tree, depth ${depth}, PID: ${currentPid}`
+    );
+
+    const processes = await ((findProcess as any).default ?? findProcess)(
+      "pid",
+      currentPid
+    );
+
+    if (processes.length === 0) {
+      console.error(
+        `[CLIENT-DETECTOR] Process ${currentPid} not found at depth ${depth}`
+      );
+      return {
+        name: PROXY_NAME,
+        version: PROXY_VERSION,
+      };
+    }
+
+    const currentProcess = processes[0] as ProcessInfo;
+    console.error(
+      `[CLIENT-DETECTOR] Found process: ${currentProcess.name} (${currentProcess.cmd})`
+    );
+
+    // Check if this is an intermediary process we should skip
+    if (isIntermediaryProcess(currentProcess)) {
+      console.error(
+        `[CLIENT-DETECTOR] Process '${currentProcess.name}' is intermediary, checking parent`
+      );
+
+      if (!currentProcess.ppid) {
+        console.error(
+          `[CLIENT-DETECTOR] No parent PID available for intermediary process`
+        );
+        return {
+          name: PROXY_NAME,
+          version: PROXY_VERSION,
+        };
+      }
+
+      // Recursively check parent process
+      return await findRealClient(currentProcess.ppid, depth + 1);
+    }
+
+    // This looks like a real client process
+    console.error(
+      `[CLIENT-DETECTOR] Found real client process: ${currentProcess.name}`
+    );
+    return await identifyClientFromProcess(currentProcess);
+  } catch (error) {
+    console.error(
+      `[CLIENT-DETECTOR] Error during traversal at depth ${depth}: ${String(error)}`
+    );
+    return {
+      name: PROXY_NAME,
+      version: PROXY_VERSION,
+    };
+  }
+}
+
+/**
  * Extracts original client info from parent process
  */
 export async function extractClientInfoFromParent(): Promise<ClientInfo> {
@@ -238,33 +366,10 @@ export async function extractClientInfoFromParent(): Promise<ClientInfo> {
     };
   }
 
-  try {
-    console.error(
-      `[CLIENT-DETECTOR] Looking up parent process PID: ${parentPid}`
-    );
-    // Handle CJS/ESM module interoperability - findProcess may be default export or named export
-    const processes = await ((findProcess as any).default ?? findProcess)(
-      "pid",
-      parentPid
-    );
+  console.error(
+    `[CLIENT-DETECTOR] Looking up parent process PID: ${parentPid}`
+  );
 
-    if (processes.length === 0) {
-      console.error(`[CLIENT-DETECTOR] Parent process ${parentPid} not found`);
-      return {
-        name: PROXY_NAME,
-        version: PROXY_VERSION,
-      };
-    }
-
-    const parentProcess = processes[0] as ProcessInfo;
-    return await identifyClientFromProcess(parentProcess);
-  } catch (error) {
-    console.error(
-      `[CLIENT-DETECTOR] Error looking up parent process: ${String(error)}`
-    );
-    return {
-      name: PROXY_NAME,
-      version: PROXY_VERSION,
-    };
-  }
+  // Use the new traversal logic to find the real client
+  return await findRealClient(parentPid);
 }
