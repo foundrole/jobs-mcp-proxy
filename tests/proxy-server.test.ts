@@ -1,423 +1,817 @@
 /**
- * Integration tests for MCP proxy server startup and connection handling
- * Tests server lifecycle, connection management, and integration with mcp-proxy library
+ * proxy-server functionality tests
+ * Tests MCP request/response proxying with comprehensive coverage
  */
 
+// @ts-nocheck - Complex mocking scenarios with MCP SDK types
+
 import {
+  afterEach,
+  beforeEach,
   describe,
   expect,
-  test,
-  beforeEach,
-  afterEach,
   jest,
+  test,
 } from "@jest/globals";
 
-// Mock the mcp-proxy module before importing our code
-jest.mock("mcp-proxy", () => ({
-  ServerType: {
-    HTTPStream: "HTTPStream",
+// Create mock implementations using jest.fn with manual implementation
+const mockClient = {
+  callTool: jest.fn(async () => ({
+    content: [{ text: "Tool response", type: "text" }],
+  })),
+  complete: jest.fn(async () => ({
+    completion: {
+      hasMore: false,
+      total: 1,
+      values: ["test completion"],
+    },
+  })),
+  getPrompt: jest.fn(async () => ({
+    messages: [
+      { content: { text: "Test prompt", type: "text" }, role: "user" },
+    ],
+  })),
+  listPrompts: jest.fn(async () => ({
+    prompts: [{ description: "Test prompt", name: "test-prompt" }],
+  })),
+  listResources: jest.fn(async () => ({
+    resources: [{ name: "Test Resource", uri: "test://resource" }],
+  })),
+  listResourceTemplates: jest.fn(async () => ({
+    resourceTemplates: [{ name: "Test Template", uriTemplate: "test://{id}" }],
+  })),
+  listTools: jest.fn(async () => ({
+    tools: [{ description: "Test tool", name: "test-tool" }],
+  })),
+  notification: jest.fn(async () => void 0),
+  readResource: jest.fn(async () => ({
+    contents: [{ text: "Resource content", type: "text" }],
+  })),
+  setNotificationHandler: jest.fn(),
+  subscribeResource: jest.fn(async () => ({})),
+  unsubscribeResource: jest.fn(async () => ({})),
+} as unknown as Client;
+
+const mockServer = {
+  notification: jest.fn(async () => void 0),
+  setNotificationHandler: jest.fn(),
+  setRequestHandler: jest.fn(),
+} as any;
+
+// Mock the schema imports
+jest.mock("@modelcontextprotocol/sdk/types.js", () => ({
+  CallToolRequestSchema: { method: "tools/call", type: "request" },
+  CompleteRequestSchema: { method: "completion/complete", type: "request" },
+  GetPromptRequestSchema: { method: "prompts/get", type: "request" },
+  ListPromptsRequestSchema: { method: "prompts/list", type: "request" },
+  ListResourcesRequestSchema: { method: "resources/list", type: "request" },
+  ListResourceTemplatesRequestSchema: {
+    method: "resources/templates/list",
+    type: "request",
   },
-  startStdioServer: jest.fn(),
+  ListToolsRequestSchema: { method: "tools/list", type: "request" },
+  LoggingMessageNotificationSchema: {
+    method: "notifications/message",
+    type: "notification",
+  },
+  ReadResourceRequestSchema: { method: "resources/read", type: "request" },
+  ResourceUpdatedNotificationSchema: {
+    method: "notifications/resources/updated",
+    type: "notification",
+  },
+  SubscribeRequestSchema: { method: "resources/subscribe", type: "request" },
+  UnsubscribeRequestSchema: {
+    method: "resources/unsubscribe",
+    type: "request",
+  },
 }));
 
-import { startProxy } from "~/index";
-
+import type { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import {
-  cleanupTestEnvironment,
-  ConsoleCapture,
-  createMockStdioServer,
-  createTestEnvironment,
-  createTestProxyConfig,
-  delay,
-  delayedReject,
-  TEST_ERROR_MESSAGES,
-  TEST_URLS,
-} from "./utils/test-helpers";
+  CallToolRequestSchema,
+  CompleteRequestSchema,
+  GetPromptRequestSchema,
+  ListPromptsRequestSchema,
+  ListResourcesRequestSchema,
+  ListResourceTemplatesRequestSchema,
+  ListToolsRequestSchema,
+  LoggingMessageNotificationSchema,
+  ReadResourceRequestSchema,
+  ResourceUpdatedNotificationSchema,
+  SubscribeRequestSchema,
+  UnsubscribeRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
 
-// Mock the mcp-proxy module
-jest.unstable_mockModule("mcp-proxy", () => {
-  const mockStdioServer = createMockStdioServer();
-  return {
-    ServerType: mockStdioServer.mockServerType,
-    startStdioServer: mockStdioServer.mockStartStdioServer,
-  };
-});
+import { proxyServer } from "../src/proxy-server.js";
 
-describe("MCP Proxy Server", () => {
-  let consoleCapture: ConsoleCapture;
-  let mockStartStdioServer: jest.MockedFunction<any>;
-  let mockServerType: { HTTPStream: string };
-
-  beforeEach(async () => {
-    // Import the mocked module
-    const mcpProxy = await import("mcp-proxy");
-    mockStartStdioServer =
-      mcpProxy.startStdioServer as jest.MockedFunction<any>;
-    mockServerType = mcpProxy.ServerType as { HTTPStream: string };
-
-    consoleCapture = new ConsoleCapture();
-    consoleCapture.start();
-
-    // Clean up environment variables
-    cleanupTestEnvironment(["MCP_TARGET_URL"]);
-
-    // Reset all mocks
+describe("proxy-server Tests", () => {
+  beforeEach(() => {
     jest.clearAllMocks();
+
+    // Restore mock implementations after clear
+    (mockClient.getPrompt as jest.Mock).mockImplementation(async () => ({
+      messages: [
+        { content: { text: "Test prompt", type: "text" }, role: "user" },
+      ],
+    }));
+    (mockClient.listPrompts as jest.Mock).mockImplementation(async () => ({
+      prompts: [{ description: "Test prompt", name: "test-prompt" }],
+    }));
+    (mockClient.listResources as jest.Mock).mockImplementation(async () => ({
+      resources: [{ name: "Test Resource", uri: "test://resource" }],
+    }));
+    (mockClient.readResource as jest.Mock).mockImplementation(async () => ({
+      contents: [{ text: "Resource content", type: "text" }],
+    }));
+    (mockClient.subscribeResource as jest.Mock).mockImplementation(
+      async () => ({})
+    );
+    (mockClient.callTool as jest.Mock).mockImplementation(async () => ({
+      content: [{ text: "Tool response", type: "text" }],
+    }));
+    (mockClient.listTools as jest.Mock).mockImplementation(async () => ({
+      tools: [{ description: "Test tool", name: "test-tool" }],
+    }));
+    (mockClient.complete as jest.Mock).mockImplementation(async () => ({
+      completion: {
+        hasMore: false,
+        total: 1,
+        values: ["test completion"],
+      },
+    }));
   });
 
   afterEach(() => {
-    consoleCapture.stop();
+    jest.clearAllMocks();
   });
 
-  describe("startProxy", () => {
-    test("successfully starts proxy server with default configuration", async () => {
-      mockStartStdioServer.mockResolvedValue(undefined);
+  describe("Logging Capabilities", () => {
+    test("sets up logging handlers when logging capability is present", async () => {
+      const serverCapabilities = { logging: {} };
 
-      const config = createTestProxyConfig();
-      await startProxy(config);
-
-      expect(mockStartStdioServer).toHaveBeenCalledWith({
-        serverType: mockServerType.HTTPStream,
-        url: TEST_URLS.DEFAULT,
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
       });
 
-      const errorOutput = consoleCapture.getErrorOutput();
-      expect(errorOutput).toContain(
-        "Starting ai-job-search-mcp (stdio -> HTTPStream)"
+      expect(mockServer.setNotificationHandler).toHaveBeenCalledWith(
+        LoggingMessageNotificationSchema,
+        expect.any(Function)
       );
-      expect(errorOutput).toContain(`Target URL: ${TEST_URLS.DEFAULT}`);
-      expect(errorOutput).toContain("Debug mode: disabled");
-      expect(errorOutput).toContain(
-        "AI Job Search MCP server started successfully"
-      );
-      expect(errorOutput).toContain(
-        "Ready to accept MCP client connections via stdio"
+      expect(mockClient.setNotificationHandler).toHaveBeenCalledWith(
+        LoggingMessageNotificationSchema,
+        expect.any(Function)
       );
     });
 
-    test("successfully starts proxy server with custom configuration", async () => {
-      mockStartStdioServer.mockResolvedValue(undefined);
+    test("server logging handler forwards to client", async () => {
+      const serverCapabilities = { logging: {} };
 
-      const customConfig = createTestProxyConfig({
-        debugMode: true,
-        targetUrl: TEST_URLS.LOCALHOST,
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
       });
 
-      await startProxy(customConfig);
+      // Get the handler function that was registered
+      const serverLogHandler = (
+        mockServer.setNotificationHandler as jest.Mock
+      ).mock.calls.find(
+        (call: any[]) => call[0] === LoggingMessageNotificationSchema
+      )?.[1];
 
-      expect(mockStartStdioServer).toHaveBeenCalledWith({
-        serverType: mockServerType.HTTPStream,
-        url: TEST_URLS.LOCALHOST,
+      expect(serverLogHandler).toBeDefined();
+
+      // Test the handler
+      const logArgs = {
+        method: "notifications/message",
+        params: { level: "info", message: "test" },
+      };
+      await (serverLogHandler as any)(logArgs);
+
+      expect(mockClient.notification).toHaveBeenCalledWith(logArgs);
+    });
+
+    test("client logging handler forwards to server", async () => {
+      const serverCapabilities = { logging: {} };
+
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
       });
 
-      const errorOutput = consoleCapture.getErrorOutput();
-      expect(errorOutput).toContain(
-        "Starting ai-job-search-mcp (stdio -> HTTPStream)"
-      );
-      expect(errorOutput).toContain(`Target URL: ${TEST_URLS.LOCALHOST}`);
-      expect(errorOutput).toContain("Debug mode: enabled");
-      expect(errorOutput).toContain(
-        "AI Job Search MCP server started successfully"
-      );
+      // Get the handler function that was registered
+      const clientLogHandler = (
+        mockClient.setNotificationHandler as jest.Mock
+      ).mock.calls.find(
+        (call: any[]) => call[0] === LoggingMessageNotificationSchema
+      )?.[1];
+
+      expect(clientLogHandler).toBeDefined();
+
+      // Test the handler
+      const logArgs = {
+        method: "notifications/message",
+        params: { level: "error", message: "test error" },
+      };
+      await (clientLogHandler as any)(logArgs);
+
+      expect(mockServer.notification).toHaveBeenCalledWith(logArgs);
     });
 
-    test("logs appropriate messages for debug mode enabled", async () => {
-      mockStartStdioServer.mockResolvedValue(undefined);
+    test("does not set up logging handlers when logging capability is absent", async () => {
+      const serverCapabilities = {};
 
-      const debugConfig = createTestProxyConfig({
-        debugMode: true,
-        targetUrl: TEST_URLS.SECURE,
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
       });
 
-      await startProxy(debugConfig);
-
-      const errorOutput = consoleCapture.getErrorOutput();
-      expect(errorOutput).toContain("Debug mode: enabled");
-      expect(errorOutput).toContain(`Target URL: ${TEST_URLS.SECURE}`);
-    });
-
-    test("logs appropriate messages for debug mode disabled", async () => {
-      mockStartStdioServer.mockResolvedValue(undefined);
-
-      const config = createTestProxyConfig({
-        debugMode: false,
-        targetUrl: TEST_URLS.DEFAULT,
-      });
-
-      await startProxy(config);
-
-      const errorOutput = consoleCapture.getErrorOutput();
-      expect(errorOutput).toContain("Debug mode: disabled");
-    });
-
-    test("handles connection failures gracefully", async () => {
-      const connectionError = new Error(TEST_ERROR_MESSAGES.CONNECTION_FAILED);
-      mockStartStdioServer.mockRejectedValue(connectionError);
-
-      const config = createTestProxyConfig();
-
-      await expect(startProxy(config)).rejects.toThrow(
-        TEST_ERROR_MESSAGES.CONNECTION_FAILED
-      );
-
-      const errorOutput = consoleCapture.getErrorOutput();
-      expect(errorOutput).toContain("Failed to connect to target MCP server:");
-      expect(errorOutput).toContain(
-        `Please check that the target server at ${config.targetUrl} is accessible`
-      );
-      expect(errorOutput).toContain(
-        "For debugging, try setting MCP_TARGET_URL to a local server"
-      );
-    });
-
-    test("handles network timeout errors", async () => {
-      const timeoutError = new Error(TEST_ERROR_MESSAGES.TIMEOUT);
-      mockStartStdioServer.mockRejectedValue(timeoutError);
-
-      const config = createTestProxyConfig();
-
-      await expect(startProxy(config)).rejects.toThrow(
-        TEST_ERROR_MESSAGES.TIMEOUT
-      );
-
-      const errorOutput = consoleCapture.getErrorOutput();
-      expect(errorOutput).toContain("Failed to connect to target MCP server:");
-      expect(errorOutput).toContain(TEST_ERROR_MESSAGES.TIMEOUT);
-    });
-
-    test("handles server unreachable errors", async () => {
-      const unreachableError = new Error(
-        TEST_ERROR_MESSAGES.SERVER_UNREACHABLE
-      );
-      mockStartStdioServer.mockRejectedValue(unreachableError);
-
-      const config = createTestProxyConfig();
-
-      await expect(startProxy(config)).rejects.toThrow(
-        TEST_ERROR_MESSAGES.SERVER_UNREACHABLE
-      );
-    });
-
-    test("preserves original error when connection fails", async () => {
-      const originalError = new Error("ECONNREFUSED");
-      mockStartStdioServer.mockRejectedValue(originalError);
-
-      const config = createTestProxyConfig();
-
-      await expect(startProxy(config)).rejects.toBe(originalError);
-    });
-
-    test("calls startStdioServer with correct parameters", async () => {
-      mockStartStdioServer.mockResolvedValue(undefined);
-
-      const config = createTestProxyConfig({
-        targetUrl: "https://custom.example.com/mcp",
-      });
-
-      await startProxy(config);
-
-      expect(mockStartStdioServer).toHaveBeenCalledTimes(1);
-      expect(mockStartStdioServer).toHaveBeenCalledWith({
-        serverType: mockServerType.HTTPStream,
-        url: "https://custom.example.com/mcp",
-      });
-    });
-
-    test("handles URL with query parameters correctly", async () => {
-      mockStartStdioServer.mockResolvedValue(undefined);
-
-      const urlWithQuery =
-        "https://api.example.com/mcp?token=abc123&debug=true";
-      const config = createTestProxyConfig({
-        targetUrl: urlWithQuery,
-      });
-
-      await startProxy(config);
-
-      expect(mockStartStdioServer).toHaveBeenCalledWith({
-        serverType: mockServerType.HTTPStream,
-        url: urlWithQuery,
-      });
-    });
-
-    test("handles startup delay gracefully", async () => {
-      // Simulate a slow startup
-      mockStartStdioServer.mockImplementation(() => delay(100));
-
-      const config = createTestProxyConfig();
-      const startTime = Date.now();
-
-      await startProxy(config);
-
-      const endTime = Date.now();
-      expect(endTime - startTime).toBeGreaterThanOrEqual(100);
-
-      const errorOutput = consoleCapture.getErrorOutput();
-      expect(errorOutput).toContain(
-        "AI Job Search MCP server started successfully"
-      );
-    });
-
-    test("handles rejection after delay", async () => {
-      const error = new Error("Delayed failure");
-      mockStartStdioServer.mockImplementation(() => delayedReject(50, error));
-
-      const config = createTestProxyConfig();
-
-      await expect(startProxy(config)).rejects.toThrow("Delayed failure");
-
-      const errorOutput = consoleCapture.getErrorOutput();
-      expect(errorOutput).toContain("Failed to connect to target MCP server:");
-    });
-  });
-
-  describe("error message formatting", () => {
-    test("includes target URL in error messages", async () => {
-      const error = new Error("Connection refused");
-      mockStartStdioServer.mockRejectedValue(error);
-
-      const customUrl = "https://custom.example.com/mcp";
-      const config = createTestProxyConfig({ targetUrl: customUrl });
-
-      await expect(startProxy(config)).rejects.toThrow("Connection refused");
-
-      const errorOutput = consoleCapture.getErrorOutput();
-      expect(errorOutput).toContain(
-        `Please check that the target server at ${customUrl} is accessible`
-      );
-    });
-
-    test("provides debugging guidance in error messages", async () => {
-      const error = new Error("Network error");
-      mockStartStdioServer.mockRejectedValue(error);
-
-      const config = createTestProxyConfig();
-
-      await expect(startProxy(config)).rejects.toThrow("Network error");
-
-      const errorOutput = consoleCapture.getErrorOutput();
-      expect(errorOutput).toContain(
-        "For debugging, try setting MCP_TARGET_URL to a local server"
-      );
-    });
-
-    test("logs complete error information", async () => {
-      const detailedError = new Error(
-        "Detailed connection error with stack trace"
-      );
-      mockStartStdioServer.mockRejectedValue(detailedError);
-
-      const config = createTestProxyConfig();
-
-      await expect(startProxy(config)).rejects.toThrow(
-        "Detailed connection error with stack trace"
-      );
-
-      const errorOutput = consoleCapture.getErrorOutput();
-      expect(errorOutput).toContain("Failed to connect to target MCP server:");
-      expect(errorOutput).toContain(
-        "Detailed connection error with stack trace"
+      // Should not have set logging handlers
+      expect(mockServer.setNotificationHandler).not.toHaveBeenCalledWith(
+        LoggingMessageNotificationSchema,
+        expect.any(Function)
       );
     });
   });
 
-  describe("server type configuration", () => {
-    test("always uses HTTPStream server type", async () => {
-      mockStartStdioServer.mockResolvedValue(undefined);
+  describe("Prompts Capabilities", () => {
+    test("sets up prompt handlers when prompts capability is present", async () => {
+      const serverCapabilities = { prompts: {} };
 
-      const config = createTestProxyConfig();
-      await startProxy(config);
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
+      });
 
-      expect(mockStartStdioServer).toHaveBeenCalledWith({
-        serverType: mockServerType.HTTPStream,
-        url: config.targetUrl,
+      expect(mockServer.setRequestHandler).toHaveBeenCalledWith(
+        GetPromptRequestSchema,
+        expect.any(Function)
+      );
+      expect(mockServer.setRequestHandler).toHaveBeenCalledWith(
+        ListPromptsRequestSchema,
+        expect.any(Function)
+      );
+    });
+
+    test("getPrompt handler forwards to client", async () => {
+      const serverCapabilities = { prompts: {} };
+
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
+      });
+
+      const getPromptHandler = (
+        mockServer.setRequestHandler as jest.Mock
+      ).mock.calls.find(
+        (call: any[]) => call[0] === GetPromptRequestSchema
+      )?.[1];
+
+      expect(getPromptHandler).toBeDefined();
+
+      const promptArgs = { params: { arguments: {}, name: "test-prompt" } };
+      const result = await (getPromptHandler as any)(promptArgs);
+
+      expect(mockClient.getPrompt).toHaveBeenCalledWith(promptArgs.params);
+      expect(result).toEqual({
+        messages: [
+          { content: { text: "Test prompt", type: "text" }, role: "user" },
+        ],
       });
     });
 
-    test("server type is not affected by configuration", async () => {
-      mockStartStdioServer.mockResolvedValue(undefined);
+    test("listPrompts handler forwards to client", async () => {
+      const serverCapabilities = { prompts: {} };
 
-      const configs = [
-        createTestProxyConfig({ debugMode: true }),
-        createTestProxyConfig({ debugMode: false }),
-        createTestProxyConfig({ targetUrl: TEST_URLS.LOCALHOST }),
-        createTestProxyConfig({ targetUrl: TEST_URLS.SECURE }),
-      ];
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
+      });
 
-      for (const config of configs) {
-        jest.clearAllMocks();
-        await startProxy(config);
+      const listPromptsHandler = (
+        mockServer.setRequestHandler as jest.Mock
+      ).mock.calls.find(
+        (call: any[]) => call[0] === ListPromptsRequestSchema
+      )?.[1];
 
-        expect(mockStartStdioServer).toHaveBeenCalledWith({
-          serverType: mockServerType.HTTPStream,
-          url: config.targetUrl,
-        });
-      }
+      expect(listPromptsHandler).toBeDefined();
+
+      const listArgs = { params: { cursor: "test" } };
+      const result = await (listPromptsHandler as any)(listArgs);
+
+      expect(mockClient.listPrompts).toHaveBeenCalledWith(listArgs.params);
+      expect(result).toEqual({
+        prompts: [{ description: "Test prompt", name: "test-prompt" }],
+      });
+    });
+
+    test("does not set up prompt handlers when prompts capability is absent", async () => {
+      const serverCapabilities = {};
+
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
+      });
+
+      expect(mockServer.setRequestHandler).not.toHaveBeenCalledWith(
+        GetPromptRequestSchema,
+        expect.any(Function)
+      );
+      expect(mockServer.setRequestHandler).not.toHaveBeenCalledWith(
+        ListPromptsRequestSchema,
+        expect.any(Function)
+      );
     });
   });
 
-  describe("console output validation", () => {
-    test("all console output goes to stderr", async () => {
-      mockStartStdioServer.mockResolvedValue(undefined);
+  describe("Resources Capabilities", () => {
+    test("sets up basic resource handlers when resources capability is present", async () => {
+      const serverCapabilities = { resources: {} };
 
-      const config = createTestProxyConfig();
-      await startProxy(config);
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
+      });
 
-      // All output should be in error stream (stderr)
-      expect(consoleCapture.getErrorOutput().length).toBeGreaterThan(0);
-      expect(consoleCapture.getLogOutput().length).toBe(0);
-    });
-
-    test("startup messages are in correct order", async () => {
-      mockStartStdioServer.mockResolvedValue(undefined);
-
-      const config = createTestProxyConfig();
-      await startProxy(config);
-
-      const errorOutput = consoleCapture.getErrorOutput();
-      const lines = errorOutput.split("\n").filter((line) => line.trim());
-
-      expect(lines[0]).toContain(
-        "Starting ai-job-search-mcp (stdio -> HTTPStream)"
+      expect(mockServer.setRequestHandler).toHaveBeenCalledWith(
+        ListResourcesRequestSchema,
+        expect.any(Function)
       );
-      expect(lines[1]).toContain("Target URL:");
-      expect(lines[2]).toContain("Debug mode:");
-      expect(lines[3]).toContain(
-        "AI Job Search MCP server started successfully"
+      expect(mockServer.setRequestHandler).toHaveBeenCalledWith(
+        ListResourceTemplatesRequestSchema,
+        expect.any(Function)
       );
-      expect(lines[4]).toContain(
-        "Ready to accept MCP client connections via stdio"
+      expect(mockServer.setRequestHandler).toHaveBeenCalledWith(
+        ReadResourceRequestSchema,
+        expect.any(Function)
       );
     });
 
-    test("error messages are properly formatted", async () => {
-      const error = new Error("Test error message");
-      mockStartStdioServer.mockRejectedValue(error);
+    test("sets up subscription handlers when subscribe capability is enabled", async () => {
+      const serverCapabilities = { resources: { subscribe: true } };
 
-      const config = createTestProxyConfig();
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
+      });
 
-      await expect(startProxy(config)).rejects.toThrow("Test error message");
+      expect(mockServer.setNotificationHandler).toHaveBeenCalledWith(
+        ResourceUpdatedNotificationSchema,
+        expect.any(Function)
+      );
+      expect(mockServer.setRequestHandler).toHaveBeenCalledWith(
+        SubscribeRequestSchema,
+        expect.any(Function)
+      );
+      expect(mockServer.setRequestHandler).toHaveBeenCalledWith(
+        UnsubscribeRequestSchema,
+        expect.any(Function)
+      );
+    });
 
-      const errorOutput = consoleCapture.getErrorOutput();
-      const lines = errorOutput.split("\n").filter((line) => line.trim());
+    test("listResources handler forwards to client", async () => {
+      const serverCapabilities = { resources: {} };
 
-      expect(
-        lines.some((line) =>
-          line.includes("Failed to connect to target MCP server:")
-        )
-      ).toBe(true);
-      expect(
-        lines.some((line) =>
-          line.includes("Please check that the target server at")
-        )
-      ).toBe(true);
-      expect(
-        lines.some((line) =>
-          line.includes(
-            "For debugging, try setting MCP_TARGET_URL to a local server"
-          )
-        )
-      ).toBe(true);
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
+      });
+
+      const listResourcesHandler = (
+        mockServer.setRequestHandler as jest.Mock
+      ).mock.calls.find(
+        (call: any[]) => call[0] === ListResourcesRequestSchema
+      )?.[1];
+
+      expect(listResourcesHandler).toBeDefined();
+
+      const listArgs = { params: { cursor: "test" } };
+      const result = await (listResourcesHandler as any)(listArgs);
+
+      expect(mockClient.listResources).toHaveBeenCalledWith(listArgs.params);
+      expect(result).toEqual({
+        resources: [{ name: "Test Resource", uri: "test://resource" }],
+      });
+    });
+
+    test("readResource handler forwards to client", async () => {
+      const serverCapabilities = { resources: {} };
+
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
+      });
+
+      const readResourceHandler = (
+        mockServer.setRequestHandler as jest.Mock
+      ).mock.calls.find(
+        (call: any[]) => call[0] === ReadResourceRequestSchema
+      )?.[1];
+
+      expect(readResourceHandler).toBeDefined();
+
+      const readArgs = { params: { uri: "test://resource" } };
+      const result = await (readResourceHandler as any)(readArgs);
+
+      expect(mockClient.readResource).toHaveBeenCalledWith(readArgs.params);
+      expect(result).toEqual({
+        contents: [{ text: "Resource content", type: "text" }],
+      });
+    });
+
+    test("subscribe handler forwards to client", async () => {
+      const serverCapabilities = { resources: { subscribe: true } };
+
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
+      });
+
+      const subscribeHandler = (
+        mockServer.setRequestHandler as jest.Mock
+      ).mock.calls.find(
+        (call: any[]) => call[0] === SubscribeRequestSchema
+      )?.[1];
+
+      expect(subscribeHandler).toBeDefined();
+
+      const subscribeArgs = { params: { uri: "test://resource" } };
+      const result = await (subscribeHandler as any)(subscribeArgs);
+
+      expect(mockClient.subscribeResource).toHaveBeenCalledWith(
+        subscribeArgs.params
+      );
+      expect(result).toEqual({});
+    });
+
+    test("resource updated notification forwards to client", async () => {
+      const serverCapabilities = { resources: { subscribe: true } };
+
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
+      });
+
+      const updateHandler = (
+        mockServer.setNotificationHandler as jest.Mock
+      ).mock.calls.find(
+        (call: any[]) => call[0] === ResourceUpdatedNotificationSchema
+      )?.[1];
+
+      expect(updateHandler).toBeDefined();
+
+      const updateArgs = {
+        method: "notifications/resources/updated",
+        params: { uri: "test://resource" },
+      };
+      await (updateHandler as any)(updateArgs);
+
+      expect(mockClient.notification).toHaveBeenCalledWith(updateArgs);
+    });
+  });
+
+  describe("Tools Capabilities", () => {
+    test("sets up tool handlers when tools capability is present", async () => {
+      const serverCapabilities = { tools: {} };
+
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
+      });
+
+      expect(mockServer.setRequestHandler).toHaveBeenCalledWith(
+        CallToolRequestSchema,
+        expect.any(Function)
+      );
+      expect(mockServer.setRequestHandler).toHaveBeenCalledWith(
+        ListToolsRequestSchema,
+        expect.any(Function)
+      );
+    });
+
+    test("callTool handler forwards to client", async () => {
+      const serverCapabilities = { tools: {} };
+
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
+      });
+
+      const callToolHandler = (
+        mockServer.setRequestHandler as jest.Mock
+      ).mock.calls.find(
+        (call: any[]) => call[0] === CallToolRequestSchema
+      )?.[1];
+
+      expect(callToolHandler).toBeDefined();
+
+      const toolArgs = { params: { arguments: {}, name: "test-tool" } };
+      const result = await (callToolHandler as any)(toolArgs);
+
+      expect(mockClient.callTool).toHaveBeenCalledWith(toolArgs.params);
+      expect(result).toEqual({
+        content: [{ text: "Tool response", type: "text" }],
+      });
+    });
+
+    test("listTools handler forwards to client", async () => {
+      const serverCapabilities = { tools: {} };
+
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
+      });
+
+      const listToolsHandler = (
+        mockServer.setRequestHandler as jest.Mock
+      ).mock.calls.find(
+        (call: any[]) => call[0] === ListToolsRequestSchema
+      )?.[1];
+
+      expect(listToolsHandler).toBeDefined();
+
+      const listArgs = { params: { cursor: "test" } };
+      const result = await (listToolsHandler as any)(listArgs);
+
+      expect(mockClient.listTools).toHaveBeenCalledWith(listArgs.params);
+      expect(result).toEqual({
+        tools: [{ description: "Test tool", name: "test-tool" }],
+      });
+    });
+  });
+
+  describe("Completion Capability", () => {
+    test("always sets up completion handler", async () => {
+      const serverCapabilities = {};
+
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
+      });
+
+      expect(mockServer.setRequestHandler).toHaveBeenCalledWith(
+        CompleteRequestSchema,
+        expect.any(Function)
+      );
+    });
+
+    test("complete handler forwards to client", async () => {
+      const serverCapabilities = {};
+
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
+      });
+
+      const completeHandler = (
+        mockServer.setRequestHandler as jest.Mock
+      ).mock.calls.find(
+        (call: any[]) => call[0] === CompleteRequestSchema
+      )?.[1];
+
+      expect(completeHandler).toBeDefined();
+
+      const completeArgs = {
+        params: {
+          argument: { name: "arg", value: "test-value" },
+          ref: { name: "test", type: "ref/prompt" as const },
+        },
+      };
+      const result = await (completeHandler as any)(completeArgs);
+
+      expect(mockClient.complete).toHaveBeenCalledWith(completeArgs.params);
+      expect(result).toEqual({
+        completion: {
+          hasMore: false,
+          total: 1,
+          values: ["test completion"],
+        },
+      });
+    });
+  });
+
+  describe("getClient Parameter", () => {
+    test("uses getClient function when provided", async () => {
+      const alternateClient = {
+        ...mockClient,
+        listTools: jest.fn(async () => ({
+          tools: [{ name: "alternate-tool" }],
+        })),
+      };
+
+      const getClient = jest.fn().mockReturnValue(alternateClient) as jest.Mock<
+        () => Client
+      >;
+
+      await proxyServer({
+        client: mockClient,
+        getClient,
+        server: mockServer,
+        serverCapabilities: { tools: {} },
+      });
+
+      const listToolsHandler = (
+        mockServer.setRequestHandler as jest.Mock
+      ).mock.calls.find(
+        (call: any[]) => call[0] === ListToolsRequestSchema
+      )?.[1];
+
+      const result = await (listToolsHandler as any)({ params: {} });
+
+      expect(getClient).toHaveBeenCalled();
+      expect(alternateClient.listTools).toHaveBeenCalled();
+      expect(mockClient.listTools).not.toHaveBeenCalled();
+      expect(result).toEqual({ tools: [{ name: "alternate-tool" }] });
+    });
+
+    test("falls back to original client when getClient returns null", async () => {
+      const getClient = jest.fn().mockReturnValue(null) as unknown as jest.Mock<
+        () => Client
+      >;
+
+      await proxyServer({
+        client: mockClient,
+        getClient,
+        server: mockServer,
+        serverCapabilities: { tools: {} },
+      });
+
+      const listToolsHandler = (
+        mockServer.setRequestHandler as jest.Mock
+      ).mock.calls.find(
+        (call: any[]) => call[0] === ListToolsRequestSchema
+      )?.[1];
+
+      await (listToolsHandler as any)({ params: {} });
+
+      expect(getClient).toHaveBeenCalled();
+      expect(mockClient.listTools).toHaveBeenCalled();
+    });
+
+    test("falls back to original client when getClient is not provided", async () => {
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities: { tools: {} },
+      });
+
+      const listToolsHandler = (
+        mockServer.setRequestHandler as jest.Mock
+      ).mock.calls.find(
+        (call: any[]) => call[0] === ListToolsRequestSchema
+      )?.[1];
+
+      await (listToolsHandler as any)({ params: {} });
+
+      expect(mockClient.listTools).toHaveBeenCalled();
+    });
+  });
+
+  describe("Complex Capability Combinations", () => {
+    test("handles all capabilities enabled", async () => {
+      const serverCapabilities = {
+        logging: {},
+        prompts: {},
+        resources: { subscribe: true },
+        tools: {},
+      };
+
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
+      });
+
+      // Should set up all handlers
+      expect(mockServer.setRequestHandler).toHaveBeenCalledTimes(10); // All request handlers
+      expect(mockServer.setNotificationHandler).toHaveBeenCalledTimes(2); // Logging + resource updates
+      expect(mockClient.setNotificationHandler).toHaveBeenCalledTimes(1); // Logging
+    });
+
+    test("handles no capabilities", async () => {
+      const serverCapabilities = {};
+
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
+      });
+
+      // Should only set up completion handler
+      expect(mockServer.setRequestHandler).toHaveBeenCalledTimes(1);
+      expect(mockServer.setNotificationHandler).toHaveBeenCalledTimes(0);
+      expect(mockClient.setNotificationHandler).toHaveBeenCalledTimes(0);
+    });
+
+    test("handles resources without subscribe capability", async () => {
+      const serverCapabilities = { resources: {} };
+
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
+      });
+
+      // Should set up basic resource handlers but not subscription handlers
+      expect(mockServer.setRequestHandler).toHaveBeenCalledWith(
+        ListResourcesRequestSchema,
+        expect.any(Function)
+      );
+      expect(mockServer.setRequestHandler).not.toHaveBeenCalledWith(
+        SubscribeRequestSchema,
+        expect.any(Function)
+      );
+    });
+
+    test("handles resources with subscribe disabled", async () => {
+      const serverCapabilities = { resources: { subscribe: false } };
+
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
+      });
+
+      // Should not set up subscription handlers
+      expect(mockServer.setNotificationHandler).not.toHaveBeenCalledWith(
+        ResourceUpdatedNotificationSchema,
+        expect.any(Function)
+      );
+    });
+  });
+
+  describe("Error Handling", () => {
+    test("handles client method failures gracefully", async () => {
+      const error = new Error("Client method failed");
+      (mockClient.listTools as jest.Mock).mockImplementation(async () => {
+        throw error;
+      });
+
+      const serverCapabilities = { tools: {} };
+
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
+      });
+
+      const listToolsHandler = (
+        mockServer.setRequestHandler as jest.Mock
+      ).mock.calls.find(
+        (call: any[]) => call[0] === ListToolsRequestSchema
+      )?.[1];
+
+      await expect((listToolsHandler as any)({ params: {} })).rejects.toThrow(
+        "Client method failed"
+      );
+    });
+
+    test("handles notification failures gracefully", async () => {
+      const error = new Error("Notification failed");
+      (mockClient.notification as jest.Mock).mockImplementation(async () => {
+        throw error;
+      });
+
+      const serverCapabilities = { logging: {} };
+
+      await proxyServer({
+        client: mockClient,
+        server: mockServer,
+        serverCapabilities,
+      });
+
+      const serverLogHandler = (
+        mockServer.setNotificationHandler as jest.Mock
+      ).mock.calls.find(
+        (call: any[]) => call[0] === LoggingMessageNotificationSchema
+      )?.[1];
+
+      const logArgs = {
+        method: "notifications/message",
+        params: { level: "info", message: "test" },
+      };
+      await expect((serverLogHandler as any)(logArgs)).rejects.toThrow(
+        "Notification failed"
+      );
     });
   });
 });

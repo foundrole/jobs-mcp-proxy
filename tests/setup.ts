@@ -4,6 +4,60 @@
 
 import { jest } from "@jest/globals";
 
+// Set up global mocks for external dependencies
+jest.mock("@modelcontextprotocol/sdk/server/index.js", () =>
+  import("./mocks/mcp-sdk.js").then((m) => ({ Server: m.Server }))
+);
+
+jest.mock("@modelcontextprotocol/sdk/client/index.js", () =>
+  import("./mocks/mcp-sdk.js").then((m) => ({ Client: m.Client }))
+);
+
+jest.mock("@modelcontextprotocol/sdk/server/stdio.js", () =>
+  import("./mocks/mcp-sdk.js").then((m) => ({
+    StdioServerTransport: m.StdioServerTransport,
+  }))
+);
+
+jest.mock("@modelcontextprotocol/sdk/client/streamableHttp.js", () =>
+  import("./mocks/mcp-sdk.js").then((m) => ({
+    StreamableHTTPClientTransport: m.StreamableHTTPClientTransport,
+  }))
+);
+
+jest.mock("@modelcontextprotocol/sdk/types.js", () =>
+  import("./mocks/mcp-sdk.js").then((m) => ({
+    CallToolRequestSchema: m.CallToolRequestSchema,
+    CompleteRequestSchema: m.CompleteRequestSchema,
+    GetPromptRequestSchema: m.GetPromptRequestSchema,
+    ListPromptsRequestSchema: m.ListPromptsRequestSchema,
+    ListResourcesRequestSchema: m.ListResourcesRequestSchema,
+    ListResourceTemplatesRequestSchema: m.ListResourceTemplatesRequestSchema,
+    ListToolsRequestSchema: m.ListToolsRequestSchema,
+    LoggingMessageNotificationSchema: m.LoggingMessageNotificationSchema,
+    ReadResourceRequestSchema: m.ReadResourceRequestSchema,
+    ResourceUpdatedNotificationSchema: m.ResourceUpdatedNotificationSchema,
+    SubscribeRequestSchema: m.SubscribeRequestSchema,
+    UnsubscribeRequestSchema: m.UnsubscribeRequestSchema,
+  }))
+);
+
+jest.mock("find-process", () =>
+  import("./mocks/external-dependencies.js").then((m) => m.findProcess)
+);
+
+jest.mock("elfy", () =>
+  import("./mocks/external-dependencies.js").then((m) => m.elfy)
+);
+
+jest.mock("plist", () =>
+  import("./mocks/external-dependencies.js").then((m) => m.plist)
+);
+
+jest.mock("win-version-info", () =>
+  import("./mocks/external-dependencies.js").then((m) => m.winVersionInfo)
+);
+
 // Global test setup - runs before all tests
 
 // Store original environment variables
