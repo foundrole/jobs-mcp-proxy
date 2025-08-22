@@ -1,7 +1,11 @@
 import { readFileSync } from "fs";
 import { dirname, join, resolve } from "path";
 
-import type { ApplicationInfo, VersionExtractionResult } from "./types.js";
+import type {
+  ApplicationInfo,
+  PlistInfo,
+  VersionExtractionResult,
+} from "./types.js";
 
 /**
  * Cross-platform version extractor for applications
@@ -192,8 +196,8 @@ export class VersionExtractor {
         ? plist.default.parse(plistContent)
         : plist.parse(plistContent);
 
-      // Cast to any for property access since plist structure varies
-      const plistObj = parsed as any;
+      // Cast to PlistInfo interface for type-safe property access
+      const plistObj = parsed as PlistInfo;
 
       // Try different version keys
       const version =

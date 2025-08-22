@@ -21,6 +21,8 @@ export const startStdioServer = async ({
   const createHttpClient = async () => {
     const transport = new StreamableHTTPClientTransport(new URL(url));
     const client = new Client(originalClientInfo, { capabilities: {} });
+    // Type assertion needed due to MCP SDK type incompatibility:
+    // StreamableHTTPClientTransport.sessionId is string|undefined but Transport expects string
     await client.connect(transport as any);
     return client;
   };

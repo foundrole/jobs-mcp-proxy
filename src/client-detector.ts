@@ -88,9 +88,10 @@ function extractExecutablePath(
 
   // For Windows, look for .exe paths
   if (process.platform === "win32") {
-    const exeMatch = cmd.match(/([^\s]*\.exe)/i);
-    if (exeMatch && exeMatch[1]) {
-      return exeMatch[1];
+    // Handle quoted paths, single-quoted paths, and unquoted paths
+    const exeMatch = cmd.match(/"([^"]+\.exe)"|'([^']+\.exe)'|([^\s]+\.exe)/i);
+    if (exeMatch) {
+      return exeMatch[1] || exeMatch[2] || exeMatch[3] || null;
     }
   }
 
@@ -229,7 +230,7 @@ async function identifyClientFromProcess(
 export async function extractClientInfoFromParent(): Promise<ClientInfo> {
   const parentPid = process.ppid;
 
-  if (!parentPid || parentPid === undefined) {
+  if (!parentPid) {
     console.error("[CLIENT-DETECTOR] No parent PID available");
     return {
       name: PROXY_NAME,
@@ -241,7 +242,11 @@ export async function extractClientInfoFromParent(): Promise<ClientInfo> {
     console.error(
       `[CLIENT-DETECTOR] Looking up parent process PID: ${parentPid}`
     );
-    const processes = await (findProcess as any).default("pid", parentPid);
+    // Handle CJS/ESM module interoperability - findProcess may be default export or named export
+    const processes = await ((findProcess as any).default ?? findProcess)(
+      "pid",
+      parentPid
+    );
 
     if (processes.length === 0) {
       console.error(`[CLIENT-DETECTOR] Parent process ${parentPid} not found`);

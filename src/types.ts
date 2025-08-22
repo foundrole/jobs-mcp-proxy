@@ -21,3 +21,9 @@ export interface ApplicationInfo {
   bundlePath?: string;
   executablePath?: string;
 }
+
+export interface PlistInfo {
+  CFBundleShortVersionString?: string;
+  CFBundleVersion?: string;
+  CFBundleVersionString?: string;
+}
