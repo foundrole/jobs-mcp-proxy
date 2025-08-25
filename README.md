@@ -2,7 +2,7 @@
 
 **Instantly add powerful job search capabilities to your AI assistant!** 🚀
 
-This tool connects AI assistants like Claude, Cursor, and other MCP-compatible clients to comprehensive job search services. No technical knowledge required - just one simple command gets you started.
+This tool connects AI assistants like Claude, ChatGPT, and other MCP-compatible clients to comprehensive job search services. Choose from direct HTTP connection or stdio server based on your AI client.
 
 ## 🎯 For Job Seekers
 
@@ -17,89 +17,136 @@ This tool connects AI assistants like Claude, Cursor, and other MCP-compatible c
 
 ## ⚡ Quick Setup (2 Options)
 
-### Option 1: One-Command Setup (Easiest)
+### Option 1: Direct HTTP Connection (Recommended)
 
-Just run this single command - no installation needed:
+**For Claude Web/Desktop and ChatGPT** - Use our direct HTTP endpoint:
+
+**MCP Server URL:** `https://www.foundrole.com/mcp`
+
+This is the easiest method for modern AI clients that support HTTP MCP connections.
+
+### Option 2: stdio Server (For Other Clients)
+
+For MCP-compatible clients that require stdio transport:
 
 ```bash
 npx @foundrole/ai-job-search-mcp
 ```
 
-That's it! Your proxy server is now running and ready to connect to your AI assistant.
-
-### Option 2: Direct Connection (If Your AI Client Supports HTTP)
-
-Some AI clients can connect directly to our streamable HTTP endpoint:
-
-**Streamable HTTP URL:** `https://www.foundrole.com/mcp`
-
-Use this URL directly in clients that support streamable HTTP MCP connections.
+This starts a local proxy server that communicates via standard input/output.
 
 ## 🤖 Connecting to AI Assistants
 
-### Claude Desktop
+### Claude Web/Desktop Setup
 
-1. **Start the proxy server:**
+**Estimated Time:** 2 minutes | **Requirements:** Claude Pro account
 
-   ```bash
-   npx @foundrole/ai-job-search-mcp
+1. Navigate to the main settings or preferences area of Claude (click your profile or settings icon)
+
+2. Find the "Connectors" or "Tools" section and click 'Add custom connector'
+
+3. In the Name or Label field, enter: `Foundrole`
+
+4. In the Remote MCP server URL field, paste the following endpoint:
+
+   ```
+   https://www.foundrole.com/mcp
    ```
 
-2. **Add to Claude Desktop configuration:**
+5. Save the configuration and allow Claude to connect to the Found Role server
 
-   Open your Claude Desktop configuration file:
-   - **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
-   - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+6. Once connected, you can access job search capabilities directly within your Claude conversations
 
-3. **Add this configuration:**
+> **🔗 Pro Account Required:** Claude MCP connectors require a Claude Pro subscription to access external data sources and tools.
+
+### ChatGPT Setup
+
+**Estimated Time:** 3 minutes | **Requirements:** ChatGPT Plus/Team/Enterprise
+
+1. In the ChatGPT web interface, click your profile name and select 'Settings'
+
+2. Navigate to the 'Connectors' tab within the settings menu
+
+3. Click 'Add new connector' or 'Add custom connector'
+
+4. For the 'Name' field, enter: `foundrole`
+
+5. When prompted for the server URL, paste the following endpoint:
+
+   ```
+   https://www.foundrole.com/mcp
+   ```
+
+6. Follow any on-screen prompts to authorize the connection
+
+7. Once added, you can select 'Found Role' as a data source when using Deep Research or enabling connectors
+
+> **🔒 Premium Features:** ChatGPT connectors and Deep Research mode require ChatGPT Plus, Team, or Enterprise subscription.
+
+### LM Studio Setup
+
+**Estimated Time:** 3 minutes | **Requirements:** Node.js + npm
+
+1. Open LM Studio and navigate to the MCP servers configuration section
+
+2. Create or edit your MCP servers configuration file with the following JSON:
 
    ```json
    {
      "mcpServers": {
-       "jobs-search": {
+       "foundrole": {
          "command": "npx",
-         "args": ["@foundrole/ai-job-search-mcp"],
+         "args": ["@foundrole/ai-job-search-mcp@latest"],
          "env": {}
        }
      }
    }
    ```
 
-4. **Restart Claude Desktop** and start asking about jobs!
+3. Save the configuration file and restart LM Studio to load the new MCP server
 
-### Other MCP-Compatible Clients
+4. Verify the connection by checking that Found Role appears in your available MCP servers list
 
-The setup process is similar for other clients:
+5. You can now access job search capabilities through LM Studio's chat interface
 
-1. Run: `npx @foundrole/ai-job-search-mcp`
-2. Configure your client to use this as an MCP server
-3. The server communicates via stdio (standard input/output)
+> **💡 Requirements:** Make sure you have Node.js and npm installed on your system, as the MCP server runs using npx. LM Studio will automatically manage the server connection once configured.
 
-## 🔧 Advanced Configuration
+### Perplexity Desktop Setup
 
-### Using a Local Development Server
+**Estimated Time:** 4 minutes | **Requirements:** Perplexity Pro + Node.js
 
-If you're a developer working with a local job search server:
+1. Open Perplexity Desktop and navigate to MCP servers configuration
 
-```bash
-MCP_TARGET_URL=http://localhost:3000/mcp npx @foundrole/ai-job-search-mcp
-```
+2. Create or edit your MCP configuration with the following JSON:
 
-This connects to your local server instead of the production service.
+   ```json
+   {
+     "command": "npx",
+     "args": ["@foundrole/ai-job-search-mcp@latest"],
+     "env": {}
+   }
+   ```
 
-### Environment Variables
+3. Save the configuration and restart Perplexity to load the MCP server
 
-- `MCP_TARGET_URL`: Override the target server URL (default: `https://www.foundrole.com/mcp`)
+4. Verify the connection in Perplexity's MCP servers list
+
+5. Access job search capabilities through Perplexity Pro features
+
+> **⚠️ Note:** Perplexity uses stdio MCP transport. Make sure Node.js and npm are installed for the MCP server to run properly.
 
 ## 💬 Example Usage
 
 Once connected, you can ask your AI assistant questions like:
 
 - _"Find software engineering jobs in San Francisco"_
-- _"Show me remote data science positions"_
-- _"What are the highest paying tech jobs right now?"_
-- _"Help me find entry-level marketing jobs"_
-- _"Compare salaries for product manager roles"_
+- _"Search for data scientist positions in California"_
+- _"Show me React developer jobs in Seattle, then search Austin next so I can compare opportunities"_
+- _"I want to work at Netflix or Uber. Search for their open developer positions"_
+- _"Find Python Django jobs in San Francisco, then show me more results if available"_
+- _"Search for ‘senior software engineer’ positions in Boston. Filter out any that seem too junior when you show me the results"_
+- _"Look for full-stack developer jobs in Denver. Show me several pages of results, then get detailed info on any that mention good benefits"_
+- _"Find ‘fintech developer’ or ‘financial software’ jobs in New York. Highlight any with higher salaries when presenting results"_
 
 ## ❓ Troubleshooting
 
@@ -108,19 +155,19 @@ Once connected, you can ask your AI assistant questions like:
 **"Connection failed" error:**
 
 - Check your internet connection
-- Try running the command again
-- For local development, ensure your local server is running
+- Try the setup process again
+- Ensure you have the required subscription (Claude Pro, ChatGPT Plus, etc.)
 
-**"Command not found" error:**
+**"Command not found" error (for stdio clients):**
 
 - Make sure you have Node.js installed (version 22.17.0 or higher)
 - Try: `npm install -g @foundrole/ai-job-search-mcp` then `ai-job-search-mcp`
 
-**Claude Desktop not detecting the server:**
+**MCP connector not working:**
 
-- Double-check your configuration file syntax
-- Restart Claude Desktop completely
-- Verify the file path is correct for your operating system
+- Double-check your configuration and URL
+- Restart your AI client completely
+- Verify you have the required premium subscription
 
 ### Getting Help
 
@@ -136,68 +183,6 @@ Once you have job search working in your AI assistant:
 2. **Save interesting opportunities** - Ask your AI to help organize and track applications
 3. **Get application help** - Use your AI to tailor resumes and cover letters
 4. **Interview preparation** - Practice with AI-generated questions based on job descriptions
-
-## 🚀 For Developers
-
-### Testing
-
-The project includes comprehensive testing with coverage reporting:
-
-```bash
-# Run all tests
-yarn test
-
-# Run tests with coverage
-yarn test:coverage
-
-# Run tests in watch mode (during development)
-yarn test:watch
-
-# Run specific test file
-yarn test tests/basic.test.ts
-```
-
-**Test Coverage:**
-
-- Unit tests for configuration handling
-- Integration tests for CLI functionality
-- Environment variable testing
-- Package validation tests
-
-### Code Quality
-
-Before committing, run the full quality check:
-
-```bash
-# Run all quality checks (auto-runs in pre-commit hook)
-yarn type-check  # TypeScript validation
-yarn prettier:write  # Code formatting
-yarn lint:fix  # ESLint fixes
-yarn test  # Test suite
-yarn build  # Compilation check
-```
-
-### Publishing
-
-To publish this package to npm:
-
-```bash
-# Login to npm with @foundrole organization access
-npm login
-
-# Build and publish the package
-yarn publish:npm
-
-# Or manually:
-yarn test && yarn build
-npm publish --access public
-```
-
-**Prerequisites:**
-
-- Access to the `@foundrole` organization on npm
-- Proper version number in `package.json`
-- All tests passing and code quality checks passed
 
 ---
 
