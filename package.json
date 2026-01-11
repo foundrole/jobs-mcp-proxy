@@ -1,6 +1,6 @@
 {
   "name": "@foundrole/ai-job-search-mcp",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Easy-to-use MCP proxy server that connects AI assistants like Claude to job search services. Simply run with npx for instant job search capabilities in your AI conversations.",
   "keywords": [
     "mcp",
@@ -99,6 +99,6 @@
     "elfy": "^1.0.0"
   },
   "engines": {
-    "node": ">=22.17.0"
+    "node": ">=24.12.0"
   }
 }
