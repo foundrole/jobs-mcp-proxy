@@ -578,9 +578,8 @@ describe("Proxy Flow Integration Tests", () => {
   describe("Server Integration Flow", () => {
     test("complete server startup to request handling flow", async () => {
       // Import the mocked client detector to ensure mock is active
-      const { extractClientInfoFromParent } = await import(
-        "../../src/client-detector.js"
-      );
+      const { extractClientInfoFromParent } =
+        await import("../../src/client-detector.js");
 
       // Verify the mock is working
       const clientInfo = await extractClientInfoFromParent();
