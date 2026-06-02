@@ -56,6 +56,7 @@
     "prettier:check": "prettier . --check",
     "prettier:write": "prettier . --write",
     "publish:npm": "npm_config_registry=https://registry.npmjs.org/ npm publish --access public",
+    "release": "node scripts/release.mjs",
     "start": "node dist/cli.js",
     "test": "jest",
     "test:coverage": "jest --coverage",

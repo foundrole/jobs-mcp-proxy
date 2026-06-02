@@ -4,7 +4,7 @@
     "name": "FoundRole",
     "url": "https://www.foundrole.com"
   },
-  "description": "Run your job search from your AI assistant: search live jobs, track applications on a Kanban board, set follow-up reminders, and subscribe to alerts — all through conversation. OAuth 2.1, free, no API key.",
+  "description": "Search jobs, track applications, and set follow-up reminders from your AI assistant.",
   "keywords": [
     "mcp",
     "mcp-server",
