@@ -1,0 +1,40 @@
+# Publishes server.json to the official MCP Registry on a version tag or GitHub Release.
+#
+# Prerequisites:
+#   - server.json in the repo root (name: io.github.foundrole/jobs-mcp-proxy).
+#   - @foundrole/ai-job-search-mcp must ALREADY be published to npm at the matching
+#     version — the registry validates the package and returns 400 "NPM package not
+#     found" until it exists. Publish to npm first (npm run publish:npm), then push
+#     the tag (or re-run this workflow).
+#   - server.json "version" and packages[0].version must equal the npm version.
+#
+# Auth: github-oidc. The registry verifies the io.github.foundrole/* namespace
+# against the repository owner via the OIDC token — no secrets needed, but the
+# workflow must run from a repo under the `foundrole` GitHub org.
+name: Publish to MCP Registry
+
+on:
+  push:
+    tags: ["v*"]
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install mcp-publisher
+        run: |
+          curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz" | tar xz
+          sudo mv mcp-publisher /usr/local/bin/
+          mcp-publisher --version
+
+      - name: Publish to registry
+        run: |
+          mcp-publisher login github-oidc
+          mcp-publisher publish

@@ -1,3 +1,8 @@
+# MCP Registry publisher tokens (created by `mcp-publisher login`)
+.mcpregistry_github_token
+.mcpregistry_registry_token
+.mcpregistry*
+
 # Logs
 logs
 *.log
