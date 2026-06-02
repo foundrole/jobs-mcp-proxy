@@ -1,6 +1,6 @@
 {
   "name": "@foundrole/ai-job-search-mcp",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "Run your job search from your AI assistant. Connect FoundRole to Claude, ChatGPT, Cursor, and any MCP client to search live jobs, track applications on a Kanban board, set follow-up reminders, and subscribe to alerts — all through conversation. OAuth 2.1, free, no API key.",
   "keywords": [
     "mcp",
