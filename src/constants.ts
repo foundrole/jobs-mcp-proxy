@@ -67,4 +67,7 @@ const pkg = getPackageInfo();
 export const PROXY_NAME = pkg.name;
 export const PROXY_VERSION = pkg.version;
 export const USER_AGENT = `${PROXY_NAME}/${PROXY_VERSION}`;
-export const MCP_PROTOCOL_VERSION = "2025-03-26";
+// Informational only — the @modelcontextprotocol/sdk Client/Server negotiate
+// the actual protocol version on connect. Kept current with what the FoundRole
+// server (jobs-back) supports: 2025-11-25, 2025-06-18, 2025-03-26.
+export const MCP_PROTOCOL_VERSION = "2025-06-18";
