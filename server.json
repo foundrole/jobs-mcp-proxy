@@ -40,7 +40,7 @@
       "transport": {
         "type": "stdio"
       },
-      "version": "1.1.8"
+      "version": "1.1.9"
     }
   ],
   "remotes": [
@@ -54,6 +54,6 @@
     "url": "https://github.com/foundrole/jobs-mcp-proxy"
   },
   "title": "FoundRole — AI Job Search & Application Tracker MCP for Claude & ChatGPT",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "websiteUrl": "https://www.foundrole.com/ai-search-mcp"
 }
