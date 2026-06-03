@@ -4,25 +4,31 @@
     "name": "FoundRole",
     "url": "https://www.foundrole.com"
   },
-  "description": "Search jobs, track applications, and set follow-up reminders from your AI assistant.",
+  "description": "MCP server for AI job search — find jobs, track applications, get alerts. Claude, ChatGPT, Cursor.",
   "keywords": [
     "mcp",
     "mcp-server",
     "model-context-protocol",
+    "mcp-job-search",
     "jobs",
     "job-search",
     "job-board",
+    "remote-jobs",
     "application-tracker",
+    "job-application-tracker",
     "job-tracker",
     "job-alerts",
     "career",
     "ai-assistant",
+    "ai",
     "claude",
     "chatgpt",
     "cursor",
     "windsurf",
     "lm-studio",
     "perplexity",
+    "anthropic",
+    "openai",
     "oauth"
   ],
   "license": "ISC",
@@ -47,7 +53,7 @@
     "source": "github",
     "url": "https://github.com/foundrole/jobs-mcp-proxy"
   },
-  "title": "FoundRole — AI Job Search, Tracker & Reminders",
+  "title": "FoundRole — AI Job Search & Application Tracker MCP for Claude & ChatGPT",
   "version": "1.1.8",
   "websiteUrl": "https://www.foundrole.com/ai-search-mcp"
 }
