@@ -23,6 +23,7 @@
  * before the tag triggers `mcp-publisher publish`).
  */
 import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 
 const REPO = "foundrole/jobs-mcp-proxy";
 const bump = process.argv[2];
@@ -71,7 +72,11 @@ const branch = gitOut(["rev-parse", "--abbrev-ref", "HEAD"]);
 //    (sync-server-json.js + git add server.json), commits, and creates the tag —
 //    all under the bot identity via env above.
 execFileSync("npm", ["version", bump], { stdio: "inherit", env });
-const tag = `v${JSON.parse(execFileSync("npm", ["pkg", "get", "version"], { encoding: "utf8" }).trim().replace(/"/g, ""))}`;
+// Read the bumped version straight from package.json. (Parsing `npm pkg get`
+// output is fragile — depending on the npm version it returns either a
+// JSON-quoted "1.2.3" or a bare 1.2.3, and the bare form is not valid JSON.)
+const pkgUrl = new URL("../package.json", import.meta.url);
+const tag = `v${JSON.parse(readFileSync(pkgUrl, "utf8")).version}`;
 
 // 2. Push branch + tag over a bot-token URL so GitHub attributes everything to
 //    the bot — NOT to whoever owns the configured `origin` remote.
