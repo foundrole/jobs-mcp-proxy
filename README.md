@@ -4,16 +4,16 @@ Your job search is scattered across a dozen browser tabs, a spreadsheet you forg
 
 Ask in plain language. Your assistant searches live roles, saves the good ones to your tracker, moves them through your pipeline, and sets the follow-up reminders you'd otherwise miss — without you leaving the chat.
 
-> **Connect your FoundRole account once (OAuth 2.1).** After that everything runs through conversation. Free forever — no API key to manage, no credit card.
+> **Start searching right away — no sign-up needed.** Connect your client and ask for jobs immediately. You only sign in (once) when you want to save and track them — and your AI does that for you the moment you ask. Free forever — no API key to manage, no credit card.
 
 ## What it does for you
 
-- **Find roles without tab-juggling.** Search [FoundRole's live job board](https://www.foundrole.com/jobs) by title, location, company, salary, and how recently a role was posted — straight from chat.
-- **See the full picture before you apply.** Pull a job's description, requirements, salary, and apply link without opening the page.
-- **Stop losing track of applications.** Save jobs to your [Kanban application tracker](https://www.foundrole.com/job-tracker) and move them through stages (Saved → Applied → Interviewing → Offer) by asking. Attach notes, tags, expected salary, and recruiter contacts.
+- **Find roles without tab-juggling — no sign-up.** Search [FoundRole's live job board](https://www.foundrole.com/jobs) by title, location, company, salary, and how recently a role was posted, straight from chat. No account needed — connect your client and start searching.
+- **See the full picture before you apply.** Pull a job's description, requirements, salary, and apply link without opening the page. Also works without an account.
+- **Stop losing track of applications.** Save jobs to your [Kanban application tracker](https://www.foundrole.com/job-tracker) and move them through stages (Saved → Applied → Interviewing → Offer) by asking. Attach notes, tags, expected salary, and recruiter contacts. _(One-time sign-in — your AI handles it the first time you save a job.)_
 - **Research before you commit.** Dig into [companies](https://www.foundrole.com/companies), [industry sectors](https://www.foundrole.com/sectors), and [hiring by location](https://www.foundrole.com/locations) to decide where to aim.
-- **Never miss a follow-up.** Set a reminder on any tracked job and get an email with a calendar (`.ics`) invite for Google Calendar, Outlook, or Apple Calendar.
-- **Let the search come to you.** Subscribe a saved search to recurring alerts (daily, weekly, or monthly) so new matches land in your inbox.
+- **Never miss a follow-up.** Set a reminder on any tracked job and get an email with a calendar (`.ics`) invite for Google Calendar, Outlook, or Apple Calendar. _(Part of your tracked jobs — uses the same one-time sign-in.)_
+- **Let the search come to you.** Subscribe a saved search to recurring alerts (daily, weekly, or monthly) so new matches land in your inbox. _(One-time sign-in, the same as the tracker.)_
 
 It's the same account and data as [FoundRole.com](https://www.foundrole.com) — the MCP server just lets your AI drive it.
 
@@ -21,7 +21,7 @@ It's the same account and data as [FoundRole.com](https://www.foundrole.com) —
 
 ## Setup
 
-Two ways to connect, depending on your client. Either way you'll authorize with your FoundRole account through a standard OAuth sign-in the first time.
+Two ways to connect, depending on your client. Either way, **searching works the moment you connect — no sign-up.** A FoundRole sign-in is only needed for saving and tracking jobs, and your client prompts for it automatically the first time you ask for that.
 
 ### Option 1 — Direct HTTP (recommended for Claude & ChatGPT)
 
@@ -31,11 +31,11 @@ Point your client at the FoundRole MCP endpoint:
 https://www.foundrole.com/mcp
 ```
 
-Modern clients open a browser window to sign in to FoundRole on first connect, then remember it.
+That's it — you can start searching jobs immediately. When you later ask to save or track a job, the client opens a browser window to sign in to FoundRole once, then remembers it.
 
 ### Option 2 — stdio bridge (for clients without remote HTTP MCP)
 
-Run the proxy locally with npx; it bridges your client's stdio transport to the FoundRole endpoint and handles the OAuth handshake:
+Run the proxy locally with npx; it bridges your client's stdio transport to the FoundRole endpoint. Search works straight away; it handles the OAuth sign-in for you only when you first save or track a job:
 
 ```bash
 npx @foundrole/ai-job-search-mcp
@@ -56,7 +56,7 @@ npx @foundrole/ai-job-search-mcp
    https://www.foundrole.com/mcp
    ```
 
-5. Save, then complete the FoundRole sign-in when Claude opens the authorization window.
+5. Save — and start searching jobs right away. The first time you ask Claude to save or track a role, it opens a FoundRole sign-in window; complete it once and you're set.
 
 > Claude's custom connectors require a Claude Pro/Team/Enterprise plan on Claude's side. The FoundRole connection itself is free.
 
@@ -73,8 +73,7 @@ npx @foundrole/ai-job-search-mcp
    https://www.foundrole.com/mcp
    ```
 
-5. Follow the on-screen prompts to authorize, signing in to FoundRole.
-6. Select **FoundRole** as a source in Deep Research or when enabling connectors.
+5. Select **FoundRole** as a source in Deep Research or when enabling connectors — searching works immediately. ChatGPT will prompt you to sign in to FoundRole the first time you ask it to save or track a job.
 
 > ChatGPT connectors require a ChatGPT Plus/Team/Enterprise plan on ChatGPT's side. The FoundRole connection itself is free.
 
@@ -93,7 +92,7 @@ Add FoundRole to your client's MCP config. With the stdio bridge:
 }
 ```
 
-Clients that support remote HTTP MCP can instead point directly at `https://www.foundrole.com/mcp`. Authorize with FoundRole on first use.
+Clients that support remote HTTP MCP can instead point directly at `https://www.foundrole.com/mcp`. Searching works as soon as it's connected; FoundRole sign-in is prompted the first time you save or track a job.
 
 ### LM Studio
 
@@ -115,7 +114,7 @@ Clients that support remote HTTP MCP can instead point directly at `https://www.
    ```
 
 3. Save and restart LM Studio.
-4. Confirm **foundrole** appears in your MCP servers list, then authorize with FoundRole on first use.
+4. Confirm **foundrole** appears in your MCP servers list — you can search jobs straight away. FoundRole sign-in is prompted the first time you save or track a job.
 
 ### Perplexity Desktop
 
@@ -132,7 +131,7 @@ Clients that support remote HTTP MCP can instead point directly at `https://www.
    }
    ```
 
-3. Save and restart Perplexity, then authorize with FoundRole on first use.
+3. Save and restart Perplexity — searching works right away. FoundRole sign-in is prompted the first time you save or track a job.
 
 > Perplexity uses stdio MCP transport — Node.js and npm must be installed.
 
@@ -156,8 +155,8 @@ Clients that support remote HTTP MCP can instead point directly at `https://www.
 
 **Asked to sign in / "needs authentication":**
 
-- Expected on first connect — complete the FoundRole OAuth sign-in in the browser window your client opens.
-- If tools don't appear afterward, reconnect the connector so the authorization is re-sent.
+- Expected the first time you save or track a job — searching itself never asks for this. Complete the FoundRole sign-in in the browser window your client opens.
+- If saving still doesn't work afterward, reconnect the connector so the authorization is re-sent.
 
 **"Connection failed":**
 
@@ -170,7 +169,7 @@ Clients that support remote HTTP MCP can instead point directly at `https://www.
 
 **Connector not working:**
 
-- Double-check the URL, restart the AI client, and reconnect to re-trigger the FoundRole sign-in.
+- Double-check the URL and restart the AI client. If searching works but saving a job doesn't, reconnect to re-trigger the FoundRole sign-in.
 
 ## Help
 
@@ -181,6 +180,6 @@ Clients that support remote HTTP MCP can instead point directly at `https://www.
 
 ---
 
-**No account yet?** [Sign up free at FoundRole](https://www.foundrole.com), connect it once, and let your AI run the job search.
+**No account needed to search.** Connect your AI client and start finding roles now. [Sign up free at FoundRole](https://www.foundrole.com) when you want to save jobs and track your applications — your AI signs you in the first time you ask.
 
 _Made by the [FoundRole](https://www.foundrole.com) team._
