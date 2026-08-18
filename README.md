@@ -12,6 +12,7 @@ Ask ChatGPT or Claude for jobs and get real openings back — each one checked f
   - **Am I being underpaid?** The pay against what employers in that market really file, so a hidden salary range stops being a guess.
   - **Would they sponsor me?** Whether the company has sponsored visas before, counted year by year from public filings.
 - **See how well you fit.** Match scoring against your resume and profile, plus personalized job recommendations ranked by fit.
+- **Research before you commit.** Dig into [companies](https://www.foundrole.com/companies), [industry sectors](https://www.foundrole.com/sectors), and [hiring by location](https://www.foundrole.com/locations) to decide where to aim.
 - **Compare roles side by side.** _"Compare these two"_ lines up fit, pay, sponsorship, and posting risk at once — so the choice stops being a feeling.
 - **Paste a job from anywhere.** LinkedIn, a careers page, a link a friend sent — paste the posting into the chat and it gets the same checks, and can sit in your tracker alongside FoundRole listings. Your assistant reads the text you provide; nothing crawls the site for you.
 - **Stop losing track of applications.** Save jobs to your [Kanban application tracker](https://www.foundrole.com/job-tracker) and move them through Saved → Applied → Interviewing → Offered → Hired by asking. Attach notes, tags, expected salary, recruiter contacts, and deadlines. The same board shows up in the web app.
@@ -192,11 +193,23 @@ The same address works everywhere: add `https://www.foundrole.com/mcp` as a remo
 
 - Double-check the URL, complete the sign-in, and restart the AI client — some clients only pick up the connection after a restart.
 
+## Explore the data behind the answers
+
+The same data your assistant reads is browsable on FoundRole:
+
+- [How It Works](https://www.foundrole.com/how-it-works) — where the openings come from and how each posting gets its ghost, pay, and visa checks
+- [H1B Salary Explorer](https://www.foundrole.com/h1b-salaries) — certified wages employers filed with the U.S. Department of Labor, charted by sector, industry, location, and role
+- [H1B Sponsor Rankings](https://www.foundrole.com/h1b-sponsors) — top visa-sponsoring companies by median filed wage, browsable by industry, sector, city, and state
+- [Company Directory](https://www.foundrole.com/companies) — open roles, salary data, and visa sponsorship history for any employer
+- [Industry Sectors](https://www.foundrole.com/sectors) — who's hiring across 40+ industries
+- [Hiring by Location](https://www.foundrole.com/locations) — openings and wage benchmarks by state and metro
+- [Job Tracker](https://www.foundrole.com/job-tracker) — the Kanban board your assistant manages, in the browser
+- [Live Job Board](https://www.foundrole.com/jobs) — browse the listings directly
+
 ## Help
 
 - 🌐 Website: [www.foundrole.com](https://www.foundrole.com) — free AI job search, application tracker, and company research
 - 📖 Setup guide & FAQ: [foundrole.com/ai-search-mcp](https://www.foundrole.com/ai-search-mcp)
-- 🔍 How the fact-checks work: [foundrole.com/how-it-works](https://www.foundrole.com/how-it-works)
 - 🐛 Issues: [GitHub Issues](https://github.com/foundrole/jobs-mcp-proxy/issues)
 - 💬 Questions: dev@foundrole.com
 
