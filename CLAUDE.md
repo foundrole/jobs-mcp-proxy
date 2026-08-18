@@ -4,16 +4,13 @@ This document defines the comprehensive rules and guidelines for working with th
 
 ## Project Overview
 
-The jobs-mcp-proxy project is a **basic MCP stdio server** that provides a foundation for building MCP (Model Context Protocol) applications with efficient AI toolchain integration. It's designed as a simple, extensible server with minimal overhead:
+The jobs-mcp-proxy project is a **stdio → Streamable HTTP bridge** for the FoundRole MCP server: it lets stdio-only MCP clients (LM Studio, Perplexity, older editors) talk to `https://www.foundrole.com/mcp`, including the OAuth sign-in flow. It is published to npm as `@foundrole/ai-job-search-mcp` and listed in the official MCP Registry; the repo's README doubles as FoundRole's public MCP documentation and SEO anchor on GitHub.
 
-- **MCP SDK Version**: @modelcontextprotocol/sdk@1.17.3
-- **Transport**: stdio server transport
-- **Primary Function**: Basic MCP server foundation ready for extension
-- **Architecture**: Simple MCP server with TypeScript support
+- **MCP SDK Version**: @modelcontextprotocol/sdk (see `package.json` for the pinned version; protocol version is negotiated by the SDK on connect)
+- **Transport**: stdio on the client side, Streamable HTTP to the FoundRole endpoint
+- **Primary Function**: bridge stdio clients to the remote FoundRole MCP server
 - **Code Quality**: Strict TypeScript, comprehensive linting, and modern development tooling
 - **Development**: Hot reload and comprehensive development environment
-
-The server provides a basic MCP stdio server that can be extended to connect AI clients to various services.
 
 ## Table of Contents
 
@@ -550,8 +547,7 @@ ps aux | grep node
 
 ### Node.js Version
 
-- Use Node.js >= 22.17.0 (specified in `package.json`)
-- Use the version specified in `.nvmrc`: v22.17.0
+- Use the Node.js version required by `engines` in `package.json`, which matches `.nvmrc`
 
 ### Package Manager
 
@@ -718,7 +714,7 @@ secrets needed, but the workflow must run from a repo under the `foundrole` org.
 
 ### Core Dependencies
 
-- **@modelcontextprotocol/sdk@1.17.3** - Official MCP protocol implementation
+- **@modelcontextprotocol/sdk** - Official MCP protocol implementation (version pinned in `package.json`)
 
 ### Development Dependencies
 
