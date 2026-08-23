@@ -15,6 +15,7 @@ export default {
   },
   moduleNameMapper: {
     "^~/(.*)$": "<rootDir>/src/$1",
+    "^plist$": "<rootDir>/node_modules/plist/dist/index.js",
     "^(.*)\\.js$": "$1",
   },
   transformIgnorePatterns: [

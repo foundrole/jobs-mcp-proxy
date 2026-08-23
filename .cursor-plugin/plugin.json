@@ -1,15 +1,11 @@
 {
-  "name": "foundrole",
-  "displayName": "FoundRole Jobs",
-  "version": "1.0.0",
-  "description": "AI job search and job application tracker. Search live jobs by title, location, salary, date posted, and remote or on-site, and see each one judged on real data: pay against market rates, ghost-job signals, visa sponsorship history, and how well it matches your resume. Track applications, set reminders, and get email alerts.",
   "author": {
-    "name": "FoundRole",
-    "email": "dev@foundrole.com"
+    "email": "dev@foundrole.com",
+    "name": "FoundRole"
   },
+  "description": "AI job search and job application tracker. Search live jobs by title, location, salary, date posted, and remote or on-site, and see each one judged on real data: pay against market rates, ghost-job signals, visa sponsorship history, and how well it matches your resume. Track applications, set reminders, and get email alerts.",
+  "displayName": "FoundRole Jobs",
   "homepage": "https://www.foundrole.com/ai-search-mcp",
-  "repository": "https://github.com/foundrole/jobs-mcp-proxy",
-  "license": "ISC",
   "keywords": [
     "ai-job-search",
     "job-search",
@@ -30,5 +26,9 @@
     "interview-prep",
     "mcp"
   ],
-  "logo": "assets/logo.svg"
+  "license": "ISC",
+  "logo": "assets/logo.svg",
+  "name": "foundrole",
+  "repository": "https://github.com/foundrole/jobs-mcp-proxy",
+  "version": "1.0.0"
 }
