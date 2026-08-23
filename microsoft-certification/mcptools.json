@@ -1,0 +1,5053 @@
+{
+  "tools": [
+    {
+      "name": "jobs_search",
+      "description": "Searches a database for real-time job listings matching the user's criteria.\n\nThe query is the full job title or role: \"Ruby Developer\" or \"Ruby on Rails Engineer\" rather than\na bare keyword like \"Ruby\", which is too broad and matches unrelated fields. Results may be\nfiltered by location, company, and how recently a job was posted.\n\nEach result carries an `id`; jobs_details takes that `id` and returns the job's full description,\nrequirements, and benefits. The response also carries a `nextCursor` for the next page of\nresults; a follow-up page is fetched by passing only that cursor, with no other search parameters.\n\nAuthenticated results include resume match data when a profile is available. Job details include\nFoundRole salary benchmarks, H-1B sponsorship signals, E-Verify status, and job-trust analysis;\nlist-level employer signals follow the user's current entitlements.\n\nAdvanced constraints in the user's request — remote-only work, H1B sponsorship, a minimum salary,\nhiding risky postings, a minimum match score — are the search parameters remote, h1b_sponsors_only,\nsalary_floor, hide_low_quality, and min_match. The search enforces only constraints passed as\nparameters; a constraint left out of the call is not applied to the result set. FoundRole Pro\naccounts receive the screened list; other accounts receive the full list and the response reports\nthat the advanced filters were not applied.\n\nEach response includes a system_instruction describing how to present the results for the current\nclient.\n",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "The full job title or skill (e.g., \"Ruby Developer\", NOT just \"Ruby\")"
+          },
+          "location": {
+            "type": "string",
+            "description": "Geographic location (e.g., 'Boston, MA')"
+          },
+          "company": {
+            "type": "string",
+            "description": "The official company name"
+          },
+          "posted_days_ago": {
+            "type": "integer",
+            "description": "Number of days ago to search for jobs (1-365)",
+            "minimum": 1,
+            "maximum": 365
+          },
+          "remote": {
+            "type": "boolean",
+            "description": "Advanced filter: only remote-eligible jobs (respects the location/region scope)."
+          },
+          "h1b_sponsors_only": {
+            "type": "boolean",
+            "description": "Advanced filter: only companies known to sponsor H1B visas."
+          },
+          "salary_floor": {
+            "type": "integer",
+            "description": "Advanced filter: minimum annualized salary in USD; a posting qualifies when the midpoint of its pay band reaches the floor. Jobs without a USD salary are dropped.",
+            "minimum": 0
+          },
+          "hide_low_quality": {
+            "type": "boolean",
+            "description": "Advanced filter: hides postings with a risky ghost grade (D/F); ungraded postings stay."
+          },
+          "min_match": {
+            "type": "integer",
+            "description": "Advanced filter: minimum personal FoundRole match score (0-100); needs a resume on the account.",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor. Treat as an opaque string. COPY EXACTLY."
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "jobs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": ["string", "null"]
+                },
+                "companyName": {
+                  "type": ["string", "null"]
+                },
+                "location": {
+                  "type": ["string", "null"]
+                },
+                "salary": {
+                  "type": ["string", "null"]
+                },
+                "url": {
+                  "type": ["string", "null"]
+                },
+                "logoUrl": {
+                  "type": ["string", "null"]
+                },
+                "link": {
+                  "type": ["string", "null"]
+                },
+                "employmentType": {
+                  "type": ["string", "null"]
+                },
+                "postedAt": {
+                  "type": ["string", "null"]
+                },
+                "descriptionSnippet": {
+                  "type": ["string", "null"]
+                },
+                "description": {
+                  "type": ["string", "null"]
+                },
+                "skills": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "benefits": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "bonuses": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "requirements": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "workLocationType": {
+                  "type": ["string", "null"]
+                },
+                "companyRating": {
+                  "type": ["number", "null"]
+                },
+                "companySize": {
+                  "type": ["string", "null"]
+                },
+                "companyWebsite": {
+                  "type": ["string", "null"]
+                },
+                "category": {
+                  "type": ["string", "null"]
+                },
+                "subcategory": {
+                  "type": ["string", "null"]
+                },
+                "estimatedSalary": {
+                  "type": ["object", "null"],
+                  "properties": {
+                    "median": {
+                      "type": ["number", "null"]
+                    },
+                    "p25": {
+                      "type": ["number", "null"]
+                    },
+                    "p75": {
+                      "type": ["number", "null"]
+                    },
+                    "min": {
+                      "type": ["number", "null"]
+                    },
+                    "max": {
+                      "type": ["number", "null"]
+                    },
+                    "currency": {
+                      "type": ["string", "null"]
+                    },
+                    "sampleSize": {
+                      "type": ["integer", "null"]
+                    },
+                    "basedOn": {
+                      "type": ["string", "null"]
+                    },
+                    "updatedAt": {
+                      "type": ["string", "null"]
+                    }
+                  }
+                },
+                "salaryBand": {
+                  "type": ["object", "null"],
+                  "properties": {
+                    "min": {
+                      "type": "number"
+                    },
+                    "max": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "insights": {
+                  "type": ["object", "null"],
+                  "properties": {
+                    "match": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "score": {
+                          "type": ["integer", "null"]
+                        },
+                        "grade": {
+                          "type": ["string", "null"]
+                        },
+                        "gradeConfidence": {
+                          "type": ["string", "null"]
+                        },
+                        "gradeReasons": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "severity": {
+                                "type": "string"
+                              },
+                              "params": {
+                                "type": ["object", "null"]
+                              }
+                            }
+                          }
+                        },
+                        "insufficientData": {
+                          "type": "boolean"
+                        },
+                        "matchedCount": {
+                          "type": "integer"
+                        },
+                        "missingRequired": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "missingRequiredTotal": {
+                          "type": "integer"
+                        },
+                        "requiredTotal": {
+                          "type": "integer"
+                        },
+                        "matchedRequiredCount": {
+                          "type": "integer"
+                        },
+                        "missingNice": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "missingNiceTotal": {
+                          "type": "integer"
+                        },
+                        "seniorityMatch": {
+                          "type": ["string", "null"]
+                        },
+                        "breakdown": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "skillScore": {
+                              "type": ["number", "null"]
+                            },
+                            "seniorityMultiplier": {
+                              "type": ["number", "null"]
+                            },
+                            "userRank": {
+                              "type": ["integer", "null"]
+                            },
+                            "jobRank": {
+                              "type": ["integer", "null"]
+                            },
+                            "userTrack": {
+                              "type": ["string", "null"]
+                            },
+                            "jobTrack": {
+                              "type": ["string", "null"]
+                            },
+                            "scoredSkillCount": {
+                              "type": ["integer", "null"]
+                            },
+                            "weightedDenominator": {
+                              "type": ["number", "null"]
+                            },
+                            "alignmentKind": {
+                              "type": ["string", "null"]
+                            },
+                            "alignmentMultiplier": {
+                              "type": ["number", "null"]
+                            },
+                            "jobCareerProfileId": {
+                              "type": ["integer", "null"]
+                            },
+                            "jobCareerSpecializationId": {
+                              "type": ["integer", "null"]
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "h1bSponsor": {
+                      "type": ["boolean", "null"]
+                    },
+                    "h1bPetitions": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "count": {
+                          "type": ["integer", "null"]
+                        },
+                        "workers": {
+                          "type": ["integer", "null"]
+                        },
+                        "fiscalPeriod": {
+                          "type": ["string", "null"]
+                        }
+                      }
+                    },
+                    "eVerify": {
+                      "type": ["boolean", "null"]
+                    },
+                    "ghostScore": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "grade": {
+                          "type": ["string", "null"]
+                        },
+                        "confidence": {
+                          "type": ["string", "null"]
+                        },
+                        "reasons": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "severity": {
+                                "type": "string"
+                              },
+                              "params": {
+                                "type": ["object", "null"]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "h1bHistory": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "fiscalPeriod": {
+                            "type": "string"
+                          },
+                          "petitions": {
+                            "type": "integer"
+                          },
+                          "workers": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "trackedJob": {
+                  "type": ["object", "null"]
+                }
+              },
+              "required": ["id"]
+            }
+          },
+          "jobSearchId": {
+            "type": ["string", "null"]
+          },
+          "statusOrder": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "trackerWebUrl": {
+            "type": "string"
+          },
+          "profileSetupUrl": {
+            "type": ["string", "null"]
+          },
+          "profileSetupState": {
+            "type": ["string", "null"]
+          },
+          "feedKind": {
+            "type": "string"
+          },
+          "feedStatus": {
+            "type": ["string", "null"]
+          },
+          "lowRelevanceNotice": {
+            "type": ["string", "null"]
+          },
+          "revalidating": {
+            "type": "boolean"
+          },
+          "proFilterUpsellUrl": {
+            "type": ["string", "null"]
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://foundrole/jobs-search"
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": ["mcp:tools"]
+        }
+      ]
+    },
+    {
+      "name": "jobs_details",
+      "description": "Fetches full details for one job by the `id` returned from jobs_search — the deeper view behind a search result.\n\n**Input:**\n- `job_id`: The exact ID string from the `id` field of a `jobs_search` result.\n\n**Output:**\nComplete job details: description, skills, benefits, requirements, salary benchmark, resume match,\nH-1B and E-Verify signals, job-trust analysis, and application link. Personalized and extended\ninsight fields follow the authenticated user's current entitlements.\n",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "description": "The unique identifier of the job from jobs_search results"
+          }
+        },
+        "required": ["job_id"],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "job": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": ["string", "null"]
+              },
+              "companyName": {
+                "type": ["string", "null"]
+              },
+              "location": {
+                "type": ["string", "null"]
+              },
+              "salary": {
+                "type": ["string", "null"]
+              },
+              "url": {
+                "type": ["string", "null"]
+              },
+              "logoUrl": {
+                "type": ["string", "null"]
+              },
+              "link": {
+                "type": ["string", "null"]
+              },
+              "description": {
+                "type": ["string", "null"]
+              },
+              "skills": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "benefits": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "bonuses": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "requirements": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "employmentType": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "workLocationType": {
+                "type": ["string", "null"]
+              },
+              "companyRating": {
+                "type": ["number", "null"]
+              },
+              "companySize": {
+                "type": ["string", "null"]
+              },
+              "companyWebsite": {
+                "type": ["string", "null"]
+              },
+              "category": {
+                "type": ["string", "null"]
+              },
+              "subcategory": {
+                "type": ["string", "null"]
+              },
+              "postedAt": {
+                "type": ["string", "null"]
+              },
+              "estimatedSalary": {
+                "type": ["object", "null"],
+                "properties": {
+                  "median": {
+                    "type": ["number", "null"]
+                  },
+                  "p25": {
+                    "type": ["number", "null"]
+                  },
+                  "p75": {
+                    "type": ["number", "null"]
+                  },
+                  "min": {
+                    "type": ["number", "null"]
+                  },
+                  "max": {
+                    "type": ["number", "null"]
+                  },
+                  "currency": {
+                    "type": ["string", "null"]
+                  },
+                  "sampleSize": {
+                    "type": ["integer", "null"]
+                  },
+                  "basedOn": {
+                    "type": ["string", "null"]
+                  },
+                  "updatedAt": {
+                    "type": ["string", "null"]
+                  }
+                }
+              },
+              "salaryBand": {
+                "type": ["object", "null"],
+                "properties": {
+                  "min": {
+                    "type": "number"
+                  },
+                  "max": {
+                    "type": "number"
+                  }
+                }
+              },
+              "insights": {
+                "type": ["object", "null"],
+                "properties": {
+                  "match": {
+                    "type": ["object", "null"],
+                    "properties": {
+                      "score": {
+                        "type": ["integer", "null"]
+                      },
+                      "grade": {
+                        "type": ["string", "null"]
+                      },
+                      "gradeConfidence": {
+                        "type": ["string", "null"]
+                      },
+                      "gradeReasons": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "severity": {
+                              "type": "string"
+                            },
+                            "params": {
+                              "type": ["object", "null"]
+                            }
+                          }
+                        }
+                      },
+                      "insufficientData": {
+                        "type": "boolean"
+                      },
+                      "matchedCount": {
+                        "type": "integer"
+                      },
+                      "missingRequired": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "missingRequiredTotal": {
+                        "type": "integer"
+                      },
+                      "requiredTotal": {
+                        "type": "integer"
+                      },
+                      "matchedRequiredCount": {
+                        "type": "integer"
+                      },
+                      "missingNice": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "missingNiceTotal": {
+                        "type": "integer"
+                      },
+                      "seniorityMatch": {
+                        "type": ["string", "null"]
+                      },
+                      "breakdown": {
+                        "type": ["object", "null"],
+                        "properties": {
+                          "skillScore": {
+                            "type": ["number", "null"]
+                          },
+                          "seniorityMultiplier": {
+                            "type": ["number", "null"]
+                          },
+                          "userRank": {
+                            "type": ["integer", "null"]
+                          },
+                          "jobRank": {
+                            "type": ["integer", "null"]
+                          },
+                          "userTrack": {
+                            "type": ["string", "null"]
+                          },
+                          "jobTrack": {
+                            "type": ["string", "null"]
+                          },
+                          "scoredSkillCount": {
+                            "type": ["integer", "null"]
+                          },
+                          "weightedDenominator": {
+                            "type": ["number", "null"]
+                          },
+                          "alignmentKind": {
+                            "type": ["string", "null"]
+                          },
+                          "alignmentMultiplier": {
+                            "type": ["number", "null"]
+                          },
+                          "jobCareerProfileId": {
+                            "type": ["integer", "null"]
+                          },
+                          "jobCareerSpecializationId": {
+                            "type": ["integer", "null"]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "h1bSponsor": {
+                    "type": ["boolean", "null"]
+                  },
+                  "h1bPetitions": {
+                    "type": ["object", "null"],
+                    "properties": {
+                      "count": {
+                        "type": ["integer", "null"]
+                      },
+                      "workers": {
+                        "type": ["integer", "null"]
+                      },
+                      "fiscalPeriod": {
+                        "type": ["string", "null"]
+                      }
+                    }
+                  },
+                  "eVerify": {
+                    "type": ["boolean", "null"]
+                  },
+                  "ghostScore": {
+                    "type": ["object", "null"],
+                    "properties": {
+                      "grade": {
+                        "type": ["string", "null"]
+                      },
+                      "confidence": {
+                        "type": ["string", "null"]
+                      },
+                      "reasons": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "severity": {
+                              "type": "string"
+                            },
+                            "params": {
+                              "type": ["object", "null"]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "h1bHistory": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "fiscalPeriod": {
+                          "type": "string"
+                        },
+                        "petitions": {
+                          "type": "integer"
+                        },
+                        "workers": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": ["id"]
+          },
+          "trackedJob": {
+            "type": ["object", "null"]
+          },
+          "statusOrder": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "trackerWebUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://foundrole/jobs-details",
+          "visibility": ["model", "app"]
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": ["mcp:tools"]
+        }
+      ]
+    },
+    {
+      "name": "jobs_analyze_external",
+      "description": "Analyzes one job found outside FoundRole using the authenticated user's FoundRole profile and the same\nsignals used for FoundRole jobs: resume match, missing skills, H-1B sponsorship history, E-Verify,\nghost-job risk, posted compensation, and market salary estimates. Use tracker_add_external only when\nthe user asks to save without analysis.\n\nThe input represents the direct posting URL and all job content already available in the conversation.\nThe five text identity fields are required; every structured fact field is optional, with a fact the\nsource does not state simply omitted (or null). The optional `client_extraction` object carries\nevidence-backed skills, technology, benefits, bonuses, seniority, industry, management, clearance,\nvisa, and remote-scope labels when source excerpts for them exist. FoundRole validates the evidence,\nstores the client extraction separately, derives missing deterministic facts, and reports which\nvalues were provided, derived, accepted, rejected, or remain unknown.\n\nThe output includes `comparisonRef`; retain it exactly for a later jobs_compare call. The analysis is a\ndecision aid, not a guarantee about sponsorship, legitimacy, compensation, or hiring outcome.\n",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Direct URL of the specific job posting; a company homepage is invalid"
+          },
+          "company_name": {
+            "type": "string",
+            "description": "Company name from the posting"
+          },
+          "title_name": {
+            "type": "string",
+            "description": "Job title from the posting"
+          },
+          "location_name": {
+            "type": "string",
+            "description": "Location text from the posting, including Remote when stated"
+          },
+          "description": {
+            "type": "string",
+            "description": "Complete posting text available in the conversation; a source summary is valid only when no fuller posting text is available"
+          },
+          "posted_at": {
+            "type": ["string", "null"],
+            "description": "Posting date as ISO 8601, when the source states it",
+            "format": "date-time"
+          },
+          "salary_min_value": {
+            "type": ["number", "null"],
+            "description": "Salary range minimum, when stated"
+          },
+          "salary_max_value": {
+            "type": ["number", "null"],
+            "description": "Salary range maximum, when stated"
+          },
+          "salary_value": {
+            "type": ["number", "null"],
+            "description": "Single salary amount, when the posting gives one figure instead of a range"
+          },
+          "salary_type": {
+            "type": ["string", "null"],
+            "description": "Salary period: year, month, week, day, hour",
+            "enum": [null, "year", "month", "week", "day", "hour"]
+          },
+          "salary_currency": {
+            "type": ["string", "null"],
+            "description": "ISO 4217 salary currency code, when stated"
+          },
+          "employment_type": {
+            "type": ["array", "null"],
+            "description": "Employment types: full_time, part_time, contractor, temporary, intern, volunteer, per_diem, other",
+            "items": {
+              "type": "string",
+              "enum": [
+                "full_time",
+                "part_time",
+                "contractor",
+                "temporary",
+                "intern",
+                "volunteer",
+                "per_diem",
+                "other"
+              ]
+            }
+          },
+          "work_location_type": {
+            "type": ["string", "null"],
+            "description": "Work arrangement: on_site, remote, hybrid",
+            "enum": [null, "on_site", "remote", "hybrid"]
+          },
+          "education_requirements": {
+            "type": ["array", "null"],
+            "description": "Education requirements: no_requirements, high_school, associate_degree, bachelor_degree, professional_certificate, postgraduate_degree",
+            "items": {
+              "type": "string",
+              "enum": [
+                "no_requirements",
+                "high_school",
+                "associate_degree",
+                "bachelor_degree",
+                "professional_certificate",
+                "postgraduate_degree"
+              ]
+            }
+          },
+          "experience_months": {
+            "type": ["integer", "null"],
+            "description": "Minimum required experience in months, when stated"
+          },
+          "client_extraction": {
+            "type": ["object", "null"],
+            "description": "Evidence-backed facts extracted by the client model from the posting; non-null evidence is a short source excerpt rather than an inference. Fields absent from the source are omitted or null.",
+            "properties": {
+              "skills": {
+                "type": ["array", "null"],
+                "maxItems": 50,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255
+                    },
+                    "evidence": {
+                      "type": "string",
+                      "minLength": 8,
+                      "maxLength": 500
+                    },
+                    "importance": {
+                      "type": "string",
+                      "enum": ["required", "preferred", "mentioned"]
+                    }
+                  },
+                  "required": ["value", "evidence", "importance"],
+                  "additionalProperties": false
+                }
+              },
+              "tech_stack": {
+                "type": ["array", "null"],
+                "maxItems": 30,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255
+                    },
+                    "evidence": {
+                      "type": "string",
+                      "minLength": 8,
+                      "maxLength": 500
+                    }
+                  },
+                  "required": ["value", "evidence"],
+                  "additionalProperties": false
+                }
+              },
+              "benefits": {
+                "type": ["array", "null"],
+                "maxItems": 30,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255
+                    },
+                    "evidence": {
+                      "type": "string",
+                      "minLength": 8,
+                      "maxLength": 500
+                    }
+                  },
+                  "required": ["value", "evidence"],
+                  "additionalProperties": false
+                }
+              },
+              "bonuses": {
+                "type": ["array", "null"],
+                "maxItems": 20,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255
+                    },
+                    "evidence": {
+                      "type": "string",
+                      "minLength": 8,
+                      "maxLength": 500
+                    }
+                  },
+                  "required": ["value", "evidence"],
+                  "additionalProperties": false
+                }
+              },
+              "seniority": {
+                "type": ["object", "null"],
+                "properties": {
+                  "value": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 500
+                  }
+                },
+                "required": ["value", "evidence"],
+                "additionalProperties": false
+              },
+              "industry": {
+                "type": ["object", "null"],
+                "properties": {
+                  "value": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 500
+                  }
+                },
+                "required": ["value", "evidence"],
+                "additionalProperties": false
+              },
+              "management": {
+                "type": ["object", "null"],
+                "properties": {
+                  "value": {
+                    "type": "boolean"
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 500
+                  }
+                },
+                "required": ["value", "evidence"],
+                "additionalProperties": false
+              },
+              "security_clearance": {
+                "type": ["object", "null"],
+                "properties": {
+                  "value": {
+                    "type": "boolean"
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 500
+                  }
+                },
+                "required": ["value", "evidence"],
+                "additionalProperties": false
+              },
+              "visa_sponsorship": {
+                "type": ["object", "null"],
+                "properties": {
+                  "value": {
+                    "type": "string",
+                    "enum": ["offered", "not_offered", "conditional"]
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 500
+                  }
+                },
+                "required": ["value", "evidence"],
+                "additionalProperties": false
+              },
+              "remote_scope": {
+                "type": ["object", "null"],
+                "properties": {
+                  "value": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 500
+                  }
+                },
+                "required": ["value", "evidence"],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "url",
+          "company_name",
+          "title_name",
+          "location_name",
+          "description"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": ["analysis"]
+          },
+          "jobs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": ["string", "null"]
+                },
+                "companyName": {
+                  "type": ["string", "null"]
+                },
+                "location": {
+                  "type": ["string", "null"]
+                },
+                "salary": {
+                  "type": ["string", "null"]
+                },
+                "url": {
+                  "type": ["string", "null"]
+                },
+                "logoUrl": {
+                  "type": ["string", "null"]
+                },
+                "link": {
+                  "type": ["string", "null"]
+                },
+                "description": {
+                  "type": ["string", "null"]
+                },
+                "skills": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "benefits": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "bonuses": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "requirements": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "employmentType": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "workLocationType": {
+                  "type": ["string", "null"]
+                },
+                "estimatedSalary": {
+                  "type": ["object", "null"],
+                  "properties": {
+                    "median": {
+                      "type": ["number", "null"]
+                    },
+                    "p25": {
+                      "type": ["number", "null"]
+                    },
+                    "p75": {
+                      "type": ["number", "null"]
+                    },
+                    "min": {
+                      "type": ["number", "null"]
+                    },
+                    "max": {
+                      "type": ["number", "null"]
+                    },
+                    "currency": {
+                      "type": ["string", "null"]
+                    },
+                    "sampleSize": {
+                      "type": ["integer", "null"]
+                    },
+                    "basedOn": {
+                      "type": ["string", "null"]
+                    },
+                    "updatedAt": {
+                      "type": ["string", "null"]
+                    }
+                  }
+                },
+                "salaryBand": {
+                  "type": ["object", "null"],
+                  "properties": {
+                    "min": {
+                      "type": "number"
+                    },
+                    "max": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "companyRating": {
+                  "type": ["number", "null"]
+                },
+                "companySize": {
+                  "type": ["string", "null"]
+                },
+                "companyWebsite": {
+                  "type": ["string", "null"]
+                },
+                "category": {
+                  "type": ["string", "null"]
+                },
+                "subcategory": {
+                  "type": ["string", "null"]
+                },
+                "postedAt": {
+                  "type": ["string", "null"]
+                },
+                "insights": {
+                  "type": ["object", "null"],
+                  "properties": {
+                    "match": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "score": {
+                          "type": ["integer", "null"]
+                        },
+                        "grade": {
+                          "type": ["string", "null"]
+                        },
+                        "gradeConfidence": {
+                          "type": ["string", "null"]
+                        },
+                        "gradeReasons": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "severity": {
+                                "type": "string"
+                              },
+                              "params": {
+                                "type": ["object", "null"]
+                              }
+                            }
+                          }
+                        },
+                        "insufficientData": {
+                          "type": "boolean"
+                        },
+                        "matchedCount": {
+                          "type": "integer"
+                        },
+                        "missingRequired": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "missingRequiredTotal": {
+                          "type": "integer"
+                        },
+                        "requiredTotal": {
+                          "type": "integer"
+                        },
+                        "matchedRequiredCount": {
+                          "type": "integer"
+                        },
+                        "missingNice": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "missingNiceTotal": {
+                          "type": "integer"
+                        },
+                        "seniorityMatch": {
+                          "type": ["string", "null"]
+                        },
+                        "breakdown": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "skillScore": {
+                              "type": ["number", "null"]
+                            },
+                            "seniorityMultiplier": {
+                              "type": ["number", "null"]
+                            },
+                            "userRank": {
+                              "type": ["integer", "null"]
+                            },
+                            "jobRank": {
+                              "type": ["integer", "null"]
+                            },
+                            "userTrack": {
+                              "type": ["string", "null"]
+                            },
+                            "jobTrack": {
+                              "type": ["string", "null"]
+                            },
+                            "scoredSkillCount": {
+                              "type": ["integer", "null"]
+                            },
+                            "weightedDenominator": {
+                              "type": ["number", "null"]
+                            },
+                            "alignmentKind": {
+                              "type": ["string", "null"]
+                            },
+                            "alignmentMultiplier": {
+                              "type": ["number", "null"]
+                            },
+                            "jobCareerProfileId": {
+                              "type": ["integer", "null"]
+                            },
+                            "jobCareerSpecializationId": {
+                              "type": ["integer", "null"]
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "h1bSponsor": {
+                      "type": ["boolean", "null"]
+                    },
+                    "h1bPetitions": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "count": {
+                          "type": ["integer", "null"]
+                        },
+                        "workers": {
+                          "type": ["integer", "null"]
+                        },
+                        "fiscalPeriod": {
+                          "type": ["string", "null"]
+                        }
+                      }
+                    },
+                    "eVerify": {
+                      "type": ["boolean", "null"]
+                    },
+                    "ghostScore": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "grade": {
+                          "type": ["string", "null"]
+                        },
+                        "confidence": {
+                          "type": ["string", "null"]
+                        },
+                        "reasons": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "severity": {
+                                "type": "string"
+                              },
+                              "params": {
+                                "type": ["object", "null"]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "h1bHistory": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "fiscalPeriod": {
+                            "type": "string"
+                          },
+                          "petitions": {
+                            "type": "integer"
+                          },
+                          "workers": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "source": {
+                  "type": "string",
+                  "enum": ["external", "foundrole"]
+                },
+                "comparisonRef": {
+                  "type": "string"
+                },
+                "trackerInput": {
+                  "type": ["object", "null"],
+                  "properties": {
+                    "url": {
+                      "type": "string"
+                    },
+                    "company_name": {
+                      "type": "string"
+                    },
+                    "title_name": {
+                      "type": "string"
+                    },
+                    "location_name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "posted_at": {
+                      "type": ["string", "null"]
+                    },
+                    "salary_min_value": {
+                      "type": ["number", "null"]
+                    },
+                    "salary_max_value": {
+                      "type": ["number", "null"]
+                    },
+                    "salary_value": {
+                      "type": ["number", "null"]
+                    },
+                    "salary_type": {
+                      "type": ["string", "null"]
+                    },
+                    "salary_currency": {
+                      "type": ["string", "null"]
+                    },
+                    "employment_type": {
+                      "type": ["array", "null"],
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "work_location_type": {
+                      "type": ["string", "null"]
+                    },
+                    "education_requirements": {
+                      "type": ["array", "null"],
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "experience_months": {
+                      "type": ["integer", "null"]
+                    },
+                    "client_extraction": {
+                      "type": "object",
+                      "properties": {
+                        "skills": {
+                          "type": ["array", "null"],
+                          "maxItems": 50,
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255
+                              },
+                              "evidence": {
+                                "type": "string",
+                                "minLength": 8,
+                                "maxLength": 500
+                              },
+                              "importance": {
+                                "type": "string",
+                                "enum": ["required", "preferred", "mentioned"]
+                              }
+                            },
+                            "required": ["value", "evidence", "importance"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "tech_stack": {
+                          "type": ["array", "null"],
+                          "maxItems": 30,
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255
+                              },
+                              "evidence": {
+                                "type": "string",
+                                "minLength": 8,
+                                "maxLength": 500
+                              }
+                            },
+                            "required": ["value", "evidence"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "benefits": {
+                          "type": ["array", "null"],
+                          "maxItems": 30,
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255
+                              },
+                              "evidence": {
+                                "type": "string",
+                                "minLength": 8,
+                                "maxLength": 500
+                              }
+                            },
+                            "required": ["value", "evidence"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "bonuses": {
+                          "type": ["array", "null"],
+                          "maxItems": 20,
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255
+                              },
+                              "evidence": {
+                                "type": "string",
+                                "minLength": 8,
+                                "maxLength": 500
+                              }
+                            },
+                            "required": ["value", "evidence"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "seniority": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "value": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 255
+                            },
+                            "evidence": {
+                              "type": "string",
+                              "minLength": 8,
+                              "maxLength": 500
+                            }
+                          },
+                          "required": ["value", "evidence"],
+                          "additionalProperties": false
+                        },
+                        "industry": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "value": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 255
+                            },
+                            "evidence": {
+                              "type": "string",
+                              "minLength": 8,
+                              "maxLength": 500
+                            }
+                          },
+                          "required": ["value", "evidence"],
+                          "additionalProperties": false
+                        },
+                        "management": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "value": {
+                              "type": "boolean"
+                            },
+                            "evidence": {
+                              "type": "string",
+                              "minLength": 8,
+                              "maxLength": 500
+                            }
+                          },
+                          "required": ["value", "evidence"],
+                          "additionalProperties": false
+                        },
+                        "security_clearance": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "value": {
+                              "type": "boolean"
+                            },
+                            "evidence": {
+                              "type": "string",
+                              "minLength": 8,
+                              "maxLength": 500
+                            }
+                          },
+                          "required": ["value", "evidence"],
+                          "additionalProperties": false
+                        },
+                        "visa_sponsorship": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "value": {
+                              "type": "string",
+                              "enum": ["offered", "not_offered", "conditional"]
+                            },
+                            "evidence": {
+                              "type": "string",
+                              "minLength": 8,
+                              "maxLength": 500
+                            }
+                          },
+                          "required": ["value", "evidence"],
+                          "additionalProperties": false
+                        },
+                        "remote_scope": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "value": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 255
+                            },
+                            "evidence": {
+                              "type": "string",
+                              "minLength": 8,
+                              "maxLength": 500
+                            }
+                          },
+                          "required": ["value", "evidence"],
+                          "additionalProperties": false
+                        }
+                      }
+                    }
+                  }
+                },
+                "trackedJob": {
+                  "type": ["object", "null"]
+                }
+              },
+              "required": ["id", "source", "comparisonRef"]
+            }
+          },
+          "providedFields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "derivedFields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "unknownFields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "clientExtraction": {
+            "type": ["object", "null"],
+            "properties": {
+              "recordId": {
+                "type": "string"
+              },
+              "schemaVersion": {
+                "type": "integer"
+              },
+              "acceptedFields": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "rejectedFields": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "statusOrder": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "trackerWebUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "mode",
+          "jobs",
+          "providedFields",
+          "derivedFields",
+          "unknownFields",
+          "clientExtraction",
+          "statusOrder",
+          "trackerWebUrl"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://foundrole/jobs-analysis",
+          "visibility": ["model", "app"]
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": ["mcp:tools"]
+        }
+      ]
+    },
+    {
+      "name": "jobs_compare",
+      "description": "Compares 2 to 4 jobs side by side using the same FoundRole analysis fields: resume match, missing skills,\nH-1B and E-Verify signals, ghost-job risk, posted pay, and market salary estimates.\n\n`comparison_refs` accepts exact FoundRole job IDs returned by jobs_search and exact external\n`comparisonRef` URLs returned by jobs_analyze_external. Analyze each outside job first; a bare URL that\nhas not been analyzed cannot be compared because FoundRole does not have its posting facts. Preserve\nevery reference exactly, keep the user's requested order, and do not send duplicates.\n",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "comparison_refs": {
+            "type": "array",
+            "description": "Two to four exact FoundRole job IDs or external comparisonRef URLs",
+            "minItems": 2,
+            "maxItems": 4,
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["comparison_refs"],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": ["comparison"]
+          },
+          "jobs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": ["string", "null"]
+                },
+                "companyName": {
+                  "type": ["string", "null"]
+                },
+                "location": {
+                  "type": ["string", "null"]
+                },
+                "salary": {
+                  "type": ["string", "null"]
+                },
+                "url": {
+                  "type": ["string", "null"]
+                },
+                "logoUrl": {
+                  "type": ["string", "null"]
+                },
+                "link": {
+                  "type": ["string", "null"]
+                },
+                "description": {
+                  "type": ["string", "null"]
+                },
+                "skills": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "benefits": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "bonuses": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "requirements": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "employmentType": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "workLocationType": {
+                  "type": ["string", "null"]
+                },
+                "estimatedSalary": {
+                  "type": ["object", "null"],
+                  "properties": {
+                    "median": {
+                      "type": ["number", "null"]
+                    },
+                    "p25": {
+                      "type": ["number", "null"]
+                    },
+                    "p75": {
+                      "type": ["number", "null"]
+                    },
+                    "min": {
+                      "type": ["number", "null"]
+                    },
+                    "max": {
+                      "type": ["number", "null"]
+                    },
+                    "currency": {
+                      "type": ["string", "null"]
+                    },
+                    "sampleSize": {
+                      "type": ["integer", "null"]
+                    },
+                    "basedOn": {
+                      "type": ["string", "null"]
+                    },
+                    "updatedAt": {
+                      "type": ["string", "null"]
+                    }
+                  }
+                },
+                "salaryBand": {
+                  "type": ["object", "null"],
+                  "properties": {
+                    "min": {
+                      "type": "number"
+                    },
+                    "max": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "companyRating": {
+                  "type": ["number", "null"]
+                },
+                "companySize": {
+                  "type": ["string", "null"]
+                },
+                "companyWebsite": {
+                  "type": ["string", "null"]
+                },
+                "category": {
+                  "type": ["string", "null"]
+                },
+                "subcategory": {
+                  "type": ["string", "null"]
+                },
+                "postedAt": {
+                  "type": ["string", "null"]
+                },
+                "insights": {
+                  "type": ["object", "null"],
+                  "properties": {
+                    "match": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "score": {
+                          "type": ["integer", "null"]
+                        },
+                        "grade": {
+                          "type": ["string", "null"]
+                        },
+                        "gradeConfidence": {
+                          "type": ["string", "null"]
+                        },
+                        "gradeReasons": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "severity": {
+                                "type": "string"
+                              },
+                              "params": {
+                                "type": ["object", "null"]
+                              }
+                            }
+                          }
+                        },
+                        "insufficientData": {
+                          "type": "boolean"
+                        },
+                        "matchedCount": {
+                          "type": "integer"
+                        },
+                        "missingRequired": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "missingRequiredTotal": {
+                          "type": "integer"
+                        },
+                        "requiredTotal": {
+                          "type": "integer"
+                        },
+                        "matchedRequiredCount": {
+                          "type": "integer"
+                        },
+                        "missingNice": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "missingNiceTotal": {
+                          "type": "integer"
+                        },
+                        "seniorityMatch": {
+                          "type": ["string", "null"]
+                        },
+                        "breakdown": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "skillScore": {
+                              "type": ["number", "null"]
+                            },
+                            "seniorityMultiplier": {
+                              "type": ["number", "null"]
+                            },
+                            "userRank": {
+                              "type": ["integer", "null"]
+                            },
+                            "jobRank": {
+                              "type": ["integer", "null"]
+                            },
+                            "userTrack": {
+                              "type": ["string", "null"]
+                            },
+                            "jobTrack": {
+                              "type": ["string", "null"]
+                            },
+                            "scoredSkillCount": {
+                              "type": ["integer", "null"]
+                            },
+                            "weightedDenominator": {
+                              "type": ["number", "null"]
+                            },
+                            "alignmentKind": {
+                              "type": ["string", "null"]
+                            },
+                            "alignmentMultiplier": {
+                              "type": ["number", "null"]
+                            },
+                            "jobCareerProfileId": {
+                              "type": ["integer", "null"]
+                            },
+                            "jobCareerSpecializationId": {
+                              "type": ["integer", "null"]
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "h1bSponsor": {
+                      "type": ["boolean", "null"]
+                    },
+                    "h1bPetitions": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "count": {
+                          "type": ["integer", "null"]
+                        },
+                        "workers": {
+                          "type": ["integer", "null"]
+                        },
+                        "fiscalPeriod": {
+                          "type": ["string", "null"]
+                        }
+                      }
+                    },
+                    "eVerify": {
+                      "type": ["boolean", "null"]
+                    },
+                    "ghostScore": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "grade": {
+                          "type": ["string", "null"]
+                        },
+                        "confidence": {
+                          "type": ["string", "null"]
+                        },
+                        "reasons": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "severity": {
+                                "type": "string"
+                              },
+                              "params": {
+                                "type": ["object", "null"]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "h1bHistory": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "fiscalPeriod": {
+                            "type": "string"
+                          },
+                          "petitions": {
+                            "type": "integer"
+                          },
+                          "workers": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "source": {
+                  "type": "string",
+                  "enum": ["external", "foundrole"]
+                },
+                "comparisonRef": {
+                  "type": "string"
+                },
+                "trackerInput": {
+                  "type": ["object", "null"],
+                  "properties": {
+                    "url": {
+                      "type": "string"
+                    },
+                    "company_name": {
+                      "type": "string"
+                    },
+                    "title_name": {
+                      "type": "string"
+                    },
+                    "location_name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "posted_at": {
+                      "type": ["string", "null"]
+                    },
+                    "salary_min_value": {
+                      "type": ["number", "null"]
+                    },
+                    "salary_max_value": {
+                      "type": ["number", "null"]
+                    },
+                    "salary_value": {
+                      "type": ["number", "null"]
+                    },
+                    "salary_type": {
+                      "type": ["string", "null"]
+                    },
+                    "salary_currency": {
+                      "type": ["string", "null"]
+                    },
+                    "employment_type": {
+                      "type": ["array", "null"],
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "work_location_type": {
+                      "type": ["string", "null"]
+                    },
+                    "education_requirements": {
+                      "type": ["array", "null"],
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "experience_months": {
+                      "type": ["integer", "null"]
+                    },
+                    "client_extraction": {
+                      "type": "object",
+                      "properties": {
+                        "skills": {
+                          "type": ["array", "null"],
+                          "maxItems": 50,
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255
+                              },
+                              "evidence": {
+                                "type": "string",
+                                "minLength": 8,
+                                "maxLength": 500
+                              },
+                              "importance": {
+                                "type": "string",
+                                "enum": ["required", "preferred", "mentioned"]
+                              }
+                            },
+                            "required": ["value", "evidence", "importance"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "tech_stack": {
+                          "type": ["array", "null"],
+                          "maxItems": 30,
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255
+                              },
+                              "evidence": {
+                                "type": "string",
+                                "minLength": 8,
+                                "maxLength": 500
+                              }
+                            },
+                            "required": ["value", "evidence"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "benefits": {
+                          "type": ["array", "null"],
+                          "maxItems": 30,
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255
+                              },
+                              "evidence": {
+                                "type": "string",
+                                "minLength": 8,
+                                "maxLength": 500
+                              }
+                            },
+                            "required": ["value", "evidence"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "bonuses": {
+                          "type": ["array", "null"],
+                          "maxItems": 20,
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255
+                              },
+                              "evidence": {
+                                "type": "string",
+                                "minLength": 8,
+                                "maxLength": 500
+                              }
+                            },
+                            "required": ["value", "evidence"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "seniority": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "value": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 255
+                            },
+                            "evidence": {
+                              "type": "string",
+                              "minLength": 8,
+                              "maxLength": 500
+                            }
+                          },
+                          "required": ["value", "evidence"],
+                          "additionalProperties": false
+                        },
+                        "industry": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "value": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 255
+                            },
+                            "evidence": {
+                              "type": "string",
+                              "minLength": 8,
+                              "maxLength": 500
+                            }
+                          },
+                          "required": ["value", "evidence"],
+                          "additionalProperties": false
+                        },
+                        "management": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "value": {
+                              "type": "boolean"
+                            },
+                            "evidence": {
+                              "type": "string",
+                              "minLength": 8,
+                              "maxLength": 500
+                            }
+                          },
+                          "required": ["value", "evidence"],
+                          "additionalProperties": false
+                        },
+                        "security_clearance": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "value": {
+                              "type": "boolean"
+                            },
+                            "evidence": {
+                              "type": "string",
+                              "minLength": 8,
+                              "maxLength": 500
+                            }
+                          },
+                          "required": ["value", "evidence"],
+                          "additionalProperties": false
+                        },
+                        "visa_sponsorship": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "value": {
+                              "type": "string",
+                              "enum": ["offered", "not_offered", "conditional"]
+                            },
+                            "evidence": {
+                              "type": "string",
+                              "minLength": 8,
+                              "maxLength": 500
+                            }
+                          },
+                          "required": ["value", "evidence"],
+                          "additionalProperties": false
+                        },
+                        "remote_scope": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "value": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 255
+                            },
+                            "evidence": {
+                              "type": "string",
+                              "minLength": 8,
+                              "maxLength": 500
+                            }
+                          },
+                          "required": ["value", "evidence"],
+                          "additionalProperties": false
+                        }
+                      }
+                    }
+                  }
+                },
+                "trackedJob": {
+                  "type": ["object", "null"]
+                }
+              },
+              "required": ["id", "source", "comparisonRef"]
+            }
+          },
+          "statusOrder": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "trackerWebUrl": {
+            "type": "string"
+          }
+        },
+        "required": ["mode", "jobs", "statusOrder", "trackerWebUrl"]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://foundrole/jobs-analysis",
+          "visibility": ["model", "app"]
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": ["mcp:tools"]
+        }
+      ]
+    },
+    {
+      "name": "jobs_recommendations",
+      "description": "Returns the authenticated user's personalized job recommendations built from their resume, skills,\ntarget roles, and preferred location. Results are ranked by fit, may include related roles, and carry\nthe same salary, match, H-1B, and job-trust insight payload used by job search.\n\nA processing status means the personalized feed is still being prepared; a later call returns the\ncompleted feed. Page numbers fetch additional recommendations from the same feed.\n",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "location": {
+            "type": "string",
+            "description": "Optional preferred location name or slug"
+          },
+          "page": {
+            "type": "integer",
+            "description": "Recommendation page number",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "jobs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": ["string", "null"]
+                },
+                "companyName": {
+                  "type": ["string", "null"]
+                },
+                "location": {
+                  "type": ["string", "null"]
+                },
+                "salary": {
+                  "type": ["string", "null"]
+                },
+                "url": {
+                  "type": ["string", "null"]
+                },
+                "logoUrl": {
+                  "type": ["string", "null"]
+                },
+                "link": {
+                  "type": ["string", "null"]
+                },
+                "employmentType": {
+                  "type": ["string", "null"]
+                },
+                "postedAt": {
+                  "type": ["string", "null"]
+                },
+                "descriptionSnippet": {
+                  "type": ["string", "null"]
+                },
+                "description": {
+                  "type": ["string", "null"]
+                },
+                "skills": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "benefits": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "bonuses": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "requirements": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "workLocationType": {
+                  "type": ["string", "null"]
+                },
+                "companyRating": {
+                  "type": ["number", "null"]
+                },
+                "companySize": {
+                  "type": ["string", "null"]
+                },
+                "companyWebsite": {
+                  "type": ["string", "null"]
+                },
+                "category": {
+                  "type": ["string", "null"]
+                },
+                "subcategory": {
+                  "type": ["string", "null"]
+                },
+                "estimatedSalary": {
+                  "type": ["object", "null"],
+                  "properties": {
+                    "median": {
+                      "type": ["number", "null"]
+                    },
+                    "p25": {
+                      "type": ["number", "null"]
+                    },
+                    "p75": {
+                      "type": ["number", "null"]
+                    },
+                    "min": {
+                      "type": ["number", "null"]
+                    },
+                    "max": {
+                      "type": ["number", "null"]
+                    },
+                    "currency": {
+                      "type": ["string", "null"]
+                    },
+                    "sampleSize": {
+                      "type": ["integer", "null"]
+                    },
+                    "basedOn": {
+                      "type": ["string", "null"]
+                    },
+                    "updatedAt": {
+                      "type": ["string", "null"]
+                    }
+                  }
+                },
+                "salaryBand": {
+                  "type": ["object", "null"],
+                  "properties": {
+                    "min": {
+                      "type": "number"
+                    },
+                    "max": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "insights": {
+                  "type": ["object", "null"],
+                  "properties": {
+                    "match": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "score": {
+                          "type": ["integer", "null"]
+                        },
+                        "grade": {
+                          "type": ["string", "null"]
+                        },
+                        "gradeConfidence": {
+                          "type": ["string", "null"]
+                        },
+                        "gradeReasons": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "severity": {
+                                "type": "string"
+                              },
+                              "params": {
+                                "type": ["object", "null"]
+                              }
+                            }
+                          }
+                        },
+                        "insufficientData": {
+                          "type": "boolean"
+                        },
+                        "matchedCount": {
+                          "type": "integer"
+                        },
+                        "missingRequired": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "missingRequiredTotal": {
+                          "type": "integer"
+                        },
+                        "requiredTotal": {
+                          "type": "integer"
+                        },
+                        "matchedRequiredCount": {
+                          "type": "integer"
+                        },
+                        "missingNice": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "missingNiceTotal": {
+                          "type": "integer"
+                        },
+                        "seniorityMatch": {
+                          "type": ["string", "null"]
+                        },
+                        "breakdown": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "skillScore": {
+                              "type": ["number", "null"]
+                            },
+                            "seniorityMultiplier": {
+                              "type": ["number", "null"]
+                            },
+                            "userRank": {
+                              "type": ["integer", "null"]
+                            },
+                            "jobRank": {
+                              "type": ["integer", "null"]
+                            },
+                            "userTrack": {
+                              "type": ["string", "null"]
+                            },
+                            "jobTrack": {
+                              "type": ["string", "null"]
+                            },
+                            "scoredSkillCount": {
+                              "type": ["integer", "null"]
+                            },
+                            "weightedDenominator": {
+                              "type": ["number", "null"]
+                            },
+                            "alignmentKind": {
+                              "type": ["string", "null"]
+                            },
+                            "alignmentMultiplier": {
+                              "type": ["number", "null"]
+                            },
+                            "jobCareerProfileId": {
+                              "type": ["integer", "null"]
+                            },
+                            "jobCareerSpecializationId": {
+                              "type": ["integer", "null"]
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "h1bSponsor": {
+                      "type": ["boolean", "null"]
+                    },
+                    "h1bPetitions": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "count": {
+                          "type": ["integer", "null"]
+                        },
+                        "workers": {
+                          "type": ["integer", "null"]
+                        },
+                        "fiscalPeriod": {
+                          "type": ["string", "null"]
+                        }
+                      }
+                    },
+                    "eVerify": {
+                      "type": ["boolean", "null"]
+                    },
+                    "ghostScore": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "grade": {
+                          "type": ["string", "null"]
+                        },
+                        "confidence": {
+                          "type": ["string", "null"]
+                        },
+                        "reasons": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "severity": {
+                                "type": "string"
+                              },
+                              "params": {
+                                "type": ["object", "null"]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "h1bHistory": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "fiscalPeriod": {
+                            "type": "string"
+                          },
+                          "petitions": {
+                            "type": "integer"
+                          },
+                          "workers": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "trackedJob": {
+                  "type": ["object", "null"]
+                }
+              },
+              "required": ["id"]
+            }
+          },
+          "jobSearchId": {
+            "type": ["string", "null"]
+          },
+          "statusOrder": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "trackerWebUrl": {
+            "type": "string"
+          },
+          "profileSetupUrl": {
+            "type": ["string", "null"]
+          },
+          "profileSetupState": {
+            "type": ["string", "null"]
+          },
+          "feedKind": {
+            "type": "string"
+          },
+          "feedStatus": {
+            "type": "string"
+          },
+          "revalidating": {
+            "type": "boolean"
+          },
+          "nextPage": {
+            "type": ["integer", "null"]
+          },
+          "totalCount": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://foundrole/jobs-recommendations",
+          "visibility": ["model", "app"]
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": ["mcp:tools"]
+        }
+      ]
+    },
+    {
+      "name": "knowledge_search",
+      "description": "Searches FoundRole's published content by semantic similarity and returns the most relevant sources for a\njob-search question: career-guidance blog articles plus FoundRole site pages that describe the product's\nfeatures (job tracker, Pro plan and pricing, H1B salary data, AI job search) and industry/sector career\nlandings. Each article carries a title, url, summary, a content excerpt, publication date, and tags; each\npage carries a title, url, description, and its FAQ entries — enough material to answer the question and\nlink the source.\n\nTwo optional facets add further result groups: company returns FoundRole's employer profile pages\nmatching that company name; location returns the market landing page for that city, state, or country —\nan analytical page about that labour market, not a list of openings. The facets describe what the user is\nasking about — a company mentioned only in passing does not need the company facet.\n\nReturns empty groups when nothing is relevant rather than padding with off-topic content. Results are the\nclosest matches to the given question, not an index of the site's full coverage; questions about overall\ntopic coverage are answered by knowledge_topics, which lists the blog's categories and tags with article\ncounts. It does not search job listings and reports no open-job counts — jobs_search covers live roles,\nincluding questions about openings for a particular job title. Each response includes a\nsystem_instruction describing how to present the sources.\n",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "The career, job-search, or FoundRole product question to answer"
+          },
+          "company": {
+            "type": "string",
+            "description": "A company name, when the question is about that employer — returns FoundRole company profile pages"
+          },
+          "location": {
+            "type": "string",
+            "description": "A city, state, or country, when the question is about that labour market — returns its market landing page"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum articles to return (default 5)",
+            "minimum": 1,
+            "maximum": 8
+          }
+        },
+        "required": ["query"],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "articles": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": ["string", "null"]
+                },
+                "url": {
+                  "type": "string"
+                },
+                "summary": {
+                  "type": ["string", "null"]
+                },
+                "excerpt": {
+                  "type": ["string", "null"]
+                },
+                "publishedAt": {
+                  "type": ["string", "null"]
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "pages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": ["string", "null"]
+                },
+                "faq": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "companyPages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "industry": {
+                  "type": ["string", "null"]
+                },
+                "headquarters": {
+                  "type": ["string", "null"]
+                }
+              }
+            }
+          },
+          "landingPages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": ["string", "null"]
+                }
+              }
+            }
+          },
+          "totalCount": {
+            "type": "integer"
+          },
+          "proUrl": {
+            "type": ["string", "null"]
+          },
+          "profileSetupUrl": {
+            "type": ["string", "null"]
+          },
+          "system_instruction": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": ["mcp:tools"]
+        }
+      ]
+    },
+    {
+      "name": "knowledge_topics",
+      "description": "Lists what FoundRole's published career-guidance blog covers: every category and the most-used tags,\neach with its published-article count and url, plus the total number of published articles. This is the\nfactual source for questions about the blog's topics or overall coverage. It takes no parameters and\nreflects the live published corpus. It does not retrieve articles for a specific question;\nknowledge_search does that.\n",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "totalArticles": {
+            "type": "integer"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": ["string", "null"]
+                },
+                "articleCount": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": ["string", "null"]
+                },
+                "articleCount": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "system_instruction": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": ["mcp:tools"]
+        }
+      ]
+    },
+    {
+      "name": "tracker_add",
+      "description": "Tracks a job from jobs_search results in the user's job tracker, identified by its job_id. For a\njob found elsewhere on the open web (with a URL but no jobs_search job_id), tracker_add_external\nis the right tool instead.\n\nFields:\n- `job_id`: the job ID from jobs_search results (required)\n- `status`: initial status (saved, applied, interviewing, offered, archived); defaults to \"saved\"\n- `sub_status`: sub-status within the main status: saved: interested, researching_company, preparing_application, ready_to_apply; applied: application_submitted, followed_up; interviewing: interview_scheduled, phone_screen, technical, onsite, final_round, pending_feedback; offered: negotiating, considering, offer_received, accepted; archived: ghosted, rejected_by_company, withdrawn_by_candidate, not_interested, employed_by_this_company, employed_by_another_company\n- `notes`: notes about the job\n\nReturns the tracked job with its details. Repeated saves return the existing tracked job. A job\nthat was previously removed from the tracker is restored with its earlier status and notes.\n",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "description": "The job ID from jobs.search results"
+          },
+          "status": {
+            "type": "string",
+            "description": "Initial tracking status: saved, applied, interviewing, offered, archived"
+          },
+          "sub_status": {
+            "type": "string",
+            "description": "Sub-status within the main status, valid only for that status — saved: interested, researching_company, preparing_application, ready_to_apply; applied: application_submitted, followed_up; interviewing: interview_scheduled, phone_screen, technical, onsite, final_round, pending_feedback; offered: negotiating, considering, offer_received, accepted; archived: ghosted, rejected_by_company, withdrawn_by_candidate, not_interested, employed_by_this_company, employed_by_another_company"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Notes about this job"
+          }
+        },
+        "required": ["job_id"],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "trackedJob": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "subStatus": {
+                "type": ["string", "null"]
+              },
+              "notes": {
+                "type": ["string", "null"]
+              },
+              "isStarred": {
+                "type": "boolean"
+              },
+              "deadline": {
+                "type": ["string", "null"]
+              },
+              "salaryOffered": {
+                "type": ["number", "null"]
+              },
+              "salaryOfferedType": {
+                "type": ["string", "null"]
+              },
+              "reminderAt": {
+                "type": ["string", "null"]
+              },
+              "appliedAt": {
+                "type": ["string", "null"]
+              },
+              "createdAt": {
+                "type": ["string", "null"]
+              },
+              "updatedAt": {
+                "type": ["string", "null"]
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "contacts": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "trackable": {
+                "type": ["object", "null"]
+              }
+            },
+            "required": ["id"]
+          },
+          "trackedJobs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "subStatus": {
+                  "type": ["string", "null"]
+                },
+                "notes": {
+                  "type": ["string", "null"]
+                },
+                "isStarred": {
+                  "type": "boolean"
+                },
+                "deadline": {
+                  "type": ["string", "null"]
+                },
+                "salaryOffered": {
+                  "type": ["number", "null"]
+                },
+                "salaryOfferedType": {
+                  "type": ["string", "null"]
+                },
+                "reminderAt": {
+                  "type": ["string", "null"]
+                },
+                "appliedAt": {
+                  "type": ["string", "null"]
+                },
+                "createdAt": {
+                  "type": ["string", "null"]
+                },
+                "updatedAt": {
+                  "type": ["string", "null"]
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "contacts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "trackable": {
+                  "type": ["object", "null"]
+                },
+                "job": {
+                  "type": ["object", "null"]
+                }
+              },
+              "required": ["id"]
+            }
+          },
+          "statusOrder": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "subStatusOrder": {
+            "type": "object"
+          },
+          "totalCount": {
+            "type": "integer"
+          },
+          "hasMore": {
+            "type": "boolean"
+          },
+          "trackerWebUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://foundrole/tracker-list",
+          "visibility": ["model", "app"]
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": ["mcp:tools"]
+        }
+      ]
+    },
+    {
+      "name": "tracker_add_external",
+      "description": "Saves a job posting found anywhere on the open web into the user's tracker. For jobs that came\nfrom jobs_search results, tracker_add (which takes a job_id) is the right tool instead. A job\nseen elsewhere in the conversation needs no prior jobs_search call — its URL and details from\nthe conversation are sufficient input.\n\n`url`, `company_name`, `title_name`, `location_name`, and `description` identify the posting\nand are the only required fields. Every structured fact field (salary, dates, employment type,\neducation, experience) is optional: a fact the source does not state is simply omitted (or\nnull), and FoundRole's own extractors derive missing salary, employment, work-arrangement,\neducation, experience, skills, benefits, and bonuses from the description. A save never waits\non facts the source did not provide. The optional `client_extraction` object carries\nevidence-backed skills, technology, benefits, bonuses, seniority, industry, management,\nclearance, visa, and remote-scope labels when source excerpts for them exist; FoundRole\nvalidates and stores those labels separately.\n\nFields:\n- `url`: the job posting's direct URL (required; not a company homepage)\n- `company_name`: company name (required)\n- `title_name`: job title (required)\n- `location_name`: location, e.g. \"New York, NY\" (required)\n- `description`: the posting's description from the source result; a short summary is acceptable (required)\n- `salary_min_value` / `salary_max_value`: salary range bounds (numbers)\n- `salary_value`: a single salary figure when there is no range (number)\n- `posted_at`: ISO 8601 posting date\n- `salary_currency`: ISO 4217 currency code\n- `salary_type`: one of year, month, week, day, hour\n- `employment_type`: array of full_time, part_time, contractor, temporary, intern, volunteer, per_diem, other\n- `work_location_type`: one of on_site, remote, hybrid\n- `education_requirements`: array of no_requirements, high_school, associate_degree, bachelor_degree, professional_certificate, postgraduate_degree\n- `experience_months`: minimum required experience in months (number)\n- `client_extraction`: evidence-backed extraction object; fields without source evidence are omitted\n- `status`: initial tracking status (saved, applied, interviewing, offered, archived); defaults to \"saved\"\n- `sub_status`: sub-status within the main status: saved: interested, researching_company, preparing_application, ready_to_apply; applied: application_submitted, followed_up; interviewing: interview_scheduled, phone_screen, technical, onsite, final_round, pending_feedback; offered: negotiating, considering, offer_received, accepted; archived: ghosted, rejected_by_company, withdrawn_by_candidate, not_interested, employed_by_this_company, employed_by_another_company\n- `notes`: notes about the job\n\nReturns the tracked job. Repeated saves return the existing tracked job.\n",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Direct URL of the specific job posting; a company homepage is invalid"
+          },
+          "company_name": {
+            "type": "string",
+            "description": "Company name from the posting"
+          },
+          "title_name": {
+            "type": "string",
+            "description": "Job title from the posting"
+          },
+          "location_name": {
+            "type": "string",
+            "description": "Location text from the posting, including Remote when stated"
+          },
+          "description": {
+            "type": "string",
+            "description": "Complete posting text available in the conversation; a source summary is valid only when no fuller posting text is available"
+          },
+          "posted_at": {
+            "type": ["string", "null"],
+            "description": "Posting date as ISO 8601, when the source states it",
+            "format": "date-time"
+          },
+          "salary_min_value": {
+            "type": ["number", "null"],
+            "description": "Salary range minimum, when stated"
+          },
+          "salary_max_value": {
+            "type": ["number", "null"],
+            "description": "Salary range maximum, when stated"
+          },
+          "salary_value": {
+            "type": ["number", "null"],
+            "description": "Single salary amount, when the posting gives one figure instead of a range"
+          },
+          "salary_type": {
+            "type": ["string", "null"],
+            "description": "Salary period: year, month, week, day, hour",
+            "enum": [null, "year", "month", "week", "day", "hour"]
+          },
+          "salary_currency": {
+            "type": ["string", "null"],
+            "description": "ISO 4217 salary currency code, when stated"
+          },
+          "employment_type": {
+            "type": ["array", "null"],
+            "description": "Employment types: full_time, part_time, contractor, temporary, intern, volunteer, per_diem, other",
+            "items": {
+              "type": "string",
+              "enum": [
+                "full_time",
+                "part_time",
+                "contractor",
+                "temporary",
+                "intern",
+                "volunteer",
+                "per_diem",
+                "other"
+              ]
+            }
+          },
+          "work_location_type": {
+            "type": ["string", "null"],
+            "description": "Work arrangement: on_site, remote, hybrid",
+            "enum": [null, "on_site", "remote", "hybrid"]
+          },
+          "education_requirements": {
+            "type": ["array", "null"],
+            "description": "Education requirements: no_requirements, high_school, associate_degree, bachelor_degree, professional_certificate, postgraduate_degree",
+            "items": {
+              "type": "string",
+              "enum": [
+                "no_requirements",
+                "high_school",
+                "associate_degree",
+                "bachelor_degree",
+                "professional_certificate",
+                "postgraduate_degree"
+              ]
+            }
+          },
+          "experience_months": {
+            "type": ["integer", "null"],
+            "description": "Minimum required experience in months, when stated"
+          },
+          "client_extraction": {
+            "type": ["object", "null"],
+            "description": "Evidence-backed facts extracted by the client model from the posting; non-null evidence is a short source excerpt rather than an inference. Fields absent from the source are omitted or null.",
+            "properties": {
+              "skills": {
+                "type": ["array", "null"],
+                "maxItems": 50,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255
+                    },
+                    "evidence": {
+                      "type": "string",
+                      "minLength": 8,
+                      "maxLength": 500
+                    },
+                    "importance": {
+                      "type": "string",
+                      "enum": ["required", "preferred", "mentioned"]
+                    }
+                  },
+                  "required": ["value", "evidence", "importance"],
+                  "additionalProperties": false
+                }
+              },
+              "tech_stack": {
+                "type": ["array", "null"],
+                "maxItems": 30,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255
+                    },
+                    "evidence": {
+                      "type": "string",
+                      "minLength": 8,
+                      "maxLength": 500
+                    }
+                  },
+                  "required": ["value", "evidence"],
+                  "additionalProperties": false
+                }
+              },
+              "benefits": {
+                "type": ["array", "null"],
+                "maxItems": 30,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255
+                    },
+                    "evidence": {
+                      "type": "string",
+                      "minLength": 8,
+                      "maxLength": 500
+                    }
+                  },
+                  "required": ["value", "evidence"],
+                  "additionalProperties": false
+                }
+              },
+              "bonuses": {
+                "type": ["array", "null"],
+                "maxItems": 20,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255
+                    },
+                    "evidence": {
+                      "type": "string",
+                      "minLength": 8,
+                      "maxLength": 500
+                    }
+                  },
+                  "required": ["value", "evidence"],
+                  "additionalProperties": false
+                }
+              },
+              "seniority": {
+                "type": ["object", "null"],
+                "properties": {
+                  "value": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 500
+                  }
+                },
+                "required": ["value", "evidence"],
+                "additionalProperties": false
+              },
+              "industry": {
+                "type": ["object", "null"],
+                "properties": {
+                  "value": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 500
+                  }
+                },
+                "required": ["value", "evidence"],
+                "additionalProperties": false
+              },
+              "management": {
+                "type": ["object", "null"],
+                "properties": {
+                  "value": {
+                    "type": "boolean"
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 500
+                  }
+                },
+                "required": ["value", "evidence"],
+                "additionalProperties": false
+              },
+              "security_clearance": {
+                "type": ["object", "null"],
+                "properties": {
+                  "value": {
+                    "type": "boolean"
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 500
+                  }
+                },
+                "required": ["value", "evidence"],
+                "additionalProperties": false
+              },
+              "visa_sponsorship": {
+                "type": ["object", "null"],
+                "properties": {
+                  "value": {
+                    "type": "string",
+                    "enum": ["offered", "not_offered", "conditional"]
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 500
+                  }
+                },
+                "required": ["value", "evidence"],
+                "additionalProperties": false
+              },
+              "remote_scope": {
+                "type": ["object", "null"],
+                "properties": {
+                  "value": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 500
+                  }
+                },
+                "required": ["value", "evidence"],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "status": {
+            "type": "string",
+            "description": "Initial tracking status: saved, applied, interviewing, offered, archived"
+          },
+          "sub_status": {
+            "type": "string",
+            "description": "Sub-status within the main status, valid only for that status — saved: interested, researching_company, preparing_application, ready_to_apply; applied: application_submitted, followed_up; interviewing: interview_scheduled, phone_screen, technical, onsite, final_round, pending_feedback; offered: negotiating, considering, offer_received, accepted; archived: ghosted, rejected_by_company, withdrawn_by_candidate, not_interested, employed_by_this_company, employed_by_another_company"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Notes about this job"
+          }
+        },
+        "required": [
+          "url",
+          "company_name",
+          "title_name",
+          "location_name",
+          "description"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "trackedJob": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "subStatus": {
+                "type": ["string", "null"]
+              },
+              "notes": {
+                "type": ["string", "null"]
+              },
+              "isStarred": {
+                "type": "boolean"
+              },
+              "deadline": {
+                "type": ["string", "null"]
+              },
+              "salaryOffered": {
+                "type": ["number", "null"]
+              },
+              "salaryOfferedType": {
+                "type": ["string", "null"]
+              },
+              "reminderAt": {
+                "type": ["string", "null"]
+              },
+              "appliedAt": {
+                "type": ["string", "null"]
+              },
+              "createdAt": {
+                "type": ["string", "null"]
+              },
+              "updatedAt": {
+                "type": ["string", "null"]
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "contacts": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "trackable": {
+                "type": ["object", "null"]
+              }
+            },
+            "required": ["id"]
+          },
+          "trackedJobs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "subStatus": {
+                  "type": ["string", "null"]
+                },
+                "notes": {
+                  "type": ["string", "null"]
+                },
+                "isStarred": {
+                  "type": "boolean"
+                },
+                "deadline": {
+                  "type": ["string", "null"]
+                },
+                "salaryOffered": {
+                  "type": ["number", "null"]
+                },
+                "salaryOfferedType": {
+                  "type": ["string", "null"]
+                },
+                "reminderAt": {
+                  "type": ["string", "null"]
+                },
+                "appliedAt": {
+                  "type": ["string", "null"]
+                },
+                "createdAt": {
+                  "type": ["string", "null"]
+                },
+                "updatedAt": {
+                  "type": ["string", "null"]
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "contacts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "trackable": {
+                  "type": ["object", "null"]
+                },
+                "job": {
+                  "type": ["object", "null"]
+                }
+              },
+              "required": ["id"]
+            }
+          },
+          "statusOrder": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "subStatusOrder": {
+            "type": "object"
+          },
+          "totalCount": {
+            "type": "integer"
+          },
+          "hasMore": {
+            "type": "boolean"
+          },
+          "trackerWebUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://foundrole/tracker-list",
+          "visibility": ["model", "app"]
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": ["mcp:tools"]
+        }
+      ]
+    },
+    {
+      "name": "tracker_list",
+      "description": "Lists the user's tracked jobs with optional filtering and pagination.\n\n**Input:**\n- `status`: Filter by status (saved, applied, interviewing, offered, archived)\n- `limit`: Number of results per page (default 20, max 50)\n- `offset`: Number of results to skip (default 0)\n\n**Output:**\nReturns a list of tracked jobs grouped by status with pagination info. Each response\nincludes a system_instruction describing how to present the results for the current client.\n",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Filter by status: saved, applied, interviewing, offered, archived"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of results per page (default 20, max 50)",
+            "minimum": 1,
+            "maximum": 50
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Number of results to skip (default 0)",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "trackedJob": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "subStatus": {
+                "type": ["string", "null"]
+              },
+              "notes": {
+                "type": ["string", "null"]
+              },
+              "isStarred": {
+                "type": "boolean"
+              },
+              "deadline": {
+                "type": ["string", "null"]
+              },
+              "salaryOffered": {
+                "type": ["number", "null"]
+              },
+              "salaryOfferedType": {
+                "type": ["string", "null"]
+              },
+              "reminderAt": {
+                "type": ["string", "null"]
+              },
+              "appliedAt": {
+                "type": ["string", "null"]
+              },
+              "createdAt": {
+                "type": ["string", "null"]
+              },
+              "updatedAt": {
+                "type": ["string", "null"]
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "contacts": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "trackable": {
+                "type": ["object", "null"]
+              }
+            },
+            "required": ["id"]
+          },
+          "trackedJobs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "subStatus": {
+                  "type": ["string", "null"]
+                },
+                "notes": {
+                  "type": ["string", "null"]
+                },
+                "isStarred": {
+                  "type": "boolean"
+                },
+                "deadline": {
+                  "type": ["string", "null"]
+                },
+                "salaryOffered": {
+                  "type": ["number", "null"]
+                },
+                "salaryOfferedType": {
+                  "type": ["string", "null"]
+                },
+                "reminderAt": {
+                  "type": ["string", "null"]
+                },
+                "appliedAt": {
+                  "type": ["string", "null"]
+                },
+                "createdAt": {
+                  "type": ["string", "null"]
+                },
+                "updatedAt": {
+                  "type": ["string", "null"]
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "contacts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "trackable": {
+                  "type": ["object", "null"]
+                },
+                "job": {
+                  "type": ["object", "null"]
+                }
+              },
+              "required": ["id"]
+            }
+          },
+          "statusOrder": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "subStatusOrder": {
+            "type": "object"
+          },
+          "totalCount": {
+            "type": "integer"
+          },
+          "hasMore": {
+            "type": "boolean"
+          },
+          "trackerWebUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://foundrole/tracker-list"
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": ["mcp:tools"]
+        }
+      ]
+    },
+    {
+      "name": "tracker_update",
+      "description": "Updates details of a tracked job (notes, deadline, salary, tags).\n\n**Input:**\n- `tracked_job_id`: The tracked job ID — `trackedJobs[].id` from tracker_list output, distinct from `trackable.id` and `job.id` (required)\n- `notes`: Updated notes\n- `deadline`: Deadline date (ISO 8601 format)\n- `salary_offered`: Salary amount\n- `salary_offered_type`: Salary type: year, month, week, day, hour\n- `tags`: Comma-separated tags (e.g., \"remote,startup,tech\")\n- `reminder_at`: Reminder date/time in ISO 8601 format, e.g. \"2025-03-15T10:00:00Z\" (must be in the future, or empty to clear)\n\n**Output:**\nReturns the updated tracked job.\n",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "tracked_job_id": {
+            "type": "string",
+            "description": "The tracked job ID — `trackedJobs[].id` from tracker_list output, distinct from `trackable.id` and `job.id` (required)"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Notes about this job"
+          },
+          "deadline": {
+            "type": "string",
+            "description": "Deadline date in ISO 8601 format"
+          },
+          "salary_offered": {
+            "type": "number",
+            "description": "Salary amount"
+          },
+          "salary_offered_type": {
+            "type": "string",
+            "description": "Salary type: year, month, week, day, hour"
+          },
+          "tags": {
+            "type": "string",
+            "description": "Comma-separated tags (e.g., \"remote,startup,tech\")"
+          },
+          "reminder_at": {
+            "type": "string",
+            "description": "ISO 8601 datetime, e.g. \"2025-03-15T10:00:00Z\" (must be in the future, or empty to clear)"
+          }
+        },
+        "required": ["tracked_job_id"],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "trackedJob": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "subStatus": {
+                "type": ["string", "null"]
+              },
+              "notes": {
+                "type": ["string", "null"]
+              },
+              "isStarred": {
+                "type": "boolean"
+              },
+              "deadline": {
+                "type": ["string", "null"]
+              },
+              "salaryOffered": {
+                "type": ["number", "null"]
+              },
+              "salaryOfferedType": {
+                "type": ["string", "null"]
+              },
+              "reminderAt": {
+                "type": ["string", "null"]
+              },
+              "appliedAt": {
+                "type": ["string", "null"]
+              },
+              "createdAt": {
+                "type": ["string", "null"]
+              },
+              "updatedAt": {
+                "type": ["string", "null"]
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "contacts": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "trackable": {
+                "type": ["object", "null"]
+              }
+            },
+            "required": ["id"]
+          },
+          "trackedJobs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "subStatus": {
+                  "type": ["string", "null"]
+                },
+                "notes": {
+                  "type": ["string", "null"]
+                },
+                "isStarred": {
+                  "type": "boolean"
+                },
+                "deadline": {
+                  "type": ["string", "null"]
+                },
+                "salaryOffered": {
+                  "type": ["number", "null"]
+                },
+                "salaryOfferedType": {
+                  "type": ["string", "null"]
+                },
+                "reminderAt": {
+                  "type": ["string", "null"]
+                },
+                "appliedAt": {
+                  "type": ["string", "null"]
+                },
+                "createdAt": {
+                  "type": ["string", "null"]
+                },
+                "updatedAt": {
+                  "type": ["string", "null"]
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "contacts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "trackable": {
+                  "type": ["object", "null"]
+                },
+                "job": {
+                  "type": ["object", "null"]
+                }
+              },
+              "required": ["id"]
+            }
+          },
+          "statusOrder": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "subStatusOrder": {
+            "type": "object"
+          },
+          "totalCount": {
+            "type": "integer"
+          },
+          "hasMore": {
+            "type": "boolean"
+          },
+          "trackerWebUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": true
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://foundrole/tracker-list",
+          "visibility": ["model", "app"]
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": ["mcp:tools"]
+        }
+      ]
+    },
+    {
+      "name": "tracker_update_status",
+      "description": "Updates the status of a tracked job.\n\n**Input:**\n- `tracked_job_id`: The tracked job ID — `trackedJobs[].id` from tracker_list output, distinct from `trackable.id` and `job.id` (required)\n- `status`: New status: saved, applied, interviewing, offered, archived (required)\n- `sub_status`: Sub-status within the main status, valid only for that status (optional): saved: interested, researching_company, preparing_application, ready_to_apply; applied: application_submitted, followed_up; interviewing: interview_scheduled, phone_screen, technical, onsite, final_round, pending_feedback; offered: negotiating, considering, offer_received, accepted; archived: ghosted, rejected_by_company, withdrawn_by_candidate, not_interested, employed_by_this_company, employed_by_another_company\n\n**Output:**\nReturns the updated tracked job.\n",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "tracked_job_id": {
+            "type": "string",
+            "description": "The tracked job ID — `trackedJobs[].id` from tracker_list output, distinct from `trackable.id` and `job.id` (required)"
+          },
+          "status": {
+            "type": "string",
+            "description": "New status: saved, applied, interviewing, offered, archived"
+          },
+          "sub_status": {
+            "type": "string",
+            "description": "Sub-status within the main status, valid only for that status — saved: interested, researching_company, preparing_application, ready_to_apply; applied: application_submitted, followed_up; interviewing: interview_scheduled, phone_screen, technical, onsite, final_round, pending_feedback; offered: negotiating, considering, offer_received, accepted; archived: ghosted, rejected_by_company, withdrawn_by_candidate, not_interested, employed_by_this_company, employed_by_another_company"
+          }
+        },
+        "required": ["tracked_job_id", "status"],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "trackedJob": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "subStatus": {
+                "type": ["string", "null"]
+              },
+              "notes": {
+                "type": ["string", "null"]
+              },
+              "isStarred": {
+                "type": "boolean"
+              },
+              "deadline": {
+                "type": ["string", "null"]
+              },
+              "salaryOffered": {
+                "type": ["number", "null"]
+              },
+              "salaryOfferedType": {
+                "type": ["string", "null"]
+              },
+              "reminderAt": {
+                "type": ["string", "null"]
+              },
+              "appliedAt": {
+                "type": ["string", "null"]
+              },
+              "createdAt": {
+                "type": ["string", "null"]
+              },
+              "updatedAt": {
+                "type": ["string", "null"]
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "contacts": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "trackable": {
+                "type": ["object", "null"]
+              }
+            },
+            "required": ["id"]
+          },
+          "trackedJobs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "subStatus": {
+                  "type": ["string", "null"]
+                },
+                "notes": {
+                  "type": ["string", "null"]
+                },
+                "isStarred": {
+                  "type": "boolean"
+                },
+                "deadline": {
+                  "type": ["string", "null"]
+                },
+                "salaryOffered": {
+                  "type": ["number", "null"]
+                },
+                "salaryOfferedType": {
+                  "type": ["string", "null"]
+                },
+                "reminderAt": {
+                  "type": ["string", "null"]
+                },
+                "appliedAt": {
+                  "type": ["string", "null"]
+                },
+                "createdAt": {
+                  "type": ["string", "null"]
+                },
+                "updatedAt": {
+                  "type": ["string", "null"]
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "contacts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "trackable": {
+                  "type": ["object", "null"]
+                },
+                "job": {
+                  "type": ["object", "null"]
+                }
+              },
+              "required": ["id"]
+            }
+          },
+          "statusOrder": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "subStatusOrder": {
+            "type": "object"
+          },
+          "totalCount": {
+            "type": "integer"
+          },
+          "hasMore": {
+            "type": "boolean"
+          },
+          "trackerWebUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": true
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://foundrole/tracker-list",
+          "visibility": ["model", "app"]
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": ["mcp:tools"]
+        }
+      ]
+    },
+    {
+      "name": "tracker_remove",
+      "description": "Removes a job from the user's job tracker.\n\n**Input:**\n- `tracked_job_id`: The tracked job ID — `trackedJobs[].id` from tracker_list output, distinct from `trackable.id` and `job.id` (required)\n\n**Output:**\nConfirms the job was removed from tracking.\n",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "tracked_job_id": {
+            "type": "string",
+            "description": "The tracked job ID — `trackedJobs[].id` from tracker_list output, distinct from `trackable.id` and `job.id` (required)"
+          }
+        },
+        "required": ["tracked_job_id"],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "trackedJob": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "subStatus": {
+                "type": ["string", "null"]
+              },
+              "notes": {
+                "type": ["string", "null"]
+              },
+              "isStarred": {
+                "type": "boolean"
+              },
+              "deadline": {
+                "type": ["string", "null"]
+              },
+              "salaryOffered": {
+                "type": ["number", "null"]
+              },
+              "salaryOfferedType": {
+                "type": ["string", "null"]
+              },
+              "reminderAt": {
+                "type": ["string", "null"]
+              },
+              "appliedAt": {
+                "type": ["string", "null"]
+              },
+              "createdAt": {
+                "type": ["string", "null"]
+              },
+              "updatedAt": {
+                "type": ["string", "null"]
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "contacts": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "trackable": {
+                "type": ["object", "null"]
+              }
+            },
+            "required": ["id"]
+          },
+          "trackedJobs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "subStatus": {
+                  "type": ["string", "null"]
+                },
+                "notes": {
+                  "type": ["string", "null"]
+                },
+                "isStarred": {
+                  "type": "boolean"
+                },
+                "deadline": {
+                  "type": ["string", "null"]
+                },
+                "salaryOffered": {
+                  "type": ["number", "null"]
+                },
+                "salaryOfferedType": {
+                  "type": ["string", "null"]
+                },
+                "reminderAt": {
+                  "type": ["string", "null"]
+                },
+                "appliedAt": {
+                  "type": ["string", "null"]
+                },
+                "createdAt": {
+                  "type": ["string", "null"]
+                },
+                "updatedAt": {
+                  "type": ["string", "null"]
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "contacts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "trackable": {
+                  "type": ["object", "null"]
+                },
+                "job": {
+                  "type": ["object", "null"]
+                }
+              },
+              "required": ["id"]
+            }
+          },
+          "statusOrder": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "subStatusOrder": {
+            "type": "object"
+          },
+          "totalCount": {
+            "type": "integer"
+          },
+          "hasMore": {
+            "type": "boolean"
+          },
+          "trackerWebUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": true
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://foundrole/tracker-list",
+          "visibility": ["model", "app"]
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": ["mcp:tools"]
+        }
+      ]
+    },
+    {
+      "name": "reminder_set",
+      "description": "Sets a reminder for a tracked job. Sends a confirmation email with .ics calendar attachment.\n\n**Input:**\n- `tracked_job_id`: The tracked job ID — `trackedJobs[].id` from tracker_list output, distinct from `trackable.id` and `job.id` (required)\n- `remind_at`: Reminder date/time in ISO 8601 format, e.g. \"2025-03-15T10:00:00Z\" (required, must be in the future)\n\n**Output:**\nReturns the updated tracked job with reminderAt field.\n",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "tracked_job_id": {
+            "type": "string",
+            "description": "The tracked job ID — `trackedJobs[].id` from tracker_list output, distinct from `trackable.id` and `job.id` (required)"
+          },
+          "remind_at": {
+            "type": "string",
+            "description": "ISO 8601 datetime, e.g. \"2025-03-15T10:00:00Z\" (must be in the future)"
+          }
+        },
+        "required": ["tracked_job_id", "remind_at"],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "trackedJob": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "subStatus": {
+                "type": ["string", "null"]
+              },
+              "notes": {
+                "type": ["string", "null"]
+              },
+              "isStarred": {
+                "type": "boolean"
+              },
+              "deadline": {
+                "type": ["string", "null"]
+              },
+              "salaryOffered": {
+                "type": ["number", "null"]
+              },
+              "salaryOfferedType": {
+                "type": ["string", "null"]
+              },
+              "reminderAt": {
+                "type": ["string", "null"]
+              },
+              "appliedAt": {
+                "type": ["string", "null"]
+              },
+              "createdAt": {
+                "type": ["string", "null"]
+              },
+              "updatedAt": {
+                "type": ["string", "null"]
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "contacts": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "trackable": {
+                "type": ["object", "null"]
+              }
+            },
+            "required": ["id"]
+          },
+          "trackedJobs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "subStatus": {
+                  "type": ["string", "null"]
+                },
+                "notes": {
+                  "type": ["string", "null"]
+                },
+                "isStarred": {
+                  "type": "boolean"
+                },
+                "deadline": {
+                  "type": ["string", "null"]
+                },
+                "salaryOffered": {
+                  "type": ["number", "null"]
+                },
+                "salaryOfferedType": {
+                  "type": ["string", "null"]
+                },
+                "reminderAt": {
+                  "type": ["string", "null"]
+                },
+                "appliedAt": {
+                  "type": ["string", "null"]
+                },
+                "createdAt": {
+                  "type": ["string", "null"]
+                },
+                "updatedAt": {
+                  "type": ["string", "null"]
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "contacts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "trackable": {
+                  "type": ["object", "null"]
+                },
+                "job": {
+                  "type": ["object", "null"]
+                }
+              },
+              "required": ["id"]
+            }
+          },
+          "statusOrder": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "subStatusOrder": {
+            "type": "object"
+          },
+          "totalCount": {
+            "type": "integer"
+          },
+          "hasMore": {
+            "type": "boolean"
+          },
+          "trackerWebUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": true,
+        "destructiveHint": true
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://foundrole/tracker-list",
+          "visibility": ["model", "app"]
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": ["mcp:tools"]
+        }
+      ]
+    },
+    {
+      "name": "reminder_list",
+      "description": "Lists tracked jobs that have reminders set, ordered by reminder time (soonest first).\n\n**Input:**\n- `limit`: Number of results to return (default 20, max 50)\n\n**Output:**\nReturns a list of tracked jobs with active reminders.\n",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Number of results to return (default 20, max 50)",
+            "minimum": 1,
+            "maximum": 50
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "trackedJobs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "subStatus": {
+                  "type": ["string", "null"]
+                },
+                "notes": {
+                  "type": ["string", "null"]
+                },
+                "isStarred": {
+                  "type": "boolean"
+                },
+                "deadline": {
+                  "type": ["string", "null"]
+                },
+                "salaryOffered": {
+                  "type": ["number", "null"]
+                },
+                "salaryOfferedType": {
+                  "type": ["string", "null"]
+                },
+                "reminderAt": {
+                  "type": ["string", "null"]
+                },
+                "appliedAt": {
+                  "type": ["string", "null"]
+                },
+                "createdAt": {
+                  "type": ["string", "null"]
+                },
+                "updatedAt": {
+                  "type": ["string", "null"]
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "contacts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "trackable": {
+                  "type": ["object", "null"]
+                }
+              },
+              "required": ["id"]
+            }
+          },
+          "totalCount": {
+            "type": "integer"
+          },
+          "hasMore": {
+            "type": "boolean"
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": ["mcp:tools"]
+        }
+      ]
+    },
+    {
+      "name": "reminder_delete",
+      "description": "Deletes a reminder from a tracked job.\n\n**Input:**\n- `tracked_job_id`: The tracked job ID — `trackedJobs[].id` from tracker_list output, distinct from `trackable.id` and `job.id` (required)\n\n**Output:**\nReturns the updated tracked job with reminderAt cleared.\n",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "tracked_job_id": {
+            "type": "string",
+            "description": "The tracked job ID — `trackedJobs[].id` from tracker_list output, distinct from `trackable.id` and `job.id` (required)"
+          }
+        },
+        "required": ["tracked_job_id"],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "trackedJob": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "subStatus": {
+                "type": ["string", "null"]
+              },
+              "notes": {
+                "type": ["string", "null"]
+              },
+              "isStarred": {
+                "type": "boolean"
+              },
+              "deadline": {
+                "type": ["string", "null"]
+              },
+              "salaryOffered": {
+                "type": ["number", "null"]
+              },
+              "salaryOfferedType": {
+                "type": ["string", "null"]
+              },
+              "reminderAt": {
+                "type": ["string", "null"]
+              },
+              "appliedAt": {
+                "type": ["string", "null"]
+              },
+              "createdAt": {
+                "type": ["string", "null"]
+              },
+              "updatedAt": {
+                "type": ["string", "null"]
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "contacts": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "trackable": {
+                "type": ["object", "null"]
+              }
+            },
+            "required": ["id"]
+          },
+          "trackedJobs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "subStatus": {
+                  "type": ["string", "null"]
+                },
+                "notes": {
+                  "type": ["string", "null"]
+                },
+                "isStarred": {
+                  "type": "boolean"
+                },
+                "deadline": {
+                  "type": ["string", "null"]
+                },
+                "salaryOffered": {
+                  "type": ["number", "null"]
+                },
+                "salaryOfferedType": {
+                  "type": ["string", "null"]
+                },
+                "reminderAt": {
+                  "type": ["string", "null"]
+                },
+                "appliedAt": {
+                  "type": ["string", "null"]
+                },
+                "createdAt": {
+                  "type": ["string", "null"]
+                },
+                "updatedAt": {
+                  "type": ["string", "null"]
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "contacts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "trackable": {
+                  "type": ["object", "null"]
+                },
+                "job": {
+                  "type": ["object", "null"]
+                }
+              },
+              "required": ["id"]
+            }
+          },
+          "statusOrder": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "subStatusOrder": {
+            "type": "object"
+          },
+          "totalCount": {
+            "type": "integer"
+          },
+          "hasMore": {
+            "type": "boolean"
+          },
+          "trackerWebUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": true
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": ["mcp:tools"]
+        }
+      ]
+    },
+    {
+      "name": "job_alert_subscribe",
+      "description": "Subscribes the authenticated user to job alerts for a specific saved job search.\n\n**Input:**\n- `job_search_id`: The job search identifier to subscribe to (required). Accepts either the job search UUID or the composite job ID returned by `jobs_search` / `jobs_details` (format: \"seo_id--job_search_id\").\n- `frequency`: Alert frequency — one of daily, weekly, monthly (optional, defaults to \"weekly\")\n\n**Output:**\nReturns the created or updated job alert with id, status, and frequency.\nIdempotent: calling this tool for an already-subscribed search updates the existing alert without creating a duplicate.\n",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "job_search_id": {
+            "type": "string",
+            "description": "Job search UUID or composite job id (\"seo_id--job_search_id\") from jobs_search results"
+          },
+          "frequency": {
+            "type": "string",
+            "description": "Alert frequency: daily, weekly, monthly (defaults to \"weekly\")"
+          }
+        },
+        "required": ["job_search_id"],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "jobAlert": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "jobSearchId": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "frequency": {
+                "type": "string"
+              },
+              "subscriptionSource": {
+                "type": "string"
+              }
+            },
+            "required": ["id"]
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://foundrole/job-alerts",
+          "visibility": ["model", "app"]
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": ["mcp:tools"]
+        }
+      ]
+    },
+    {
+      "name": "job_alert_unsubscribe",
+      "description": "Unsubscribes the authenticated user from job alerts for a specific job search.\n\n**Input:**\n- `job_search_id`: The job search identifier to unsubscribe from (required). Accepts either the job search UUID or the composite job ID returned by `jobs_search` / `jobs_details` (format: \"seo_id--job_search_id\").\n\n**Output:**\nConfirms the alert has been unsubscribed.\nIdempotent: returns success even when the user was not subscribed or is already unsubscribed.\n",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "job_search_id": {
+            "type": "string",
+            "description": "Job search UUID or composite job id (\"seo_id--job_search_id\") from jobs_search results"
+          }
+        },
+        "required": ["job_search_id"],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["success"]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": true
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://foundrole/job-alerts",
+          "visibility": ["model", "app"]
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": ["mcp:tools"]
+        }
+      ]
+    },
+    {
+      "name": "job_alert_unsubscribe_all",
+      "description": "Unsubscribes the authenticated user from ALL of their job alerts at once, across every\nsubscription source (regular, company page, MCP).\n\n**Input:**\n- `confirm`: Must be `true` to execute. The call is rejected when omitted or not true — this\n  guards against an unintended bulk unsubscribe.\n\n**Output:**\nConfirms how many alerts were unsubscribed.\nIdempotent: returns success even when the user has no active alerts.\n",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "confirm": {
+            "type": "boolean",
+            "description": "Set to true to confirm unsubscribing from every alert; the call is rejected otherwise"
+          }
+        },
+        "required": ["confirm"],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["success"]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://foundrole/job-alerts",
+          "visibility": ["model", "app"]
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": ["mcp:tools"]
+        }
+      ]
+    },
+    {
+      "name": "job_alert_list",
+      "description": "Lists the authenticated user's job alerts across all subscription sources (regular, company page, MCP).\n\n**Input:**\n- `status`: Filter by status — one of pending, active, unsubscribed (optional, default: all statuses)\n- `limit`: Number of results to return (default 20, max 50)\n- `offset`: Number of results to skip (default 0)\n\n**Output:**\nReturns the user's job alerts with pagination info and a summary of the underlying job search\n(query, location, company where available). Each response includes a system_instruction\ndescribing how to present the results for the current client.\n",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Filter by status: pending, active, unsubscribed"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of results to return (default 20, max 50)",
+            "minimum": 1,
+            "maximum": 50
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Number of results to skip (default 0)",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "jobAlerts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "frequency": {
+                  "type": "string"
+                },
+                "subscriptionSource": {
+                  "type": "string"
+                },
+                "lastSentAt": {
+                  "type": ["string", "null"]
+                },
+                "createdAt": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": "string"
+                },
+                "jobSearch": {
+                  "type": ["object", "null"]
+                }
+              },
+              "required": ["id"]
+            }
+          },
+          "frequencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "totalCount": {
+            "type": "integer"
+          },
+          "hasMore": {
+            "type": "boolean"
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://foundrole/job-alerts"
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": ["mcp:tools"]
+        }
+      ]
+    }
+  ]
+}
