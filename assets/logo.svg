@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-labelledby="title desc">
+  <title id="title">FoundRole</title>
+  <desc id="desc">White FR monogram on the FoundRole red background.</desc>
+  <rect width="100" height="100" rx="16" fill="#bc3647" />
+  <g fill="#ffffff">
+    <path d="M24.3489 70.3526l-7.8 0 0-42 28.8 0 0 4.5-2.1 2.1-18.9 0 0 12.9 15 0 0 6.6-15 0 0 15.9zM81.0489 45.4526c0 7.5-6.9 8.7-6.9 8.7l8.1 12.9 0 3.3-7.8 0-8.1-15.6-8.4 0 0 15.6-7.8 0 0-42 21 0c6 0 9.9 3.9 9.9 9.3l0 7.8zM57.9489 34.9526l0 13.2 11.1 0c2.4 0 4.2-1.8 4.2-3.9l0-5.4c0-2.1-1.8-3.9-4.2-3.9l-11.1 0z" />
+  </g>
+</svg>
