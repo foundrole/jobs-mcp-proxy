@@ -1,0 +1,49 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/vDevPreview/MicrosoftTeams.schema.json",
+  "manifestVersion": "devPreview",
+  "version": "1.0.0",
+  "id": "d4c96cea-f027-48e9-9fa8-26735e33dd05",
+  "developer": {
+    "name": "FoundRole",
+    "websiteUrl": "https://www.foundrole.com",
+    "privacyUrl": "https://www.foundrole.com/privacy-policy",
+    "termsOfUseUrl": "https://www.foundrole.com/terms-of-service",
+    "contactInfo": {
+      "defaultSupport": {
+        "emailsForEmailSupport": ["contacts@foundrole.com"]
+      }
+    }
+  },
+  "name": {
+    "short": "FoundRole",
+    "full": "FoundRole AI Job Search and Application Tracker"
+  },
+  "description": {
+    "short": "AI job search and application tracker with pay, visa and ghost-job checks.",
+    "full": "FoundRole turns an AI assistant into a job search that answers back with evidence.\n\nSearch live openings by title, location, salary, posting date and remote or on-site work, then see each role judged on real data rather than the employer's own wording: how the advertised pay compares with the market, whether the posting shows ghost-listing signals, and whether the company has a history of sponsoring work visas. When a resume is on file, every result also carries a personal match score explaining where the candidate fits and what is missing.\n\nA role worth keeping goes straight onto a tracker board without leaving the conversation, including jobs found elsewhere on the web: paste a link and FoundRole reads the posting, files it, and keeps the application status, notes, deadlines and follow-up reminders in one place. Standing searches can be turned into email alerts so new matches arrive without asking again.\n\nFoundRole also answers questions about the market itself, drawing on its own salary benchmarks, H-1B sponsorship records and E-Verify data for named employers, cities and job titles.\n\nSigning in happens once through the assistant using OAuth 2.1 with PKCE. There is no API key to copy, no free-trial wall on search, and no credential ever passes through the model."
+  },
+  "agentConnectors": [
+    {
+      "id": "foundrole-job-search",
+      "displayName": "FoundRole Job Search",
+      "description": "Searches live job postings, checks pay, ghost-listing risk and visa sponsorship, and manages the user's application tracker, reminders and job alerts.",
+      "toolSource": {
+        "remoteMcpServer": {
+          "mcpServerUrl": "https://www.foundrole.com/mcp",
+          "mcpToolDescription": {
+            "file": "mcptools.json"
+          },
+          "authorization": {
+            "type": "AzureKeyVault",
+            "referenceId": "https://foundrole-mcp-kv.vault.azure.net/"
+          }
+        }
+      }
+    }
+  ],
+  "icons": {
+    "outline": "Outline.png",
+    "color": "Color.png"
+  },
+  "accentColor": "#BC3647"
+}
