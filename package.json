@@ -34,8 +34,6 @@
     "anthropic",
     "openai",
     "windsurf",
-    "perplexity",
-    "lm-studio",
     "oauth",
     "foundrole"
   ],
