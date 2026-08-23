@@ -113,46 +113,27 @@ In VS Code, add this to `.vscode/mcp.json` in your workspace (or your user `mcp.
 
 Approve the FoundRole sign-in when your editor opens it, then ask for jobs in the chat.
 
-### LM Studio
+### Antigravity (Google)
 
-**Estimated time:** ~3 minutes | **Requires:** Node.js + npm
+**Estimated time:** ~1 minute
 
-1. Open LM Studio's MCP servers configuration.
-2. Add this entry:
+Install the plugin straight from this repository:
 
-   ```json
-   {
-     "mcpServers": {
-       "foundrole": {
-         "command": "npx",
-         "args": ["@foundrole/ai-job-search-mcp@latest"],
-         "env": {}
-       }
-     }
-   }
-   ```
+```bash
+agy plugin install https://github.com/foundrole/jobs-mcp-proxy
+```
 
-3. Save and restart LM Studio.
-4. Confirm **foundrole** appears in your MCP servers list, approve the sign-in it opens, and start asking for jobs.
+Approve the FoundRole sign-in Antigravity opens, then ask for jobs in the CLI. The plugin declares the server in `mcp_config.json`; to wire it up by hand instead, add the same entry to `~/.gemini/config/mcp_config.json`:
 
-### Perplexity Desktop
-
-**Estimated time:** ~4 minutes | **Requires:** Perplexity Pro + Node.js
-
-1. Open Perplexity's MCP configuration.
-2. Add:
-
-   ```json
-   {
-     "command": "npx",
-     "args": ["@foundrole/ai-job-search-mcp@latest"],
-     "env": {}
-   }
-   ```
-
-3. Save and restart Perplexity, then approve the FoundRole sign-in when it opens.
-
-> Perplexity uses stdio MCP transport — Node.js and npm must be installed.
+```json
+{
+  "mcpServers": {
+    "foundrole": {
+      "serverUrl": "https://www.foundrole.com/mcp"
+    }
+  }
+}
+```
 
 ### Any other MCP client
 
