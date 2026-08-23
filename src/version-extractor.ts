@@ -192,9 +192,7 @@ export class VersionExtractor {
       const plist = await import("plist");
 
       const plistContent = readFileSync(plistPath, "utf8");
-      const parsed = plist.default
-        ? plist.default.parse(plistContent)
-        : plist.parse(plistContent);
+      const parsed = plist.parse(plistContent);
 
       // Cast to PlistInfo interface for type-safe property access
       const plistObj = parsed as PlistInfo;

@@ -62,7 +62,6 @@
     "dev:debug": "nodemon --exec \"node --inspect --import=tsx/esm src/cli.ts\"",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
-    "mcp:inspect": "mcp-inspector",
     "prepare": "husky",
     "prepublishOnly": "yarn test && yarn build",
     "prettier:check": "prettier . --check",
@@ -89,15 +88,14 @@
     ]
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.29.0",
+    "@modelcontextprotocol/sdk": "1.30.0",
     "find-process": "^2.0.0",
-    "plist": "^3.1.0",
+    "plist": "^5.0.0",
     "win-version-info": "^6.0.1",
     "zod": "^4.3.5"
   },
   "devDependencies": {
     "@jest/globals": "^30.0.5",
-    "@modelcontextprotocol/inspector": "^0.21.2",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.0.4",
     "@types/plist": "^3.0.5",
