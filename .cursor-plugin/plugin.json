@@ -1,0 +1,26 @@
+{
+  "name": "foundrole",
+  "displayName": "FoundRole — AI Job Search",
+  "version": "1.0.0",
+  "description": "Search live jobs and get every posting fact-checked — ghost-listing risk, real pay against the market, visa sponsorship history. Track applications, compare roles, and set job alerts without leaving the chat.",
+  "author": {
+    "name": "FoundRole",
+    "email": "dev@foundrole.com"
+  },
+  "homepage": "https://www.foundrole.com/ai-search-mcp",
+  "repository": "https://github.com/foundrole/jobs-mcp-proxy",
+  "license": "ISC",
+  "keywords": [
+    "job-search",
+    "jobs",
+    "career",
+    "application-tracker",
+    "job-alerts",
+    "ghost-jobs",
+    "visa-sponsorship",
+    "h1b",
+    "salary-data",
+    "mcp"
+  ],
+  "logo": "assets/logo.svg"
+}

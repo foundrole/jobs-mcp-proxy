@@ -76,7 +76,15 @@ npx @foundrole/ai-job-search-mcp
 
 5. Save, allow Claude to connect, and approve the FoundRole sign-in it opens. Then ask for jobs in the chat.
 
-### Cursor / VS Code / Windsurf
+### Cursor
+
+**Estimated time:** ~1 minute
+
+Install the FoundRole plugin from the [Cursor Marketplace](https://cursor.com/marketplace): open **Customize** in the sidebar, find **FoundRole**, and select **Install**. Approve the FoundRole sign-in Cursor opens, then ask for jobs in any chat.
+
+The plugin lives in this repository — `.cursor-plugin/plugin.json` with the server declared in `mcp.json`. To try it before it is listed, symlink this repo into `~/.cursor/plugins/local/` and reload the window.
+
+### Manual setup — Cursor / VS Code / Windsurf
 
 In Cursor, open Settings → MCP and add this to `~/.cursor/mcp.json`:
 
