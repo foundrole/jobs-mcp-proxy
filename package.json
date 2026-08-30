@@ -73,7 +73,7 @@
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
     "type-check": "tsc --noEmit",
-    "version": "node scripts/sync-server-json.js && git add server.json"
+    "version": "node scripts/sync-server-json.js && git add server.json .grok-plugin/plugin.json"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
