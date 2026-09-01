@@ -19,6 +19,13 @@ has a record of sponsoring work visas (H-1B filings, E-Verify enrolment).
 results carry a personal match score and an explanation of what fits and what is
 missing.
 
+**Check how hiring software reads a resume.** A deterministic parse reports what a
+typical applicant tracking system extracts — job title, years of experience,
+recognized skills, sections and contact channels — and what it loses, as a
+readability band with individual findings. It runs on the resume uploaded to the
+account or on plain text passed in, and the same input always returns the same
+result.
+
 **Track applications.** A role can be saved to the candidate's tracker board
 without leaving the conversation, including roles found elsewhere: given a URL and
 the posting details, FoundRole files an external job the same way. Status, notes,

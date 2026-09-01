@@ -2722,6 +2722,101 @@
       ]
     },
     {
+      "name": "resume_check",
+      "description": "Checks how well hiring software (an ATS parser) reads a resume, using FoundRole's deterministic parse\nlens. Pass the resume's plain text when it is available in the conversation; without `resume_text` the\ncheck runs on the resume already uploaded to the user's FoundRole account.\n\nReturns a readability band (strong, good, partial), the facts the parser extracted (detected job title,\nyears of experience, recognized skills and sections, contact channels), and the list of findings — what\na typical parser loses on this resume, each with a plain-language explanation. Deterministic and\nrepeatable; no content leaves the check. The full section-by-section report and the fixes live in\nResume Studio, linked in the response.\n",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "resume_text": {
+            "type": "string",
+            "description": "Plain text of the resume to check, when it is available in the conversation. Omit to check the resume uploaded to the user's FoundRole account. Minimum 200 characters."
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string"
+          },
+          "band": {
+            "type": ["string", "null"]
+          },
+          "findings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "detail": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "parsedAs": {
+            "type": ["object", "null"],
+            "properties": {
+              "headline": {
+                "type": ["string", "null"]
+              },
+              "headlineFound": {
+                "type": "boolean"
+              },
+              "yearsOfExperience": {
+                "type": ["integer", "null"]
+              },
+              "skillsCount": {
+                "type": "integer"
+              },
+              "sectionsFound": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "emailFound": {
+                "type": "boolean"
+              },
+              "phoneFound": {
+                "type": "boolean"
+              },
+              "linkedinFound": {
+                "type": "boolean"
+              }
+            }
+          },
+          "studioReportUrl": {
+            "type": ["string", "null"]
+          },
+          "uploadUrl": {
+            "type": ["string", "null"]
+          },
+          "system_instruction": {
+            "type": "string"
+          }
+        },
+        "required": ["mode"]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": ["mcp:tools"]
+        }
+      ]
+    },
+    {
       "name": "knowledge_search",
       "description": "Searches FoundRole's published content by semantic similarity and returns the most relevant sources for a\njob-search question: career-guidance blog articles plus FoundRole site pages that describe the product's\nfeatures (job tracker, Pro plan and pricing, H1B salary data, AI job search) and industry/sector career\nlandings. Each article carries a title, url, summary, a content excerpt, publication date, and tags; each\npage carries a title, url, description, and its FAQ entries — enough material to answer the question and\nlink the source.\n\nTwo optional facets add further result groups: company returns FoundRole's employer profile pages\nmatching that company name; location returns the market landing page for that city, state, or country —\nan analytical page about that labour market, not a list of openings. The facets describe what the user is\nasking about — a company mentioned only in passing does not need the company facet.\n\nReturns empty groups when nothing is relevant rather than padding with off-topic content. Results are the\nclosest matches to the given question, not an index of the site's full coverage; questions about overall\ntopic coverage are answered by knowledge_topics, which lists the blog's categories and tags with article\ncounts. It does not search job listings and reports no open-job counts — jobs_search covers live roles,\nincluding questions about openings for a particular job title. Each response includes a\nsystem_instruction describing how to present the sources.\n",
       "inputSchema": {
