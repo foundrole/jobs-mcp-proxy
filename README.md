@@ -12,6 +12,7 @@ Ask ChatGPT or Claude for jobs and get real openings back — each one checked f
   - **Am I being underpaid?** The pay against what employers in that market really file, so a hidden salary range stops being a guess.
   - **Would they sponsor me?** Whether the company has sponsored visas before, counted year by year from public filings.
 - **See how well you fit.** Match scoring against your resume and profile, plus personalized job recommendations ranked by fit.
+- **See what hiring software reads off your resume — free.** Ask, and you get back the version of you a parser extracts: job title, years, recognized skills, sections, contact details — plus what it loses on the way. It's the mechanical read, deterministic and repeatable, so the answer doesn't drift between asks. Paste the text into the chat, or check the resume already on your account.
 - **Research before you commit.** Dig into [companies](https://www.foundrole.com/companies), [industry sectors](https://www.foundrole.com/sectors), and [hiring by location](https://www.foundrole.com/locations) to decide where to aim.
 - **Compare roles side by side.** _"Compare these two"_ lines up fit, pay, sponsorship, and posting risk at once — so the choice stops being a feeling.
 - **Paste a job from anywhere.** LinkedIn, a careers page, a link a friend sent — paste the posting into the chat and it gets the same checks, and can sit in your tracker alongside FoundRole listings. Your assistant reads the text you provide; nothing crawls the site for you.
@@ -193,6 +194,8 @@ The same data your assistant reads is browsable on FoundRole:
 - [Industry Sectors](https://www.foundrole.com/sectors) — who's hiring across 40+ industries
 - [Hiring by Location](https://www.foundrole.com/locations) — openings and wage benchmarks by state and metro
 - [Job Tracker](https://www.foundrole.com/job-tracker) — the Kanban board your assistant manages, in the browser
+- [Resume Checker](https://www.foundrole.com/resume-checker) — upload a resume and see what hiring software reads off it, section by section
+- [Resume Builder](https://www.foundrole.com/resume-builder) — build a version per target role and export PDF, DOCX or TXT free, no watermark
 - [Live Job Board](https://www.foundrole.com/jobs) — browse the listings directly
 
 ## Help

@@ -4,7 +4,7 @@
     "email": "dev@foundrole.com",
     "name": "FoundRole"
   },
-  "description": "AI job search and job application tracker. Search live jobs by title, location, salary, date posted, and remote or on-site, and see each one judged on real data: pay against market rates, ghost-job signals, visa sponsorship history, and how well it matches your resume. Track applications, set reminders, and get email alerts.",
+  "description": "AI job search and job application tracker. Search live jobs by title, location, salary, date posted, and remote or on-site, and see each one judged on real data: pay against market rates, ghost-job signals, visa sponsorship history, and how well it matches your resume. Check how hiring software reads your resume, and track applications, set reminders, and get email alerts.",
   "displayName": "FoundRole Jobs",
   "homepage": "https://www.foundrole.com/ai-search-mcp",
   "keywords": [
