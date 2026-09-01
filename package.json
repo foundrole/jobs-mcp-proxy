@@ -1,6 +1,6 @@
 {
   "name": "@foundrole/ai-job-search-mcp",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "AI job search for ChatGPT, Claude, Cursor, and any MCP client. Search live jobs and get every posting fact-checked — ghost-listing risk, real pay against the market, visa sponsorship history. Track applications on a Kanban board, compare roles, get matched recommendations, set follow-up reminders, and subscribe to job alerts. Sign in once with OAuth (your AI handles it) — no API key, free.",
   "keywords": [
     "mcp",
