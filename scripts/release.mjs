@@ -18,9 +18,14 @@
  *     node scripts/release.mjs <patch|minor|major|x.y.z>
  *
  * It bumps the version (npm version runs the `version` hook → syncs server.json),
- * then pushes the branch + tag as the bot. It does NOT publish to npm — run
- * `npm run publish:npm` first (the registry requires the npm package to exist
- * before the tag triggers `mcp-publisher publish`).
+ * pushes the branch + tag as the bot, and creates the matching GitHub Release
+ * over the REST API with the same token. `gh release create` is deliberately NOT
+ * used: the `gh` CLI is always authenticated as the human operator, so it would
+ * stamp the release with their account. Publishing the release is what triggers
+ * publish-mcp.yml, which pushes server.json to the MCP Registry.
+ *
+ * It does NOT publish to npm — run `npm run publish:npm` first (the registry
+ * requires the npm package to exist before it will accept the version).
  */
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
@@ -68,6 +73,14 @@ const gitOut = (args) =>
 
 const branch = gitOut(["rev-parse", "--abbrev-ref", "HEAD"]);
 
+const previousTag = (() => {
+  try {
+    return gitOut(["describe", "--tags", "--abbrev=0"]);
+  } catch {
+    return null;
+  }
+})();
+
 // 1. Bump version. `npm version` runs the `version` lifecycle hook
 //    (sync-server-json.js + git add server.json), commits, and creates the tag —
 //    all under the bot identity via env above.
@@ -91,6 +104,72 @@ try {
   process.exit(1);
 }
 
+const releaseNotes = buildReleaseNotes({ previousTag, tag });
+
+const response = await fetch(`https://api.github.com/repos/${REPO}/releases`, {
+  method: "POST",
+  headers: {
+    Authorization: `token ${token}`,
+    Accept: "application/vnd.github+json",
+    "Content-Type": "application/json",
+    "User-Agent": user,
+  },
+  body: JSON.stringify({
+    tag_name: tag,
+    name: tag,
+    body: releaseNotes,
+    draft: false,
+    prerelease: false,
+    make_latest: "true",
+  }),
+});
+
+if (!response.ok) {
+  const detail = redact(await response.text());
+  console.error(
+    `\nTag ${tag} was pushed, but creating the GitHub Release failed ` +
+      `(HTTP ${response.status}): ${detail}`
+  );
+  process.exit(1);
+}
+
+const release = await response.json();
+
+if (release.author?.login !== user) {
+  console.error(
+    `\nRelease ${tag} was created as "${release.author?.login}", expected ` +
+      `"${user}". Check that GH_BOT_TOKEN belongs to the bot account.`
+  );
+  process.exit(1);
+}
+
 console.log(
-  `\nReleased ${tag} as ${user}. The publish-mcp Action will run on the tag.`
+  `\nReleased ${tag} as ${release.author.login}: ${release.html_url}\n` +
+    "The publish-mcp Action runs on the release event."
 );
+
+function buildReleaseNotes({ previousTag, tag }) {
+  const compareUrl = previousTag
+    ? `https://github.com/${REPO}/compare/${previousTag}...${tag}`
+    : null;
+
+  if (!previousTag) {
+    return compareUrl ? `Full changelog: ${compareUrl}` : `Release ${tag}.`;
+  }
+
+  const subjects = gitOut([
+    "log",
+    "--no-merges",
+    "--format=%s",
+    `${previousTag}..${tag}`,
+  ])
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line && line !== tag.replace(/^v/, "") && line !== tag);
+
+  const bullets = subjects.map((subject) => `- ${subject}`).join("\n");
+
+  return [bullets, `Full changelog: ${compareUrl}`]
+    .filter(Boolean)
+    .join("\n\n");
+}

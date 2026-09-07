@@ -603,12 +603,17 @@ happen for this repo.
 
 - **NEVER** run `git push` / `git push --tags` by hand to release. The local
   `origin` remote is the human's SSH/`gh` identity.
+- **NEVER** create the GitHub Release with `gh release create`. The `gh` CLI has
+  no bot login — it is always the human operator, and the release author is
+  permanent once published. `scripts/release.mjs` creates it over the REST API
+  with `GH_BOT_TOKEN` instead, and aborts if the API reports any author other
+  than `GH_BOT_USERNAME`.
 - Push release tags **only** via `npm run release` (`scripts/release.mjs`), which
   pushes over `https://x-access-token:<GH_BOT_TOKEN>@github.com/...` so the push,
-  the tag, and the publish-mcp Action are all attributed to FoundRoleApp. It also
-  forces the bot git identity (`GH_BOT_EMAIL`, a `@users.noreply.github.com`
-  address — a private `dev@foundrole.com`-style email is rejected by GitHub push
-  privacy protection).
+  the tag, the Release, and the publish-mcp Action are all attributed to
+  FoundRoleApp. It also forces the bot git identity (`GH_BOT_EMAIL`, a
+  `@users.noreply.github.com` address — a private `dev@foundrole.com`-style email
+  is rejected by GitHub push privacy protection).
 - Bot creds live in `ai-pipelines/.env` (`GH_BOT_TOKEN` classic PAT with `repo` +
   `workflow`, `GH_BOT_USERNAME`, `GH_BOT_EMAIL`).
 
@@ -624,16 +629,23 @@ npm version patch        # or minor/major — bumps package.json; the `version`
                          # server.json's version in lockstep, then `git add`s it
 npm run publish:npm
 
-# 2. Push the matching tag AS THE BOT, which triggers the publish-mcp workflow:
+# 2. Push the matching tag AND create the GitHub Release AS THE BOT. Publishing
+#    the Release is what triggers the publish-mcp workflow:
 GH_BOT_TOKEN=… GH_BOT_USERNAME=FoundRoleApp GH_BOT_EMAIL=…@users.noreply.github.com \
   npm run release <patch|minor|major|x.y.z>
 ```
 
-`scripts/release.mjs` bumps the version (if not already), then pushes the branch +
-tag as the bot. The tag (`v*`) fires `.github/workflows/publish-mcp.yml`, which
-runs `mcp-publisher login github-oidc && mcp-publisher publish`. github-oidc
-verifies the `io.github.foundrole/*` namespace against the repo owner — no
-secrets needed, but the workflow must run from a repo under the `foundrole` org.
+`scripts/release.mjs` bumps the version (if not already), pushes the branch + tag
+as the bot, then POSTs the GitHub Release with the same token — notes are the
+commit subjects between the previous tag and this one, plus a compare link. The
+`release: published` event fires `.github/workflows/publish-mcp.yml`, which runs
+`mcp-publisher login github-oidc && mcp-publisher publish`. github-oidc verifies
+the `io.github.foundrole/*` namespace against the repo owner — no secrets needed,
+but the workflow must run from a repo under the `foundrole` org.
+
+The workflow deliberately does **not** listen on `push: tags` as well. The script
+pushes the tag and then creates the release, so both triggers would publish the
+same version to the registry twice.
 
 ### Registry validation gates (all must pass or `mcp-publisher publish` fails)
 
@@ -641,7 +653,7 @@ secrets needed, but the workflow must run from a repo under the `foundrole` org.
    `expected length <= 100`. (README / `package.json` description can be longer;
    `server.json` cannot.)
 2. **npm package must already be published** at the release version, or HTTP 400
-   "NPM package not found". Hence npm publish before the tag push.
+   "NPM package not found". Hence npm publish before `npm run release`.
 3. **`mcpName` in the PUBLISHED `package.json`** must equal the server name
    (`io.github.foundrole/jobs-mcp-proxy`), or HTTP 400 "missing required
    'mcpName' field". This is the npm-side ownership link. Changing it requires a
@@ -654,8 +666,8 @@ secrets needed, but the workflow must run from a repo under the `foundrole` org.
   Keys are kept alphabetical (eslint `jsonc/sort-keys`).
 - `package.json` — `mcpName` field (registry ownership), `version` lifecycle hook.
 - `scripts/sync-server-json.js` — copies the npm version into `server.json`.
-- `scripts/release.mjs` — bot-only tag push (`npm run release`).
-- `.github/workflows/publish-mcp.yml` — tag/release-triggered registry publish.
+- `scripts/release.mjs` — bot-only tag push + GitHub Release (`npm run release`).
+- `.github/workflows/publish-mcp.yml` — release-triggered registry publish.
 - `.mcpregistry*` tokens are gitignored.
 
 ### Copywriting for any user-facing MCP copy (README, server.json, listings)

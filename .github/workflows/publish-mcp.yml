@@ -1,11 +1,16 @@
-# Publishes server.json to the official MCP Registry on a version tag or GitHub Release.
+# Publishes server.json to the official MCP Registry when a GitHub Release is published.
+#
+# The trigger is the release event, NOT the tag push: scripts/release.mjs pushes the
+# tag and then creates the release, so firing on both would publish the same version
+# to the registry twice. The release is also the later of the two events, which keeps
+# the order npm -> tag -> release -> registry.
 #
 # Prerequisites:
 #   - server.json in the repo root (name: io.github.foundrole/jobs-mcp-proxy).
 #   - @foundrole/ai-job-search-mcp must ALREADY be published to npm at the matching
 #     version — the registry validates the package and returns 400 "NPM package not
-#     found" until it exists. Publish to npm first (npm run publish:npm), then push
-#     the tag (or re-run this workflow).
+#     found" until it exists. Publish to npm first (npm run publish:npm), then run
+#     `npm run release` (or re-run this workflow).
 #   - server.json "version" and packages[0].version must equal the npm version.
 #
 # Auth: github-oidc. The registry verifies the io.github.foundrole/* namespace
@@ -14,8 +19,6 @@
 name: Publish to MCP Registry
 
 on:
-  push:
-    tags: ["v*"]
   release:
     types: [published]
 
@@ -27,6 +30,8 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
 
       - name: Install mcp-publisher
         run: |
