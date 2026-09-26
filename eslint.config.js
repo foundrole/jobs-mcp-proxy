@@ -96,7 +96,7 @@ export default [
   },
   {
     files: ["**/*.json", "**/*.json5", "**/*.jsonc"],
-    ignores: ["package.json"], // Let Prettier handle package.json formatting
+    ignores: ["package.json", "microsoft-certification/**/*"],
     languageOptions: {
       parser: jsoncParser,
     },
