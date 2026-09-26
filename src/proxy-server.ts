@@ -22,20 +22,25 @@ export const proxyServer = async ({
   server,
   serverCapabilities,
 }: {
-  client: Client;
+  client?: Client;
   server: Server;
   serverCapabilities: ServerCapabilities;
-  getClient?: () => Client;
+  getClient?: () => Client | null | Promise<Client | null>;
 }): Promise<void> => {
-  const getCurrentClient = () => getClient?.() || client;
+  const getCurrentClient = async (): Promise<Client> => {
+    const current = (await getClient?.()) ?? client;
+    if (!current) throw new Error("FoundRole MCP server is not connected");
+    return current;
+  };
+
   if (serverCapabilities?.logging) {
     server.setNotificationHandler(
       LoggingMessageNotificationSchema,
       async (args) => {
-        return getCurrentClient().notification(args);
+        return (await getCurrentClient()).notification(args);
       }
     );
-    getCurrentClient().setNotificationHandler(
+    (await getCurrentClient()).setNotificationHandler(
       LoggingMessageNotificationSchema,
       async (args) => {
         return server.notification(args);
@@ -45,59 +50,59 @@ export const proxyServer = async ({
 
   if (serverCapabilities?.prompts) {
     server.setRequestHandler(GetPromptRequestSchema, async (args) => {
-      return getCurrentClient().getPrompt(args.params);
+      return (await getCurrentClient()).getPrompt(args.params);
     });
 
     server.setRequestHandler(ListPromptsRequestSchema, async (args) => {
-      return getCurrentClient().listPrompts(args.params);
+      return (await getCurrentClient()).listPrompts(args.params);
     });
   }
 
   if (serverCapabilities?.resources) {
     server.setRequestHandler(ListResourcesRequestSchema, async (args) => {
-      return getCurrentClient().listResources(args.params);
+      return (await getCurrentClient()).listResources(args.params);
     });
 
     server.setRequestHandler(
       ListResourceTemplatesRequestSchema,
       async (args) => {
-        return getCurrentClient().listResourceTemplates(args.params);
+        return (await getCurrentClient()).listResourceTemplates(args.params);
       }
     );
 
     server.setRequestHandler(ReadResourceRequestSchema, async (args) => {
-      return getCurrentClient().readResource(args.params);
+      return (await getCurrentClient()).readResource(args.params);
     });
 
     if (serverCapabilities?.resources.subscribe) {
       server.setNotificationHandler(
         ResourceUpdatedNotificationSchema,
         async (args) => {
-          return getCurrentClient().notification(args);
+          return (await getCurrentClient()).notification(args);
         }
       );
 
       server.setRequestHandler(SubscribeRequestSchema, async (args) => {
-        return getCurrentClient().subscribeResource(args.params);
+        return (await getCurrentClient()).subscribeResource(args.params);
       });
 
       server.setRequestHandler(UnsubscribeRequestSchema, async (args) => {
-        return getCurrentClient().unsubscribeResource(args.params);
+        return (await getCurrentClient()).unsubscribeResource(args.params);
       });
     }
   }
 
   if (serverCapabilities?.tools) {
     server.setRequestHandler(CallToolRequestSchema, async (args) => {
-      return getCurrentClient().callTool(args.params);
+      return (await getCurrentClient()).callTool(args.params);
     });
 
     server.setRequestHandler(ListToolsRequestSchema, async (args) => {
-      return getCurrentClient().listTools(args.params);
+      return (await getCurrentClient()).listTools(args.params);
     });
   }
 
   server.setRequestHandler(CompleteRequestSchema, async (args) => {
-    return getCurrentClient().complete(args.params);
+    return (await getCurrentClient()).complete(args.params);
   });
 };
