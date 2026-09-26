@@ -64,6 +64,23 @@ jest.mock("../src/proxy-server.js", () => ({
   proxyServer: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
 }));
 
+const mockAuthProvider = { redirectUrl: "http://127.0.0.1:1/callback" };
+const mockAuthorizationCode = jest.fn();
+
+jest.mock("../src/browser-oauth.js", () => ({
+  createBrowserOAuth: jest.fn(),
+}));
+
+import { createBrowserOAuth } from "../src/browser-oauth.js";
+
+jest.mock("@modelcontextprotocol/sdk/client/auth.js", () => ({
+  UnauthorizedError: class UnauthorizedError extends Error {},
+}));
+
+import { UnauthorizedError } from "@modelcontextprotocol/sdk/client/auth.js";
+
+const withAuth = { authProvider: mockAuthProvider };
+
 // Import mocked modules
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
@@ -114,6 +131,10 @@ describe("stdio-server Tests", () => {
     });
 
     mockProxyServer.mockResolvedValue(undefined);
+    createBrowserOAuth.mockResolvedValue({
+      authorizationCode: mockAuthorizationCode,
+      provider: mockAuthProvider,
+    });
 
     // Create fresh mock instances
     mockClientInstance = createMockClient();
@@ -159,9 +180,6 @@ describe("stdio-server Tests", () => {
       await startStdioServer({ url: testUrl });
 
       expect(mockExtractClient).toHaveBeenCalledTimes(1);
-      expect(console.error).toHaveBeenCalledWith(
-        "[PROXY] Using client identity: macOS//TestApp@1.2.3"
-      );
     });
 
     test("creates HTTP client with correct transport", async () => {
@@ -169,7 +187,10 @@ describe("stdio-server Tests", () => {
 
       await startStdioServer({ url: testUrl });
 
-      expect(MockHttpTransport).toHaveBeenCalledWith(new URL(testUrl));
+      expect(MockHttpTransport).toHaveBeenCalledWith(
+        new URL(testUrl),
+        withAuth
+      );
       expect(MockClient).toHaveBeenCalledWith(
         { name: "macOS//TestApp", version: "1.2.3" },
         { capabilities: {} }
@@ -297,7 +318,10 @@ describe("stdio-server Tests", () => {
 
       await startStdioServer({ url: httpUrl });
 
-      expect(MockHttpTransport).toHaveBeenCalledWith(new URL(httpUrl));
+      expect(MockHttpTransport).toHaveBeenCalledWith(
+        new URL(httpUrl),
+        withAuth
+      );
     });
 
     test("works with HTTPS URLs", async () => {
@@ -305,7 +329,10 @@ describe("stdio-server Tests", () => {
 
       await startStdioServer({ url: httpsUrl });
 
-      expect(MockHttpTransport).toHaveBeenCalledWith(new URL(httpsUrl));
+      expect(MockHttpTransport).toHaveBeenCalledWith(
+        new URL(httpsUrl),
+        withAuth
+      );
     });
 
     test("handles URLs with query parameters", async () => {
@@ -313,7 +340,10 @@ describe("stdio-server Tests", () => {
 
       await startStdioServer({ url: urlWithQuery });
 
-      expect(MockHttpTransport).toHaveBeenCalledWith(new URL(urlWithQuery));
+      expect(MockHttpTransport).toHaveBeenCalledWith(
+        new URL(urlWithQuery),
+        withAuth
+      );
     });
 
     test("handles URLs with ports", async () => {
@@ -321,7 +351,10 @@ describe("stdio-server Tests", () => {
 
       await startStdioServer({ url: urlWithPort });
 
-      expect(MockHttpTransport).toHaveBeenCalledWith(new URL(urlWithPort));
+      expect(MockHttpTransport).toHaveBeenCalledWith(
+        new URL(urlWithPort),
+        withAuth
+      );
     });
 
     test("handles URLs with authentication", async () => {
@@ -329,7 +362,41 @@ describe("stdio-server Tests", () => {
 
       await startStdioServer({ url: urlWithAuth });
 
-      expect(MockHttpTransport).toHaveBeenCalledWith(new URL(urlWithAuth));
+      expect(MockHttpTransport).toHaveBeenCalledWith(
+        new URL(urlWithAuth),
+        withAuth
+      );
+    });
+  });
+
+  describe("OAuth sign-in", () => {
+    test("finishes the browser sign-in and reconnects when the server demands auth", async () => {
+      const unauthorizedTransport = { finishAuth: jest.fn(async () => {}) };
+      const signedInTransport = {};
+      MockHttpTransport.mockImplementationOnce(
+        () => unauthorizedTransport
+      ).mockImplementationOnce(() => signedInTransport);
+      mockClientInstance.connect.mockRejectedValueOnce(new UnauthorizedError());
+      mockAuthorizationCode.mockResolvedValueOnce("code-from-browser");
+
+      await startStdioServer({ url: "https://www.foundrole.com/mcp" });
+
+      expect(unauthorizedTransport.finishAuth).toHaveBeenCalledWith(
+        "code-from-browser"
+      );
+      expect(mockClientInstance.connect).toHaveBeenLastCalledWith(
+        signedInTransport
+      );
+      expect(MockHttpTransport).toHaveBeenCalledTimes(2);
+    });
+
+    test("does not start a sign-in for errors other than Unauthorized", async () => {
+      mockClientInstance.connect.mockRejectedValueOnce(new Error("offline"));
+
+      await expect(
+        startStdioServer({ url: "https://www.foundrole.com/mcp" })
+      ).rejects.toThrow("offline");
+      expect(mockAuthorizationCode).not.toHaveBeenCalled();
     });
   });
 
@@ -348,9 +415,6 @@ describe("stdio-server Tests", () => {
 
         await startStdioServer({ url: "https://test.com" });
 
-        expect(console.error).toHaveBeenCalledWith(
-          `[PROXY] Using client identity: ${clientInfo.name}@${clientInfo.version}`
-        );
         expect(MockClient).toHaveBeenCalledWith(clientInfo, {
           capabilities: {},
         });

@@ -52,6 +52,8 @@ If your client only supports stdio transport, run this package locally with npx;
 npx @foundrole/ai-job-search-mcp
 ```
 
+The first start opens FoundRole's sign-in page in your browser. After you approve, the bridge keeps the session in `~/.config/foundrole/mcp-auth.json` (readable only by you) and renews it on its own, so later starts connect without asking again. Delete that file to sign out.
+
 ## Connecting your AI assistant
 
 ### ChatGPT
