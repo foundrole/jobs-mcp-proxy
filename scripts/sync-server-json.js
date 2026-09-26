@@ -7,6 +7,7 @@ const rootDir = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SEMVER = /^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$/;
 const VERSIONED_MANIFESTS = [
   ".grok-plugin/plugin.json",
+  "claude-plugin/.claude-plugin/plugin.json",
   "gemini-extension.json",
 ];
 
