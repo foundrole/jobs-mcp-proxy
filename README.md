@@ -16,9 +16,9 @@ Ask ChatGPT or Claude for jobs and get real openings back — each one checked f
 - **Research before you commit.** Dig into [companies](https://www.foundrole.com/companies), [industry sectors](https://www.foundrole.com/sectors), and [hiring by location](https://www.foundrole.com/locations) to decide where to aim.
 - **Compare roles side by side.** _"Compare these two"_ lines up fit, pay, sponsorship, and posting risk at once — so the choice stops being a feeling.
 - **Paste a job from anywhere.** LinkedIn, a careers page, a link a friend sent — paste the posting into the chat and it gets the same checks, and can sit in your tracker alongside FoundRole listings. Your assistant reads the text you provide; nothing crawls the site for you.
-- **Stop losing track of applications.** Save jobs to your [Kanban application tracker](https://www.foundrole.com/job-tracker) and move them through Saved → Applied → Interviewing → Offered → Hired by asking. Attach notes, tags, expected salary, recruiter contacts, and deadlines. The same board shows up in the web app.
+- **Stop losing track of applications.** Save jobs to your [Kanban application tracker](https://www.foundrole.com/job-tracker) and move them through Saved → Applied → Interviewing → Offered by asking, then archive each one with how it ended — hired, rejected, ghosted, or withdrawn. Attach notes, tags, the salary offered, and deadlines. The same board shows up in the web app.
 - **Never miss a follow-up.** Set a reminder on any tracked job and get an email with a calendar (`.ics`) invite for Google Calendar, Outlook, or Apple Calendar.
-- **Let the search come to you.** Subscribe a search to recurring email alerts — daily, weekly, or monthly — so new matches land in your inbox.
+- **Let the search come to you.** Subscribe a search to recurring email alerts — daily, weekly, or monthly — so new matches land in your inbox. Ask to list, change, or cancel them the same way.
 - **Ask the awkward questions too.** Interview prep, salary negotiation, resume tactics, company research — answers grounded in FoundRole's knowledge base, with the sources linked.
 - **See results as real panels, not text walls.** In clients that support MCP Apps (ChatGPT among them), search results, job details, and your tracker render as interactive panels right in the chat.
 
@@ -26,7 +26,7 @@ It's the same account and data as [FoundRole.com](https://www.foundrole.com) —
 
 ## Free vs Pro
 
-Search, the fact-checks on every posting, the tracker, reminders, and alerts are free with no usage limits. Pro adds screening: ask for remote-only, sponsors-only, a salary floor, risky postings hidden, or a minimum match, and your assistant filters the list before you ever see it — and tells you when it has. A free account still gets the full list back, with a note that those filters were not applied.
+Search, the fact-checks on every posting, the tracker, reminders, and alerts are free with no usage limits. Screening filters work on every account: ask for remote-only, sponsors-only, a salary floor, risky postings hidden, a minimum match, specific benefits or employers, and your assistant filters the list before you ever see it — and tells you which filters ran. A free account gets the first few jobs that pass those filters, plus a count of how many more do; Pro returns the whole filtered list. Searches without screening filters come back in full on every account.
 
 > **New here?** The [FoundRole AI Search guide](https://www.foundrole.com/ai-search-mcp) walks through connecting each client step by step, with an FAQ.
 
