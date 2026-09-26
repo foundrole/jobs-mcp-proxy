@@ -7,7 +7,21 @@ import type { ServerCapabilities } from "@modelcontextprotocol/sdk/types.js";
 
 import { createBrowserOAuth } from "./browser-oauth.js";
 import { extractClientInfoFromParent } from "./client-detector.js";
+import { PROXY_VERSION } from "./constants.js";
 import { proxyServer } from "./proxy-server.js";
+
+export const BRIDGE_SERVER_INFO = {
+  name: "FoundRole MCP",
+  title: "FoundRole Jobs",
+  version: PROXY_VERSION,
+};
+
+export const BRIDGE_CAPABILITIES: ServerCapabilities = {
+  completions: {},
+  prompts: { listChanged: false },
+  resources: { listChanged: false, subscribe: false },
+  tools: { listChanged: false },
+};
 
 export const startStdioServer = async ({
   url,
@@ -39,28 +53,27 @@ export const startStdioServer = async ({
     }
   };
 
-  const httpClient = await connectSignedIn();
-
-  const serverVersion = httpClient.getServerVersion() as {
-    name: string;
-    version: string;
+  let upstream: Promise<Client> | undefined;
+  const getUpstream = () => {
+    upstream ??= connectSignedIn().catch((error: unknown) => {
+      upstream = undefined;
+      throw error;
+    });
+    return upstream;
   };
+  getUpstream().catch(() => undefined);
 
-  const serverCapabilities =
-    httpClient.getServerCapabilities() as ServerCapabilities;
-
-  const stdioServer = new Server(serverVersion, {
-    capabilities: serverCapabilities,
+  const stdioServer = new Server(BRIDGE_SERVER_INFO, {
+    capabilities: BRIDGE_CAPABILITIES,
   });
-
-  const stdioTransport = new StdioServerTransport();
-  await stdioServer.connect(stdioTransport);
 
   await proxyServer({
-    client: httpClient,
+    getClient: getUpstream,
     server: stdioServer,
-    serverCapabilities,
+    serverCapabilities: BRIDGE_CAPABILITIES,
   });
+
+  await stdioServer.connect(new StdioServerTransport());
 
   return stdioServer;
 };

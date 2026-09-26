@@ -53,18 +53,12 @@ export const openInBrowser: BrowserOpener = (url) =>
         : process.platform === "win32"
           ? ["cmd", ["/c", "start", "", url]]
           : ["xdg-open", [url]];
-    const child = spawn(command, args, { detached: true, stdio: "ignore" });
-    child.once("error", () =>
-      reject(
-        new Error(
-          `Open this address in a browser to sign in to FoundRole: ${url}`
-        )
-      )
+    const noBrowser = new Error(
+      `Open this address in a browser to sign in to FoundRole: ${url}`
     );
-    child.once("spawn", () => {
-      child.unref();
-      resolve();
-    });
+    const child = spawn(command, args, { stdio: "ignore" });
+    child.once("error", () => reject(noBrowser));
+    child.once("exit", (code) => (code === 0 ? resolve() : reject(noBrowser)));
   });
 
 const findFreePort = (): Promise<number> =>

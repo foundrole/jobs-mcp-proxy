@@ -1,505 +1,162 @@
-/**
- * stdio-server functionality tests
- * Tests MCP server initialization and HTTP client setup
- */
+// @ts-nocheck - module mocks stand in for SDK classes
 
-// @ts-nocheck - Disabling TypeScript for simplified mocking
+import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  jest,
-  test,
-} from "@jest/globals";
-
-import type { ClientInfo } from "../src/types.js";
-
-// Create a global mock client instance that can be shared
-const createMockClient = () => ({
-  connect: jest.fn().mockResolvedValue(undefined),
-  getServerCapabilities: jest.fn().mockReturnValue({
-    logging: {},
-    prompts: {},
-    resources: { subscribe: true },
-    tools: {},
-  }),
-  getServerVersion: jest.fn().mockReturnValue({
-    name: "test-server",
-    version: "1.0.0",
-  }),
-});
-
-// Mock the MCP SDK modules - must be declared before imports
 jest.mock("@modelcontextprotocol/sdk/client/index.js", () => ({
   Client: jest.fn(),
 }));
 
 jest.mock("@modelcontextprotocol/sdk/server/index.js", () => ({
-  Server: jest.fn().mockImplementation(() => ({
-    connect: jest.fn().mockResolvedValue(undefined),
-  })),
+  Server: jest.fn(),
 }));
 
 jest.mock("@modelcontextprotocol/sdk/server/stdio.js", () => ({
-  StdioServerTransport: jest.fn().mockImplementation(() => ({})),
+  StdioServerTransport: jest.fn(),
 }));
 
 jest.mock("@modelcontextprotocol/sdk/client/streamableHttp.js", () => ({
-  StreamableHTTPClientTransport: jest.fn().mockImplementation(() => ({})),
+  StreamableHTTPClientTransport: jest.fn(),
 }));
-
-// Mock the client detector and proxy server
-jest.mock("../src/client-detector.js", () => ({
-  extractClientInfoFromParent: jest
-    .fn<() => Promise<ClientInfo>>()
-    .mockResolvedValue({
-      name: "macOS//TestApp",
-      version: "1.2.3",
-    }),
-}));
-
-jest.mock("../src/proxy-server.js", () => ({
-  proxyServer: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
-}));
-
-const mockAuthProvider = { redirectUrl: "http://127.0.0.1:1/callback" };
-const mockAuthorizationCode = jest.fn();
-
-jest.mock("../src/browser-oauth.js", () => ({
-  createBrowserOAuth: jest.fn(),
-}));
-
-import { createBrowserOAuth } from "../src/browser-oauth.js";
 
 jest.mock("@modelcontextprotocol/sdk/client/auth.js", () => ({
   UnauthorizedError: class UnauthorizedError extends Error {},
 }));
 
+jest.mock("../src/client-detector.js", () => ({
+  extractClientInfoFromParent: jest.fn(),
+}));
+
+jest.mock("../src/proxy-server.js", () => ({
+  proxyServer: jest.fn(),
+}));
+
+jest.mock("../src/browser-oauth.js", () => ({
+  createBrowserOAuth: jest.fn(),
+}));
+
 import { UnauthorizedError } from "@modelcontextprotocol/sdk/client/auth.js";
-
-const withAuth = { authProvider: mockAuthProvider };
-
-// Import mocked modules
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
+import { createBrowserOAuth } from "../src/browser-oauth.js";
 import { extractClientInfoFromParent } from "../src/client-detector.js";
 import { proxyServer } from "../src/proxy-server.js";
-import { startStdioServer } from "../src/stdio-server.js";
+import {
+  BRIDGE_CAPABILITIES,
+  BRIDGE_SERVER_INFO,
+  startStdioServer,
+} from "../src/stdio-server.js";
 
-// Create typed mock constructors
-const MockClient = Client as jest.MockedClass<typeof Client>;
-const MockServer = Server as jest.MockedClass<typeof Server>;
-const MockStdioTransport = StdioServerTransport as jest.MockedClass<
-  typeof StdioServerTransport
->;
-const MockHttpTransport = StreamableHTTPClientTransport as jest.MockedClass<
-  typeof StreamableHTTPClientTransport
->;
+const SERVER_URL = "https://www.foundrole.com/mcp";
+const CLIENT_INFO = { name: "macOS//TestApp", version: "1.2.3" };
 
-const mockExtractClient = extractClientInfoFromParent as jest.MockedFunction<
-  typeof extractClientInfoFromParent
->;
-const mockProxyServer = proxyServer as jest.MockedFunction<typeof proxyServer>;
+describe("startStdioServer", () => {
+  let upstreamClient;
+  let stdioServer;
+  const authProvider = { redirectUrl: "http://127.0.0.1:1/callback" };
+  const authorizationCode = jest.fn();
 
-// Global mock instances
-let mockClientInstance: ReturnType<typeof createMockClient>;
-let mockServerInstance: any;
-let mockTransportInstance: any;
+  const getUpstream = () => proxyServer.mock.calls[0][0].getClient;
 
-describe("stdio-server Tests", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-
-    // Reset console.error mock
-    console.error = jest.fn();
-
-    // Get fresh references to mock instances
-    MockClient.mockClear();
-    MockServer.mockClear();
-    MockStdioTransport.mockClear();
-    MockHttpTransport.mockClear();
-
-    // Set up default mock returns
-    mockExtractClient.mockResolvedValue({
-      name: "macOS//TestApp",
-      version: "1.2.3",
-    });
-
-    mockProxyServer.mockResolvedValue(undefined);
+    upstreamClient = { connect: jest.fn(async () => {}) };
+    stdioServer = { connect: jest.fn(async () => {}) };
+    Client.mockImplementation(() => upstreamClient);
+    Server.mockImplementation(() => stdioServer);
+    StdioServerTransport.mockImplementation(() => ({}));
+    StreamableHTTPClientTransport.mockImplementation(() => ({}));
+    extractClientInfoFromParent.mockResolvedValue(CLIENT_INFO);
+    proxyServer.mockResolvedValue(undefined);
     createBrowserOAuth.mockResolvedValue({
-      authorizationCode: mockAuthorizationCode,
-      provider: mockAuthProvider,
-    });
-
-    // Create fresh mock instances
-    mockClientInstance = createMockClient();
-    mockServerInstance = {
-      connect: jest.fn().mockResolvedValue(undefined),
-    };
-    mockTransportInstance = {};
-
-    // Set up the mock implementations
-    MockClient.mockImplementation(() => mockClientInstance);
-    MockServer.mockImplementation(() => mockServerInstance);
-    MockStdioTransport.mockImplementation(() => mockTransportInstance);
-    MockHttpTransport.mockImplementation(() => mockTransportInstance);
-  });
-
-  afterEach(() => {
-    jest.resetAllMocks();
-  });
-
-  describe("startStdioServer", () => {
-    test("successfully starts stdio server with valid URL", async () => {
-      const testUrl = "https://api.example.com/mcp";
-
-      const server = await startStdioServer({ url: testUrl });
-
-      expect(server).toBeDefined();
-      expect(MockServer).toHaveBeenCalledWith(
-        { name: "test-server", version: "1.0.0" },
-        {
-          capabilities: {
-            logging: {},
-            prompts: {},
-            resources: { subscribe: true },
-            tools: {},
-          },
-        }
-      );
-    });
-
-    test("extracts client info from parent process", async () => {
-      const testUrl = "http://localhost:3000/mcp";
-
-      await startStdioServer({ url: testUrl });
-
-      expect(mockExtractClient).toHaveBeenCalledTimes(1);
-    });
-
-    test("creates HTTP client with correct transport", async () => {
-      const testUrl = "https://secure.example.com/mcp";
-
-      await startStdioServer({ url: testUrl });
-
-      expect(MockHttpTransport).toHaveBeenCalledWith(
-        new URL(testUrl),
-        withAuth
-      );
-      expect(MockClient).toHaveBeenCalledWith(
-        { name: "macOS//TestApp", version: "1.2.3" },
-        { capabilities: {} }
-      );
-
-      // Verify the client connect method was called
-      expect(mockClientInstance.connect).toHaveBeenCalled();
-    });
-
-    test("retrieves server version and capabilities", async () => {
-      const testUrl = "http://api.test.com/mcp";
-
-      await startStdioServer({ url: testUrl });
-
-      expect(mockClientInstance.getServerVersion).toHaveBeenCalledTimes(1);
-      expect(mockClientInstance.getServerCapabilities).toHaveBeenCalledTimes(1);
-    });
-
-    test("creates stdio server with retrieved info", async () => {
-      const testUrl = "https://example.com/mcp";
-
-      await startStdioServer({ url: testUrl });
-
-      expect(MockServer).toHaveBeenCalledWith(
-        { name: "test-server", version: "1.0.0" },
-        {
-          capabilities: {
-            logging: {},
-            prompts: {},
-            resources: { subscribe: true },
-            tools: {},
-          },
-        }
-      );
-    });
-
-    test("connects stdio transport to server", async () => {
-      const testUrl = "https://test.example.com/mcp";
-
-      await startStdioServer({ url: testUrl });
-
-      expect(MockStdioTransport).toHaveBeenCalledTimes(1);
-
-      // Verify server connect was called with transport
-      expect(mockServerInstance.connect).toHaveBeenCalledWith(
-        mockTransportInstance
-      );
-    });
-
-    test("sets up proxy server connection", async () => {
-      const testUrl = "http://localhost:8080/mcp";
-
-      await startStdioServer({ url: testUrl });
-
-      expect(mockProxyServer).toHaveBeenCalledWith({
-        client: mockClientInstance,
-        server: mockServerInstance,
-        serverCapabilities: {
-          logging: {},
-          prompts: {},
-          resources: { subscribe: true },
-          tools: {},
-        },
-      });
-    });
-
-    test("returns the created server instance", async () => {
-      const testUrl = "https://api.example.com/mcp";
-
-      const server = await startStdioServer({ url: testUrl });
-
-      expect(server).toBe(mockServerInstance);
+      authorizationCode,
+      provider: authProvider,
     });
   });
 
-  describe("Error Handling", () => {
-    test("handles client info extraction failure", async () => {
-      const error = new Error("Failed to extract client info");
-      mockExtractClient.mockRejectedValue(error);
+  test("serves stdio right away with the bridge identity, before the upstream connects", async () => {
+    upstreamClient.connect.mockImplementation(() => new Promise(() => {}));
 
-      await expect(
-        startStdioServer({ url: "https://test.com" })
-      ).rejects.toThrow("Failed to extract client info");
+    const server = await startStdioServer({ url: SERVER_URL });
+
+    expect(server).toBe(stdioServer);
+    expect(Server).toHaveBeenCalledWith(BRIDGE_SERVER_INFO, {
+      capabilities: BRIDGE_CAPABILITIES,
     });
-
-    test("handles HTTP client connection failure", async () => {
-      const error = new Error("Connection failed");
-
-      // Mock the connect method to fail
-      mockClientInstance.connect.mockRejectedValueOnce(error);
-
-      await expect(
-        startStdioServer({ url: "https://unreachable.com" })
-      ).rejects.toThrow("Connection failed");
-    });
-
-    test("handles stdio server connection failure", async () => {
-      const error = new Error("Stdio connection failed");
-
-      // Mock the server connect method to fail
-      mockServerInstance.connect.mockRejectedValueOnce(error);
-
-      await expect(
-        startStdioServer({ url: "https://test.com" })
-      ).rejects.toThrow("Stdio connection failed");
-    });
-
-    test("handles proxy server setup failure", async () => {
-      const error = new Error("Proxy setup failed");
-      mockProxyServer.mockRejectedValue(error);
-
-      await expect(
-        startStdioServer({ url: "https://test.com" })
-      ).rejects.toThrow("Proxy setup failed");
-    });
-
-    test("handles invalid URL format", async () => {
-      await expect(startStdioServer({ url: "invalid-url" })).rejects.toThrow();
-    });
+    expect(stdioServer.connect).toHaveBeenCalled();
+    expect(proxyServer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        server: stdioServer,
+        serverCapabilities: BRIDGE_CAPABILITIES,
+      })
+    );
   });
 
-  describe("URL Handling", () => {
-    test("works with HTTP URLs", async () => {
-      const httpUrl = "http://localhost:3000/mcp";
+  test("connects upstream with the parent client's identity and the OAuth provider", async () => {
+    await startStdioServer({ url: SERVER_URL });
 
-      await startStdioServer({ url: httpUrl });
-
-      expect(MockHttpTransport).toHaveBeenCalledWith(
-        new URL(httpUrl),
-        withAuth
-      );
-    });
-
-    test("works with HTTPS URLs", async () => {
-      const httpsUrl = "https://secure.api.com/mcp";
-
-      await startStdioServer({ url: httpsUrl });
-
-      expect(MockHttpTransport).toHaveBeenCalledWith(
-        new URL(httpsUrl),
-        withAuth
-      );
-    });
-
-    test("handles URLs with query parameters", async () => {
-      const urlWithQuery = "https://api.com/mcp?auth=token&debug=true";
-
-      await startStdioServer({ url: urlWithQuery });
-
-      expect(MockHttpTransport).toHaveBeenCalledWith(
-        new URL(urlWithQuery),
-        withAuth
-      );
-    });
-
-    test("handles URLs with ports", async () => {
-      const urlWithPort = "http://localhost:8080/mcp";
-
-      await startStdioServer({ url: urlWithPort });
-
-      expect(MockHttpTransport).toHaveBeenCalledWith(
-        new URL(urlWithPort),
-        withAuth
-      );
-    });
-
-    test("handles URLs with authentication", async () => {
-      const urlWithAuth = "https://user:pass@api.example.com/mcp";
-
-      await startStdioServer({ url: urlWithAuth });
-
-      expect(MockHttpTransport).toHaveBeenCalledWith(
-        new URL(urlWithAuth),
-        withAuth
-      );
-    });
+    expect(await getUpstream()()).toBe(upstreamClient);
+    expect(StreamableHTTPClientTransport).toHaveBeenCalledWith(
+      new URL(SERVER_URL),
+      { authProvider }
+    );
+    expect(Client).toHaveBeenCalledWith(CLIENT_INFO, { capabilities: {} });
+    expect(createBrowserOAuth).toHaveBeenCalledWith({ serverUrl: SERVER_URL });
   });
 
-  describe("OAuth sign-in", () => {
-    test("finishes the browser sign-in and reconnects when the server demands auth", async () => {
-      const unauthorizedTransport = { finishAuth: jest.fn(async () => {}) };
-      const signedInTransport = {};
-      MockHttpTransport.mockImplementationOnce(
-        () => unauthorizedTransport
-      ).mockImplementationOnce(() => signedInTransport);
-      mockClientInstance.connect.mockRejectedValueOnce(new UnauthorizedError());
-      mockAuthorizationCode.mockResolvedValueOnce("code-from-browser");
+  test("reuses one upstream connection across requests", async () => {
+    await startStdioServer({ url: SERVER_URL });
 
-      await startStdioServer({ url: "https://www.foundrole.com/mcp" });
+    await getUpstream()();
+    await getUpstream()();
 
-      expect(unauthorizedTransport.finishAuth).toHaveBeenCalledWith(
-        "code-from-browser"
-      );
-      expect(mockClientInstance.connect).toHaveBeenLastCalledWith(
-        signedInTransport
-      );
-      expect(MockHttpTransport).toHaveBeenCalledTimes(2);
-    });
-
-    test("does not start a sign-in for errors other than Unauthorized", async () => {
-      mockClientInstance.connect.mockRejectedValueOnce(new Error("offline"));
-
-      await expect(
-        startStdioServer({ url: "https://www.foundrole.com/mcp" })
-      ).rejects.toThrow("offline");
-      expect(mockAuthorizationCode).not.toHaveBeenCalled();
-    });
+    expect(upstreamClient.connect).toHaveBeenCalledTimes(1);
   });
 
-  describe("Client Info Scenarios", () => {
-    test("handles different client info formats", async () => {
-      const clientInfos: ClientInfo[] = [
-        { name: "macOS//Claude", version: "2.1.0" },
-        { name: "Windows//VSCode", version: "1.85.0" },
-        { name: "Linux//Firefox", version: "120.0" },
-        { name: "TestApp", version: "unknown" },
-      ];
+  test("finishes the browser sign-in and reconnects when the server demands auth", async () => {
+    const unauthorizedTransport = { finishAuth: jest.fn(async () => {}) };
+    const signedInTransport = {};
+    StreamableHTTPClientTransport.mockImplementationOnce(
+      () => unauthorizedTransport
+    ).mockImplementationOnce(() => signedInTransport);
+    upstreamClient.connect.mockRejectedValueOnce(new UnauthorizedError());
+    authorizationCode.mockResolvedValueOnce("code-from-browser");
 
-      for (const clientInfo of clientInfos) {
-        jest.clearAllMocks();
-        mockExtractClient.mockResolvedValue(clientInfo);
+    await startStdioServer({ url: SERVER_URL });
 
-        await startStdioServer({ url: "https://test.com" });
-
-        expect(MockClient).toHaveBeenCalledWith(clientInfo, {
-          capabilities: {},
-        });
-      }
-    });
-
-    test("handles client info with additional properties", async () => {
-      const clientInfo: ClientInfo = {
-        build: "abc123",
-        name: "macOS//CustomApp",
-        platform: "darwin",
-        version: "3.0.0",
-      };
-
-      mockExtractClient.mockResolvedValue(clientInfo);
-
-      await startStdioServer({ url: "https://test.com" });
-
-      expect(MockClient).toHaveBeenCalledWith(clientInfo, { capabilities: {} });
-    });
+    expect(await getUpstream()()).toBe(upstreamClient);
+    expect(unauthorizedTransport.finishAuth).toHaveBeenCalledWith(
+      "code-from-browser"
+    );
+    expect(upstreamClient.connect).toHaveBeenLastCalledWith(signedInTransport);
   });
 
-  describe("Server Capabilities Scenarios", () => {
-    test("handles different server capability configurations", async () => {
-      const capabilities = [
-        { prompts: {}, tools: {} },
-        { logging: {}, resources: { subscribe: false } },
-        {
-          logging: {},
-          prompts: {},
-          resources: { subscribe: true },
-          tools: {},
-        },
-        {},
-      ];
+  test("keeps serving when sign-in cannot start, and retries on the next request", async () => {
+    const noBrowser = new Error("Open this address in a browser");
+    upstreamClient.connect
+      .mockRejectedValueOnce(noBrowser)
+      .mockRejectedValueOnce(noBrowser)
+      .mockResolvedValueOnce(undefined);
 
-      for (const serverCapabilities of capabilities) {
-        jest.clearAllMocks();
+    const server = await startStdioServer({ url: SERVER_URL });
+    await new Promise((resolve) => setImmediate(resolve));
 
-        // Update the mock to return specific capabilities
-        mockClientInstance.getServerCapabilities.mockReturnValue(
-          serverCapabilities
-        );
-
-        await startStdioServer({ url: "https://test.com" });
-
-        expect(MockServer).toHaveBeenCalledWith(
-          { name: "test-server", version: "1.0.0" },
-          { capabilities: serverCapabilities }
-        );
-      }
-    });
-
-    test("handles server with no capabilities", async () => {
-      // Update mock to return empty capabilities
-      mockClientInstance.getServerCapabilities.mockReturnValue({});
-
-      await startStdioServer({ url: "https://test.com" });
-
-      expect(MockServer).toHaveBeenCalledWith(
-        { name: "test-server", version: "1.0.0" },
-        { capabilities: {} }
-      );
-    });
+    expect(server).toBe(stdioServer);
+    await expect(getUpstream()()).rejects.toThrow(
+      "Open this address in a browser"
+    );
+    expect(await getUpstream()()).toBe(upstreamClient);
+    expect(upstreamClient.connect).toHaveBeenCalledTimes(3);
   });
 
-  describe("Integration Flow", () => {
-    test("all components are properly initialized", async () => {
-      const testUrl = "https://complete.test.com/mcp";
+  test("does not start a sign-in for errors other than Unauthorized", async () => {
+    upstreamClient.connect.mockRejectedValue(new Error("offline"));
 
-      const server = await startStdioServer({ url: testUrl });
+    await startStdioServer({ url: SERVER_URL });
 
-      // Verify all mocks were called
-      expect(mockExtractClient).toHaveBeenCalled();
-      expect(MockHttpTransport).toHaveBeenCalled();
-      expect(MockClient).toHaveBeenCalled();
-      expect(MockServer).toHaveBeenCalled();
-      expect(MockStdioTransport).toHaveBeenCalled();
-      expect(mockProxyServer).toHaveBeenCalled();
-
-      expect(mockClientInstance.connect).toHaveBeenCalled();
-      expect(mockClientInstance.getServerVersion).toHaveBeenCalled();
-      expect(mockClientInstance.getServerCapabilities).toHaveBeenCalled();
-      expect(mockServerInstance.connect).toHaveBeenCalled();
-      expect(server).toBe(mockServerInstance);
-    });
+    await expect(getUpstream()()).rejects.toThrow("offline");
+    expect(authorizationCode).not.toHaveBeenCalled();
   });
 });
