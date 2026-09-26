@@ -630,12 +630,15 @@ npm version patch        # or minor/major — bumps package.json; the `version`
 npm run publish:npm
 
 # 2. Push the matching tag AND create the GitHub Release AS THE BOT. Publishing
-#    the Release is what triggers the publish-mcp workflow:
+#    the Release is what triggers the publish-mcp workflow. Pass the exact
+#    version step 1 published — the script sees the version commit and tag
+#    already exist and skips the bump:
 GH_BOT_TOKEN=… GH_BOT_USERNAME=FoundRoleApp GH_BOT_EMAIL=…@users.noreply.github.com \
-  npm run release <patch|minor|major|x.y.z>
+  npm run release <x.y.z>
 ```
 
-`scripts/release.mjs` bumps the version (if not already), pushes the branch + tag
+`scripts/release.mjs` bumps the version only when `package.json` is not already
+at `<x.y.z>` with a `v<x.y.z>` tag (a keyword like `patch` always bumps), pushes the branch + tag
 as the bot, then POSTs the GitHub Release with the same token — notes are the
 commit subjects between the previous tag and this one, plus a compare link. The
 `release: published` event fires `.github/workflows/publish-mcp.yml`, which runs
