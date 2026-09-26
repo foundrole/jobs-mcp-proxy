@@ -6,7 +6,8 @@
   },
   "description": "AI job search and job application tracker. Search live jobs by title, location, salary, date posted, and remote or on-site, and see each one judged on real data: pay against market rates, ghost-job signals, visa sponsorship history, and how well it matches your resume. Check how hiring software reads your resume, and track applications, set reminders, and get email alerts.",
   "displayName": "FoundRole Jobs",
-  "homepage": "https://www.foundrole.com/ai-search-mcp",
+  "documentationUrl": "https://www.foundrole.com/ai-search-mcp",
+  "homepage": "https://www.foundrole.com",
   "keywords": [
     "ai-job-search",
     "job-search",
@@ -30,5 +31,7 @@
   "name": "foundrole",
   "privacyPolicyUrl": "https://www.foundrole.com/privacy-policy",
   "repository": "https://github.com/foundrole/jobs-mcp-proxy",
+  "supportUrl": "https://www.foundrole.com/contact-us",
+  "termsOfServiceUrl": "https://www.foundrole.com/terms-of-service",
   "version": "1.1.12"
 }
