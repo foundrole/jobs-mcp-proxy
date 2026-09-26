@@ -4,6 +4,8 @@ Ask ChatGPT or Claude for jobs and get real openings back — each one checked f
 
 > **Sign in once — your assistant handles it.** The first time your AI calls FoundRole it opens a standard OAuth sign-in; approve it once in the browser and that covers everything: search, fact-checks, the tracker, reminders, and alerts. There is no API key to copy or rotate, and the account is free.
 
+[![FoundRole MCP MCP server – quality and maintenance score on Glama](https://glama.ai/mcp/servers/foundrole/jobs-mcp-proxy/badges/card.svg)](https://glama.ai/mcp/servers/foundrole/jobs-mcp-proxy)
+
 ## What your assistant can do
 
 - **Search live jobs by asking.** Openings straight from company career pages, refreshed hourly across 40+ industries. Natural language maps onto real filters — job title, location, company, salary range, posting date: _"remote React jobs in NYC paying over $130k posted this week."_
