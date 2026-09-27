@@ -116,7 +116,7 @@ export default [
       "dist/**/*",
       "node_modules/**/*",
       "coverage/**/*",
-      "src/tool-catalog.ts",
+      "src/server-catalog.ts",
     ],
   },
 ];
