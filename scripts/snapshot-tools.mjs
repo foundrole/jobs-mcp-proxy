@@ -8,10 +8,13 @@ import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/
 
 import { createBrowserOAuth, openInBrowser } from "../dist/browser-oauth.js";
 
-const DEFAULT_SERVER_URL = "https://www.foundrole.net/mcp";
 const CATALOG_PATH = new URL("../src/tool-catalog.ts", import.meta.url);
 
-const serverUrl = process.argv[2] ?? DEFAULT_SERVER_URL;
+const serverUrl = process.argv[2];
+if (!serverUrl) {
+  process.stderr.write("Usage: npm run snapshot:tools -- <mcp-server-url>\n");
+  process.exit(1);
+}
 const oauth = await createBrowserOAuth({
   openBrowser: async (url) => {
     process.stdout.write(`Sign in to FoundRole: ${url}\n`);
