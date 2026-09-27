@@ -620,6 +620,15 @@ happen for this repo.
 ### Release flow
 
 ```bash
+# 0. Refresh the bundled tool catalog. Until the user signs in, the stdio bridge
+#    answers tools/list from src/tool-catalog.json, so hosts and directories
+#    (Glama's build check among them) see every tool before any sign-in. The
+#    script signs in through the browser once, lists the tools of the given
+#    server (default: the local stack, https://www.foundrole.net/mcp, which
+#    serves what production serves after the deploy) and rewrites the file.
+#    Commit the result with the version bump.
+npm run snapshot:tools
+
 # 1. Publish the npm package FIRST. The registry validates that the npm package
 #    already exists at the release version, and reads two fields from the
 #    PUBLISHED package.json (see gates below). A human with npm access to the

@@ -67,6 +67,7 @@
     "prettier:write": "prettier . --write",
     "publish:npm": "npm_config_registry=https://registry.npmjs.org/ npm publish --access public",
     "release": "node scripts/release.mjs",
+    "snapshot:tools": "npm run build && node scripts/snapshot-tools.mjs",
     "start": "node dist/cli.js",
     "test": "jest",
     "test:coverage": "jest --coverage",

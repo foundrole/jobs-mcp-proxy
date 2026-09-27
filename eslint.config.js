@@ -112,6 +112,11 @@ export default [
   },
   prettier,
   {
-    ignores: ["dist/**/*", "node_modules/**/*", "coverage/**/*"],
+    ignores: [
+      "dist/**/*",
+      "node_modules/**/*",
+      "coverage/**/*",
+      "src/tool-catalog.ts",
+    ],
   },
 ];
