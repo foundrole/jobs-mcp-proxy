@@ -4,11 +4,13 @@ import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import type { ServerCapabilities } from "@modelcontextprotocol/sdk/types.js";
+import { ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 
 import { createBrowserOAuth } from "./browser-oauth.js";
 import { extractClientInfoFromParent } from "./client-detector.js";
 import { PROXY_VERSION } from "./constants.js";
 import { proxyServer } from "./proxy-server.js";
+import { TOOL_CATALOG } from "./tool-catalog.js";
 
 export const BRIDGE_SERVER_INFO = {
   name: "FoundRole MCP",
@@ -54,11 +56,15 @@ export const startStdioServer = async ({
   };
 
   let upstream: Promise<Client> | undefined;
+  let connected: Client | undefined;
   const getUpstream = () => {
-    upstream ??= connectSignedIn().catch((error: unknown) => {
-      upstream = undefined;
-      throw error;
-    });
+    upstream ??= connectSignedIn().then(
+      (client) => (connected = client),
+      (error: unknown) => {
+        upstream = undefined;
+        throw error;
+      }
+    );
     return upstream;
   };
   getUpstream().catch(() => undefined);
@@ -72,6 +78,10 @@ export const startStdioServer = async ({
     server: stdioServer,
     serverCapabilities: BRIDGE_CAPABILITIES,
   });
+
+  stdioServer.setRequestHandler(ListToolsRequestSchema, async (request) =>
+    connected ? connected.listTools(request.params) : TOOL_CATALOG
+  );
 
   await stdioServer.connect(new StdioServerTransport());
 

@@ -620,6 +620,14 @@ happen for this repo.
 ### Release flow
 
 ```bash
+# 0. Refresh the bundled tool catalog. Until the user signs in, the stdio bridge
+#    answers tools/list from src/tool-catalog.ts, so hosts and directories
+#    (Glama's build check among them) see every tool before any sign-in. The
+#    script signs in through the browser once, lists the tools of the MCP
+#    server at the given URL (one running the code that is deployed) and
+#    rewrites the file. Commit the result with the version bump.
+npm run snapshot:tools -- <mcp-server-url>
+
 # 1. Publish the npm package FIRST. The registry validates that the npm package
 #    already exists at the release version, and reads two fields from the
 #    PUBLISHED package.json (see gates below). A human with npm access to the
