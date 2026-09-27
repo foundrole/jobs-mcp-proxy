@@ -8,7 +8,7 @@ import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/
 
 import { createBrowserOAuth, openInBrowser } from "../dist/browser-oauth.js";
 
-const CATALOG_PATH = new URL("../src/tool-catalog.ts", import.meta.url);
+const CATALOG_PATH = new URL("../src/server-catalog.ts", import.meta.url);
 
 const serverUrl = process.argv[2];
 if (!serverUrl) {
@@ -47,24 +47,42 @@ const connectSignedIn = async () => {
   }
 };
 
+const listAll = async (list, key) => {
+  const items = [];
+  let cursor;
+  do {
+    const page = await list(cursor ? { cursor } : {});
+    items.push(...page[key]);
+    cursor = page.nextCursor;
+  } while (cursor);
+  return { [key]: items };
+};
+
 const client = await connectSignedIn();
-const tools = [];
-let cursor;
-do {
-  const page = await client.listTools(cursor ? { cursor } : {});
-  tools.push(...page.tools);
-  cursor = page.nextCursor;
-} while (cursor);
+const catalog = {
+  prompts: await listAll((params) => client.listPrompts(params), "prompts"),
+  resources: await listAll(
+    (params) => client.listResources(params),
+    "resources"
+  ),
+  resourceTemplates: await listAll(
+    (params) => client.listResourceTemplates(params),
+    "resourceTemplates"
+  ),
+  tools: await listAll((params) => client.listTools(params), "tools"),
+};
 await client.close();
 
 writeFileSync(
   CATALOG_PATH,
-  `import type { ListToolsResult } from "@modelcontextprotocol/sdk/types.js";\n\n` +
-    `export const TOOL_CATALOG: ListToolsResult = ${JSON.stringify({ tools }, null, 2)};\n`
+  `import type { ServerCatalog } from "./server-catalog-types.js";\n\n` +
+    `export const SERVER_CATALOG: ServerCatalog = ${JSON.stringify(catalog, null, 2)};\n`
 );
 execFileSync("npx", ["prettier", "--write", fileURLToPath(CATALOG_PATH)], {
   stdio: "ignore",
 });
 process.stdout.write(
-  `${tools.length} tools from ${serverUrl}: ${tools.map((tool) => tool.name).join(", ")}\n`
+  `${serverUrl}: ${catalog.tools.tools.length} tools, ${catalog.prompts.prompts.length} prompts, ` +
+    `${catalog.resources.resources.length} resources, ` +
+    `${catalog.resourceTemplates.resourceTemplates.length} resource templates\n`
 );

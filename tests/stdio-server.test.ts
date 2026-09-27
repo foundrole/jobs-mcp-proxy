@@ -22,6 +22,13 @@ jest.mock("@modelcontextprotocol/sdk/client/auth.js", () => ({
   UnauthorizedError: class UnauthorizedError extends Error {},
 }));
 
+jest.mock("@modelcontextprotocol/sdk/types.js", () => ({
+  ListPromptsRequestSchema: { method: "prompts/list" },
+  ListResourcesRequestSchema: { method: "resources/list" },
+  ListResourceTemplatesRequestSchema: { method: "resources/templates/list" },
+  ListToolsRequestSchema: { method: "tools/list" },
+}));
+
 jest.mock("../src/client-detector.js", () => ({
   extractClientInfoFromParent: jest.fn(),
 }));
@@ -39,21 +46,48 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import {
+  ListPromptsRequestSchema,
+  ListResourcesRequestSchema,
+  ListResourceTemplatesRequestSchema,
+  ListToolsRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
 
 import { createBrowserOAuth } from "../src/browser-oauth.js";
 import { extractClientInfoFromParent } from "../src/client-detector.js";
 import { proxyServer } from "../src/proxy-server.js";
+import { SERVER_CATALOG } from "../src/server-catalog.js";
 import {
   BRIDGE_CAPABILITIES,
   BRIDGE_SERVER_INFO,
   startStdioServer,
 } from "../src/stdio-server.js";
-import { TOOL_CATALOG } from "../src/tool-catalog.js";
 
 const SERVER_URL = "https://www.foundrole.com/mcp";
 const CLIENT_INFO = { name: "macOS//TestApp", version: "1.2.3" };
-const UPSTREAM_TOOLS = { tools: [{ inputSchema: {}, name: "jobs_search" }] };
+const UPSTREAM_LIST = { fromServer: true };
+const CATALOG_LISTS = [
+  {
+    catalogKey: "tools",
+    clientMethod: "listTools",
+    schema: ListToolsRequestSchema,
+  },
+  {
+    catalogKey: "prompts",
+    clientMethod: "listPrompts",
+    schema: ListPromptsRequestSchema,
+  },
+  {
+    catalogKey: "resources",
+    clientMethod: "listResources",
+    schema: ListResourcesRequestSchema,
+  },
+  {
+    catalogKey: "resourceTemplates",
+    clientMethod: "listResourceTemplates",
+    schema: ListResourceTemplatesRequestSchema,
+  },
+];
 
 describe("startStdioServer", () => {
   let upstreamClient;
@@ -62,45 +96,60 @@ describe("startStdioServer", () => {
   const authorizationCode = jest.fn();
 
   const getUpstream = () => proxyServer.mock.calls[0][0].getClient;
-  const listTools = (params = {}) => {
-    const [, handler] = stdioServer.setRequestHandler.mock.calls.find(
-      ([schema]) => schema === ListToolsRequestSchema
+  const list = (schema, params = {}) => {
+    const [, handler] = stdioServer.setRequestHandler.mock.calls.findLast(
+      ([registered]) => registered === schema
     );
-    return handler({ method: "tools/list", params });
+    return handler({ params });
   };
 
-  test("lists the bundled tool catalog while the sign-in is still pending", async () => {
-    upstreamClient.connect.mockImplementation(() => new Promise(() => {}));
+  describe.each(CATALOG_LISTS)(
+    "$catalogKey",
+    ({ catalogKey, clientMethod, schema }) => {
+      test("comes from the bundled catalog while the sign-in is still pending", async () => {
+        upstreamClient.connect.mockImplementation(() => new Promise(() => {}));
 
-    await startStdioServer({ url: SERVER_URL });
+        await startStdioServer({ url: SERVER_URL });
 
-    expect(await listTools()).toBe(TOOL_CATALOG);
-    expect(TOOL_CATALOG.tools.length).toBeGreaterThan(0);
-    expect(upstreamClient.listTools).not.toHaveBeenCalled();
-  });
+        expect(await list(schema)).toBe(SERVER_CATALOG[catalogKey]);
+        expect(upstreamClient[clientMethod]).not.toHaveBeenCalled();
+      });
 
-  test("lists the bundled tool catalog when the sign-in cannot start", async () => {
-    upstreamClient.connect.mockRejectedValue(new Error("Open this address"));
+      test("comes from the bundled catalog when the sign-in cannot start", async () => {
+        upstreamClient.connect.mockRejectedValue(
+          new Error("Open this address")
+        );
 
-    await startStdioServer({ url: SERVER_URL });
-    await new Promise((resolve) => setImmediate(resolve));
+        await startStdioServer({ url: SERVER_URL });
+        await new Promise((resolve) => setImmediate(resolve));
 
-    expect(await listTools()).toBe(TOOL_CATALOG);
-  });
+        expect(await list(schema)).toBe(SERVER_CATALOG[catalogKey]);
+      });
 
-  test("lists the server's live tools once signed in", async () => {
-    await startStdioServer({ url: SERVER_URL });
-    await getUpstream()();
+      test("comes from the server once signed in", async () => {
+        await startStdioServer({ url: SERVER_URL });
+        await getUpstream()();
 
-    expect(await listTools({ cursor: "next" })).toBe(UPSTREAM_TOOLS);
-    expect(upstreamClient.listTools).toHaveBeenCalledWith({ cursor: "next" });
+        expect(await list(schema, { cursor: "next" })).toBe(UPSTREAM_LIST);
+        expect(upstreamClient[clientMethod]).toHaveBeenCalledWith({
+          cursor: "next",
+        });
+      });
+    }
+  );
+
+  test("bundles every tool the server lists", () => {
+    expect(SERVER_CATALOG.tools.tools.length).toBeGreaterThan(0);
   });
 
   beforeEach(() => {
     jest.clearAllMocks();
     upstreamClient = {
       connect: jest.fn(async () => {}),
-      listTools: jest.fn(async () => UPSTREAM_TOOLS),
+      listPrompts: jest.fn(async () => UPSTREAM_LIST),
+      listResources: jest.fn(async () => UPSTREAM_LIST),
+      listResourceTemplates: jest.fn(async () => UPSTREAM_LIST),
+      listTools: jest.fn(async () => UPSTREAM_LIST),
     };
     stdioServer = {
       connect: jest.fn(async () => {}),

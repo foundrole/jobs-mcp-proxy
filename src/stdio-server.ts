@@ -4,13 +4,18 @@ import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import type { ServerCapabilities } from "@modelcontextprotocol/sdk/types.js";
-import { ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import {
+  ListPromptsRequestSchema,
+  ListResourcesRequestSchema,
+  ListResourceTemplatesRequestSchema,
+  ListToolsRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
 
 import { createBrowserOAuth } from "./browser-oauth.js";
 import { extractClientInfoFromParent } from "./client-detector.js";
 import { PROXY_VERSION } from "./constants.js";
 import { proxyServer } from "./proxy-server.js";
-import { TOOL_CATALOG } from "./tool-catalog.js";
+import { SERVER_CATALOG } from "./server-catalog.js";
 
 export const BRIDGE_SERVER_INFO = {
   name: "FoundRole MCP",
@@ -80,7 +85,22 @@ export const startStdioServer = async ({
   });
 
   stdioServer.setRequestHandler(ListToolsRequestSchema, async (request) =>
-    connected ? connected.listTools(request.params) : TOOL_CATALOG
+    connected ? connected.listTools(request.params) : SERVER_CATALOG.tools
+  );
+  stdioServer.setRequestHandler(ListPromptsRequestSchema, async (request) =>
+    connected ? connected.listPrompts(request.params) : SERVER_CATALOG.prompts
+  );
+  stdioServer.setRequestHandler(ListResourcesRequestSchema, async (request) =>
+    connected
+      ? connected.listResources(request.params)
+      : SERVER_CATALOG.resources
+  );
+  stdioServer.setRequestHandler(
+    ListResourceTemplatesRequestSchema,
+    async (request) =>
+      connected
+        ? connected.listResourceTemplates(request.params)
+        : SERVER_CATALOG.resourceTemplates
   );
 
   await stdioServer.connect(new StdioServerTransport());
