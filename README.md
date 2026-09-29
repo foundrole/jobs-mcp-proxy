@@ -4,6 +4,8 @@ Ask ChatGPT or Claude for jobs and get real openings back — each one checked f
 
 > **Sign in once — your assistant handles it.** The first time your AI calls FoundRole it opens a standard OAuth sign-in; approve it once in the browser and that covers everything: search, fact-checks, the tracker, reminders, and alerts. There is no API key to copy or rotate, and the account is free.
 
+**Add it in one click:** [ChatGPT plugin](https://chatgpt.com/plugins/plugin_asdk_app_6a21bbefe8bc81919d395e1b9e90b91d) · [Claude connector](https://claude.ai/directory/foundrole-jobs) · [Cursor](https://cursor.com/install-mcp?name=foundrole&config=eyJ1cmwiOiJodHRwczovL3d3dy5mb3VuZHJvbGUuY29tL21jcCJ9) · [VS Code](https://vscode.dev/redirect/mcp/install?name=foundrole&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fwww.foundrole.com%2Fmcp%22%7D) — or [any other MCP client](#any-other-mcp-client).
+
 [![FoundRole MCP MCP server – quality and maintenance score on Glama](https://glama.ai/mcp/servers/foundrole/jobs-mcp-proxy/badges/card.svg)](https://glama.ai/mcp/servers/foundrole/jobs-mcp-proxy)
 
 ## What your assistant can do
@@ -44,7 +46,7 @@ Point your client at the FoundRole MCP endpoint:
 https://www.foundrole.com/mcp
 ```
 
-Most modern clients — ChatGPT, Claude, Cursor, VS Code — speak remote MCP (Streamable HTTP) natively, so this is all the configuration there is.
+Most modern clients — ChatGPT, Claude, Cursor, VS Code — speak remote MCP (Streamable HTTP) natively, so this is all the configuration there is. In ChatGPT and Claude you don't even need the address: FoundRole Jobs is listed in their directories (see below).
 
 ### Option 2 — stdio bridge (for clients without remote MCP)
 
@@ -62,32 +64,39 @@ The first start opens FoundRole's sign-in page in your browser. After you approv
 
 **Estimated time:** ~1 minute
 
-1. Open FoundRole in the [ChatGPT app directory](https://chatgpt.com/plugins/plugin_asdk_app_6a21bbefe8bc81919d395e1b9e90b91d).
-2. Click **Add** and approve the FoundRole sign-in when ChatGPT opens it.
+1. Open [FoundRole Jobs in ChatGPT's plugins](https://chatgpt.com/plugins/plugin_asdk_app_6a21bbefe8bc81919d395e1b9e90b91d).
+2. Click **Install plugin** and approve the FoundRole sign-in when ChatGPT opens it.
 3. Ask for jobs in any chat — no settings to configure, nothing to paste.
 
-### Claude Web/Desktop
+### Claude
 
-**Estimated time:** ~2 minutes
+**Estimated time:** ~1 minute
 
-1. Open Claude settings (profile / settings icon).
-2. Find **Connectors** (or **Tools**) and click **Add custom connector**.
-3. Name it `FoundRole`.
-4. In the **Remote MCP server URL** field, paste:
+1. Open [FoundRole Jobs in Claude's connector directory](https://claude.ai/directory/foundrole-jobs).
+2. Add the connector and approve the FoundRole sign-in Claude opens.
+3. Ask for jobs in any chat — no server address to copy.
 
-   ```
-   https://www.foundrole.com/mcp
-   ```
+**Claude Code and Cowork:** install the [FoundRole Jobs plugin](https://claude.ai/customize/plugins/id/b0559743-551f-40c0-960b-89fe68d76936%40anthropic-plugin-directory) (the page opens once you are signed in to Claude). It adds the same connector plus two skills that walk Claude through a job search and a resume check; the source is in [`claude-plugin/`](claude-plugin).
 
-5. Save, allow Claude to connect, and approve the FoundRole sign-in it opens. Then ask for jobs in the chat.
+**Directory connectors switched off in your workspace?** Add a custom connector instead: **Settings → Connectors → Add custom connector**, name it `FoundRole`, paste `https://www.foundrole.com/mcp`, save, and approve the sign-in.
 
 ### Cursor
 
 **Estimated time:** ~1 minute
 
-Install the FoundRole plugin from the [Cursor Marketplace](https://cursor.com/marketplace): open **Customize** in the sidebar, find **FoundRole**, and select **Install**. Approve the FoundRole sign-in Cursor opens, then ask for jobs in any chat.
+[![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=foundrole&config=eyJ1cmwiOiJodHRwczovL3d3dy5mb3VuZHJvbGUuY29tL21jcCJ9)
 
-The plugin lives in this repository — `.cursor-plugin/plugin.json` with the server declared in `mcp.json`. To try it before it is listed, symlink this repo into `~/.cursor/plugins/local/` and reload the window.
+Click the button, confirm **Install** in Cursor, and approve the FoundRole sign-in it opens. FoundRole Jobs is also listed on [Cursor Directory](https://cursor.directory/plugins/foundrole-jobs).
+
+The Cursor plugin lives in this repository — `.cursor-plugin/plugin.json` with the server declared in `mcp.json`. To load it locally, symlink this repo into `~/.cursor/plugins/local/` and reload the window.
+
+### VS Code
+
+**Estimated time:** ~1 minute
+
+[![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_FoundRole-0098FF?logo=visualstudiocode&logoColor=white)](https://vscode.dev/redirect/mcp/install?name=foundrole&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fwww.foundrole.com%2Fmcp%22%7D)
+
+Click the badge, confirm **Install** in VS Code, approve the FoundRole sign-in, then ask for jobs in Copilot Chat in agent mode.
 
 ### Manual setup — Cursor / VS Code / Windsurf
 
