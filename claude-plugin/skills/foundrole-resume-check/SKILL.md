@@ -7,9 +7,23 @@ description: Check how hiring software (an ATS parser) reads a resume with the F
 
 `resume_check` runs FoundRole's deterministic parse of a resume: FoundRole's own text-readability assessment, with no AI recovery. Report exactly what it returns.
 
-## When `resume_check` is not available
+## Connect FoundRole first
 
-This skill can load while the FoundRole app itself is disabled or not connected, so `resume_check` is missing from the session. Tell the user the FoundRole app is not enabled in this client, and that turning it on in the client's app or plugin settings (or connecting `https://www.foundrole.com/mcp`) and starting a new session makes the check available. Do not simulate the parse, and do not present your own reading of the resume as a FoundRole result or band.
+`resume_check` comes from the FoundRole connector at `https://www.foundrole.com/mcp`. Installing the plugin does not connect it: this skill loads, but `resume_check` stays missing until the user connects FoundRole and signs in. Check for the tool before anything else.
+
+When it is missing, offer the connection in the conversation before you answer:
+
+1. Look for the tools `search_mcp_registry` and `suggest_connectors`; they may carry a server prefix, and may need loading through tool search first. Claude chat and Cowork provide them.
+2. Call `search_mcp_registry` with the keyword `foundrole` and take the result whose URL is `https://www.foundrole.com/mcp`.
+3. Pass that result's `directoryUuid` to `suggest_connectors`. It shows a Connect button in the conversation.
+4. Tell the user to press Connect and sign in to FoundRole — a free account is enough, and there is no API key. Once `resume_check` appears, run the check they asked for.
+
+When those two tools are not available, or the search does not return FoundRole, give the exact path instead of a general pointer to settings:
+
+- In Claude: Customize → Plugins → FoundRole Jobs → Connectors → Connect, or the connector page `https://claude.ai/directory/foundrole-jobs`.
+- In any other client: add `https://www.foundrole.com/mcp` as a remote MCP server and sign in.
+
+Do not simulate the parse, and do not present your own reading of the resume as a FoundRole result or band.
 
 ## Choose what to check
 
