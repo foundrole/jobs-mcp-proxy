@@ -1,4 +1,4 @@
-# CLAUDE.md - Jobs MCP Proxy Project Development Rules
+# AGENTS.md - Jobs MCP Proxy Project Development Rules
 
 This document defines the comprehensive rules and guidelines for working with the jobs-mcp-proxy project. Always follow these rules when contributing to or maintaining this codebase.
 
