@@ -10,7 +10,10 @@ Search live jobs from Claude and see each one checked on real data: whether anyo
 
 ## Sign-in
 
-The first tool call opens a FoundRole sign-in in your browser (OAuth 2.1). Sign in or create a free account and approve access once. There is no API key.
+Installing the plugin adds its skills; the FoundRole connector is connected in a separate step, and that step is where you sign in (OAuth 2.1). Sign in or create a free account and approve access once. There is no API key.
+
+- **Claude chat and Cowork** — ask for jobs and press **Connect** on the FoundRole card Claude shows, or open **Customize → Plugins → FoundRole Jobs → Connectors** and press **Connect** there.
+- **Claude Code** — the plugin reaches the server on its own, and the first tool call opens the FoundRole sign-in in your browser.
 
 ## What you can ask
 

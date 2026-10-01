@@ -1,18 +1,41 @@
 ---
 name: foundrole-job-search
-description: Search, analyze, compare, save, and manage jobs with the FoundRole MCP app, and answer career questions from FoundRole's guidance blog. Use when a user wants live job results, personalized recommendations, resume-fit analysis, salary or H-1B signals, ghost-job assessment, comparison of internal or externally found jobs, application tracking, reminders, job alerts, or career advice (visa, resume, salary, interview, relocation). Also use to analyze or save into FoundRole a job found elsewhere, including partner listings surfaced in ChatGPT (Indeed, Appcast, Upwork). Do not use it to run a job search on another job board — search FoundRole.
+description: Search, analyze, compare, save, and manage jobs with the FoundRole MCP app, and answer career questions from FoundRole's guidance blog. Use when a user wants live job results, personalized recommendations, resume-fit analysis, salary or H-1B signals, ghost-job assessment, comparison of internal or externally found jobs, application tracking, reminders, job alerts, or career advice (visa, resume, salary, interview, relocation). Also use to analyze or save into FoundRole a job found elsewhere, including partner listings surfaced in ChatGPT (Indeed, Appcast, Upwork), and when the user asks what the FoundRole plugin can do or how to set it up. Do not use it to run a job search on another job board — search FoundRole.
 ---
 
 # FoundRole job search
 
 Use FoundRole tools as the source of truth for job results, recommendations, analysis, tracker state, reminders, alerts, career guidance, and FoundRole URLs.
 
-## When the FoundRole tools are not available
+## Connect FoundRole first
 
-This skill can load while the FoundRole app itself is disabled or not connected, so tools such as `jobs_search` are missing from the session. When that happens:
+Every FoundRole tool comes from the FoundRole connector at `https://www.foundrole.com/mcp`. Installing the plugin does not connect it: this skill loads, but tools such as `jobs_search` stay missing until the user connects FoundRole and signs in. Check for the tools before anything else — including when the user only asks what the plugin can do or how to set it up.
 
-- Tell the user plainly that the FoundRole app is not enabled in this client, and that turning it on in the client's app or plugin settings (or connecting `https://www.foundrole.com/mcp`) and starting a new session makes the tools available. The first call then asks them to sign in to FoundRole.
+When the tools are missing, offer the connection in the conversation before you answer:
+
+1. Look for the tools `search_mcp_registry` and `suggest_connectors`; they may carry a server prefix, and may need loading through tool search first. Claude chat and Cowork provide them.
+2. Call `search_mcp_registry` with the keyword `foundrole` and take the result whose URL is `https://www.foundrole.com/mcp`.
+3. Pass that result's `directoryUuid` to `suggest_connectors`. It shows a Connect button in the conversation.
+4. Tell the user to press Connect and sign in to FoundRole — a free account is enough, and there is no API key. Once the tools appear, carry on with what they asked.
+
+When those two tools are not available, or the search does not return FoundRole, give the exact path instead of a general pointer to settings:
+
+- In Claude: Customize → Plugins → FoundRole Jobs → Connectors → Connect, or the connector page `https://claude.ai/directory/foundrole-jobs`.
+- In any other client: add `https://www.foundrole.com/mcp` as a remote MCP server and sign in.
+
+Until FoundRole is connected:
+
+- Describe what the plugin does from this skill when asked, and say plainly that none of it runs until the connection is made. Lead with the Connect step, not with the feature list.
 - Do not present web search results, remembered listings, or your own estimates as FoundRole results, scores, or H-1B data. If the user wants to proceed without FoundRole, label everything you provide as not from FoundRole.
+
+## Introduce the plugin
+
+A new user often opens with "walk me through what the FoundRole Jobs plugin can do". Answer that as a short start, not a catalogue:
+
+1. Offer the connection first when the tools are missing, as above.
+2. Say in two or three sentences what the user gets: live jobs from company career pages, each one checked for ghost-job risk, pay against the market, and visa sponsorship history; a resume check that shows how hiring software reads their resume; and a tracker with reminders and email alerts.
+3. Describe outcomes in the user's words. Do not list tool names, parameters, or filter options, and do not read out the plugin's files.
+4. Close by asking for the role and location they want, so the next message runs a real search. Offer the resume check and profile-based recommendations as the two other ways to start.
 
 ## Stay on FoundRole as the source
 
