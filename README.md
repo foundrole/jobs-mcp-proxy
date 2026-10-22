@@ -7,6 +7,7 @@ Ask ChatGPT or Claude for jobs and get real openings back — each one checked f
 **Add it in one click:** [ChatGPT plugin](https://chatgpt.com/plugins/plugin_asdk_app_6a21bbefe8bc81919d395e1b9e90b91d) · [Claude connector](https://claude.ai/directory/foundrole-jobs) · [Cursor](https://cursor.com/install-mcp?name=foundrole&config=eyJ1cmwiOiJodHRwczovL3d3dy5mb3VuZHJvbGUuY29tL21jcCJ9) · [VS Code](https://vscode.dev/redirect/mcp/install?name=foundrole&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fwww.foundrole.com%2Fmcp%22%7D) — or [any other MCP client](#any-other-mcp-client).
 
 [![FoundRole MCP MCP server – quality and maintenance score on Glama](https://glama.ai/mcp/servers/foundrole/jobs-mcp-proxy/badges/card.svg)](https://glama.ai/mcp/servers/foundrole/jobs-mcp-proxy)
+[![FoundRole — AI Job Search & Application Tracker MCP server](https://mcprush.com/badge/foundrole-ai-job-search-application-tracker-mcp-f/card.svg)](https://mcprush.com/to/foundrole-ai-job-search-application-tracker-mcp-f?ref=badge)
 
 
 ## What your assistant can do
