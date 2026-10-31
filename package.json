@@ -1,6 +1,6 @@
 {
   "name": "@foundrole/ai-job-search-mcp",
-  "version": "1.1.18",
+  "version": "1.1.19",
   "description": "AI job search and job application tracker for ChatGPT, Claude, Cursor, and any MCP client. Find jobs near you and remote jobs in any country, with pay against market rates, a ghost-job risk grade, and visa sponsorship history for US jobs. Check how hiring software reads your resume, compare jobs, track applications, set follow-up reminders, and get job alerts. Sign in once with OAuth (your AI handles it) — no API key, free account.",
   "keywords": [
     "mcp",
