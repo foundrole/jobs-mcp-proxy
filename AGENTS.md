@@ -681,6 +681,17 @@ same version to the registry twice.
 - `scripts/release.mjs` — bot-only tag push + GitHub Release (`npm run release`).
 - `.github/workflows/publish-mcp.yml` — release-triggered registry publish.
 - `.mcpregistry*` tokens are gitignored.
+- `plugin.json` + `mcp_config.json` + `skills/` — the Antigravity plugin
+  (`agy plugin install https://github.com/foundrole/jobs-mcp-proxy`). Check it with
+  `agy plugin validate .`; the only expected warnings are the files other hosts read
+  (`.mcp.json`, `mcp.json`, `AGENTS.md`, `GEMINI.md`). `name` stays lowercase
+  kebab-case, or the marketplace refuses it.
+- `skills/` is a real copy of `claude-plugin/skills/`, not a symlink: git on Windows
+  checks a symlink out as a text file and the skills would vanish. Edit
+  `claude-plugin/skills/`, copy it over `skills/`; `tests/skills-copy.test.ts` fails
+  while the two differ.
+- `src/server-catalog.ts` and `microsoft-certification/mcptools.json` come from
+  `npm run snapshot:catalog`; regenerate both whenever the server's tools change.
 
 ### Copywriting for any user-facing MCP copy (README, server.json, listings)
 
@@ -743,17 +754,17 @@ same version to the registry twice.
 ### Development Dependencies
 
 - **typescript@^5.8.3** - TypeScript compiler
-- **eslint@^9.29.0** - Linting with TypeScript support
+- **eslint@^10.14.0** - Linting with TypeScript support
 - **@typescript-eslint/eslint-plugin@^8.36.0** - TypeScript ESLint plugin
 - **@typescript-eslint/parser@^8.36.0** - TypeScript ESLint parser
 - **prettier@^3.6.1** - Code formatting
 - **eslint-config-prettier@^10.1.5** - Prettier ESLint config
-- **eslint-plugin-perfectionist@^4.15.0** - Import sorting
-- **eslint-plugin-jsonc@^2.20.1** - JSON linting
+- **eslint-plugin-perfectionist@^5.13.0** - Import sorting
+- **eslint-plugin-jsonc@^3.4.2** - JSON linting
 - **husky@^9.1.7** - Git hooks
 - **nodemon@^3.1.10** - Development server
 - **tsx@^4.19.2** - TypeScript execution
-- **tsc-alias@1.8.8** - TypeScript path mapping
+- **tsc-alias@1.9.10** - TypeScript path mapping
 
 ## Important Reminders
 

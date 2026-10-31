@@ -4,7 +4,7 @@
     "name": "FoundRole",
     "url": "https://www.foundrole.com"
   },
-  "description": "AI job search MCP — fact-checked jobs, application tracker, alerts. ChatGPT, Claude, Cursor.",
+  "description": "AI job search and tracker: jobs near you and remote, pay vs market, ghost-job risk, resume checker.",
   "keywords": [
     "mcp",
     "mcp-server",
@@ -13,7 +13,10 @@
     "jobs",
     "job-search",
     "job-board",
+    "jobs-near-me",
     "remote-jobs",
+    "work-from-home-jobs",
+    "part-time-jobs",
     "application-tracker",
     "job-application-tracker",
     "job-tracker",

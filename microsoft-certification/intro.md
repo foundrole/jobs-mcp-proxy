@@ -6,9 +6,14 @@ tracker, follow-up reminders and job alerts — all from inside the conversation
 
 ## What it does
 
-**Search live openings.** Query by job title or skill, location, salary floor,
-posting date, and remote or on-site work. Results carry the posting's own facts
-plus FoundRole's analysis of them.
+**Search live openings in any country.** Query by job title or skill, location and
+distance, salary floor, posting date, full-time or part-time, and remote or on-site
+work. Results carry the posting's own facts plus FoundRole's analysis of them.
+
+**Pick the right role.** When the user's words could mean several roles, FoundRole
+lists the matching roles with their open-job counts in the place searched. The role
+the user picks is saved to the account, and later searches and recommendations
+look for exactly that role.
 
 **Check a posting before applying.** Every result is judged on data the employer
 does not provide: how the advertised pay compares with FoundRole's salary
@@ -54,24 +59,22 @@ are free to create; signing in is the only setup step.
 
 ## Known issues and limitations
 
-**Job search does not cover every country.** The catalogue is built from employer
-career sites and covers a fixed set of countries. A search scoped to a country
-outside that set returns no results and reports which countries are available —
-it does not fail silently. Remote roles are matched against the location scope of
-the search, so a worldwide-remote query is not a way around the limit.
+**Coverage follows employer career sites.** Search runs in every country, but a
+place has only the openings its employers publish on their own career sites, so a
+small town or country can return few results. Remote roles are matched against the
+location scope of the search: a remote job appears for the countries it is open to.
 
 **Personal match scores need a completed profile.** Without a resume on file,
 results carry no match score and personalised recommendations are unavailable. The
 response says so and returns a profile setup link rather than reporting a score of
 zero.
 
-**Some analysis is limited on free accounts.** Search itself is not gated, but the
-screening layer — filtering a whole result list by remote work, visa sponsorship, a
-salary floor, posting risk or a minimum match score — is a FoundRole Pro feature.
-A free account receives the same unfiltered results, and the response states that
-the advanced filters were not applied instead of returning a silently smaller list.
-Deep employer signals (full H-1B filing history, match-score breakdowns) follow the
-same rule.
+**Screened lists are shortened on free accounts.** Search itself is not gated, and
+the screening filters — remote work, visa sponsorship, a salary floor, posting risk,
+a minimum match score — run on every account. A free account receives the first
+few jobs that pass them plus a count of how many more do; FoundRole Pro returns the
+whole screened list. The response names the filters that ran, so a short list is
+never silent.
 
 **External jobs are analysed from what is supplied.** For a posting found outside
 FoundRole, the analysis works from the URL and posting details passed in. Facts

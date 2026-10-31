@@ -1,7 +1,7 @@
 import tseslint from "typescript-eslint";
 import prettier from "eslint-config-prettier";
 import perfectionist from "eslint-plugin-perfectionist";
-import jsoncParser from "jsonc-eslint-parser";
+import * as jsoncParser from "jsonc-eslint-parser";
 import jsoncPlugin from "eslint-plugin-jsonc";
 
 export default [
@@ -58,13 +58,12 @@ export default [
           groups: [
             "unknown",
             "side-effect",
-            ["builtin", "builtin-type"],
-            ["external", "external-type"],
-            ["parent", "parent-type"],
-            ["sibling", "sibling-type", "index", "index-type"],
+            ["builtin", "type-builtin"],
+            ["external", "type-external"],
+            ["parent", "type-parent"],
+            ["sibling", "type-sibling", "index", "type-index"],
             "side-effect-style",
             "style",
-            "object",
           ],
         },
       ],
@@ -77,8 +76,8 @@ export default [
             "property",
             "required-method",
             "method",
-            "required-multiline",
-            "multiline",
+            "required-multiline-member",
+            "multiline-member",
             "required-index-signature",
             "index-signature",
           ],
