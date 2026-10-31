@@ -46,6 +46,7 @@ A new user often opens with "walk me through what the FoundRole Jobs plugin can 
 
 - Search FoundRole listings with `jobs_search`. Use a full role title rather than a bare technology or keyword. Apply location, seniority, remote, salary, employment-type, and sponsorship filters when the user states them.
 - Get profile-based matches with `jobs_recommendations` when the user asks for roles that fit them.
+- When the user's words could mean several roles, list them with `roles_lookup`: up to five roles with their open-job counts in the place. Save only the role the user picks, with `profile_role_set` on an account with no role yet or `profile_role_replace` to swap the saved one; searches with no title then search exactly that role.
 - Load a FoundRole result with `jobs_details` when the user wants a closer evaluation of one listing.
 - Analyze a job found outside FoundRole with `jobs_analyze_external`.
 - Compare two to four jobs with `jobs_compare`. Preserve each returned `comparisonRef` exactly.

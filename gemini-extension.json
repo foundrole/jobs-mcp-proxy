@@ -1,6 +1,6 @@
 {
   "contextFileName": "GEMINI.md",
-  "description": "AI job search and job application tracker. Search live jobs from company career pages, each checked for ghost-posting risk, pay against market rates and visa sponsorship history; see your resume match, check how hiring software reads your resume, and track applications, reminders and email alerts.",
+  "description": "AI job search and job application tracker. Find remote jobs and jobs near you in any country, check pay vs market and ghost-job risk, run a resume checker, and track every application.",
   "mcpServers": {
     "foundrole": {
       "httpUrl": "https://www.foundrole.com/mcp"

@@ -9,10 +9,10 @@ Ask ChatGPT or Claude for jobs and get real openings back — each one checked f
 [![FoundRole MCP MCP server – quality and maintenance score on Glama](https://glama.ai/mcp/servers/foundrole/jobs-mcp-proxy/badges/card.svg)](https://glama.ai/mcp/servers/foundrole/jobs-mcp-proxy)
 [![FoundRole — AI Job Search & Application Tracker MCP server](https://mcprush.com/badge/foundrole-ai-job-search-application-tracker-mcp-f/card.svg)](https://mcprush.com/to/foundrole-ai-job-search-application-tracker-mcp-f?ref=badge)
 
-
 ## What your assistant can do
 
-- **Search live jobs by asking.** Openings straight from company career pages, refreshed hourly across 40+ industries. Natural language maps onto real filters — job title, location, company, salary range, posting date: _"remote React jobs in NYC paying over $130k posted this week."_
+- **Search live jobs by asking, in any country.** Openings straight from company career pages, refreshed hourly across 40+ industries — jobs near you within the distance you set, remote and work-from-home jobs open to your country, full-time or part-time. Natural language maps onto real filters — job title, location, company, salary range, posting date: _"remote React jobs in NYC paying over $130k posted this week."_
+- **Not sure which title to search?** Describe the work in your own words and FoundRole shows the roles that match, with how many open jobs each has where you're looking. Pick one and it's saved to your account, so later searches and recommendations look for exactly that role.
 - **Get every posting fact-checked — free.** Before you spend an evening on an application, three questions get answered with the evidence behind each call:
   - **Is anyone actually hiring?** Ghost-posting risk — whether the role has been reposted for months or looks like it's fishing for resumes.
   - **Am I being underpaid?** The pay against what employers in that market really file, so a hidden salary range stops being a guess.
@@ -159,6 +159,7 @@ The same address works everywhere: add `https://www.foundrole.com/mcp` as a remo
 
 ## Try saying
 
+- _"Show me jobs near me."_
 - _"Find senior backend engineer roles in San Francisco posted this week."_
 - _"Which of these is least likely to be a ghost posting?"_
 - _"Does Stripe sponsor visas? What does this role really pay?"_
