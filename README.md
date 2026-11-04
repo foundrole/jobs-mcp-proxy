@@ -15,7 +15,7 @@ Ask ChatGPT or Claude for jobs and get real openings back — each one checked f
 - **Not sure which title to search?** Describe the work in your own words and FoundRole shows the roles that match, with how many open jobs each has where you're looking. Pick one and it's saved to your account, so later searches and recommendations look for exactly that role.
 - **Get every posting fact-checked — free.** Before you spend an evening on an application, three questions get answered with the evidence behind each call:
   - **Is anyone actually hiring?** Ghost-posting risk — whether the posting has sat open for months, comes through a staffing agency, or reads like it's fishing for resumes.
-  - **Am I being underpaid?** The posted pay against advertised pay on similar postings — same role, same area, last 12 months — and, when a posting hides its range, an estimate from those postings wherever enough of them state pay.
+  - **Am I being underpaid?** The posted pay against pay advertised over the last 12 months on the closest match with enough postings that state pay — the same role in the same area when there are enough, otherwise the same role statewide or nationwide, or the wider occupation — and, when a posting hides its range, an estimate from those postings that names the match it used.
   - **Would they sponsor me?** Whether the company has sponsored visas before, from the visa filings employers make with the U.S. Department of Labor, with the wages they filed.
 - **See how well you fit.** Match scoring against your resume and profile, plus personalized job recommendations ranked by fit.
 - **See what hiring software reads off your resume — free.** Ask, and you get back the version of you a parser extracts: job title, years, recognized skills, sections, contact details — plus what it loses on the way. It's the mechanical read, deterministic and repeatable, so the answer doesn't drift between asks. Paste the text into the chat, or check the resume already on your account.
@@ -204,6 +204,7 @@ The same address works everywhere: add `https://www.foundrole.com/mcp` as a remo
 The same data your assistant reads is browsable on FoundRole:
 
 - [How It Works](https://www.foundrole.com/how-it-works) — where the openings come from and how each posting gets its ghost, pay, and visa checks
+- [Methodology](https://www.foundrole.com/methodology) — how every FoundRole figure is made: salary estimates, the real-or-ghost grade, visa sponsorship records, and the remote check
 - [H1B Salary Explorer](https://www.foundrole.com/h1b-salaries) — certified wages employers filed with the U.S. Department of Labor, charted by sector, industry, location, and role
 - [H1B Sponsor Rankings](https://www.foundrole.com/h1b-sponsors) — top visa-sponsoring companies by median filed wage, browsable by industry, sector, city, and state
 - [Company Directory](https://www.foundrole.com/companies) — open roles, salary data, and visa sponsorship history for any employer
