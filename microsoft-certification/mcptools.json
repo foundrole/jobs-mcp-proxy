@@ -5473,6 +5473,10 @@
           },
           "roleQuestion": {
             "type": ["string", "null"]
+          },
+          "profileSetupQuestion": {
+            "type": ["string", "null"],
+            "description": "A ready-to-say question about an available profile setup step"
           }
         }
       },

@@ -5,7 +5,7 @@ Use the returned result or error to decide what to say. Keep the role, employer,
 | Returned evidence | What to do |
 |---|---|
 | `locationRecovery.reason` is `ambiguous` | Ask which qualified place the person means. Use a confirmed `options[].location` for the retry. |
-| The reason is `unknown` | Say that the supplied place could not be resolved and ask for the intended city, region, or country. If there is a candidate, present it as a choice. If a country or region is already clear, ask for the missing place within that area. A remote search keeps its work-from geography. |
+| The reason is `unknown` | Say that the search didn’t run because the supplied place could not be resolved. Ask for the intended city, region, or country. The empty jobs array in this error gives no inventory result. If there is a candidate, present it as a choice. If a country or region is already clear, ask for the missing place within that area. A remote search keeps its work-from geography. |
 | The reason is `unsupported` | Explain the coverage limit. When the person says the place is required, stop with that explanation. A search somewhere else needs the person's agreement. |
 | The response says the employer could not be confirmed | Clarify the name or domain using `company_lookup`. Retry with the chosen `candidates[].lookupValue` in `company`. Keep the other arguments. |
 | `jobs` is empty after a completed search | Say that the search returned no jobs with the conditions it used. Use `appliedConditions` or the text summary to explain scope. A confirmed employer with an empty result has no matches in this answer, and the answer alone gives no company-wide inventory count. |

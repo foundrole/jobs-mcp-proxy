@@ -312,7 +312,7 @@ export const SERVER_CATALOG: ServerCatalog = {
         title: "Foundrole job search: references/profile-recommendations.md",
         uri: "skill://foundrole-job-search/references/profile-recommendations.md",
         mimeType: "application/octet-stream",
-        size: 2631,
+        size: 2751,
       },
       {
         name: "skill://foundrole-job-search/references/search-criteria.md",
@@ -326,7 +326,7 @@ export const SERVER_CATALOG: ServerCatalog = {
         title: "Foundrole job search: references/search-recovery.md",
         uri: "skill://foundrole-job-search/references/search-recovery.md",
         mimeType: "application/octet-stream",
-        size: 2561,
+        size: 2652,
       },
       {
         name: "skill://foundrole-resume-check/SKILL.md",
@@ -5992,6 +5992,11 @@ export const SERVER_CATALOG: ServerCatalog = {
             },
             roleQuestion: {
               type: ["string", "null"],
+            },
+            profileSetupQuestion: {
+              type: ["string", "null"],
+              description:
+                "A ready-to-say question about an available profile setup step",
             },
           },
         },
