@@ -1,7 +1,43 @@
 {
   "$schema": "https://antigravity.google/schemas/v1/plugin.json",
-  "description": "Search FoundRole jobs by role, employer, place and work mode. Check advertised pay, posting risk and visa sponsorship history where available. See how hiring software reads your resume, preview tailoring and fit for a job, and start a cover letter from your saved experience. Manage applications, reminders and job alerts.",
+  "author": {
+    "name": "FoundRole",
+    "url": "https://www.foundrole.com"
+  },
+  "description": "FoundRole is an AI job search and job application tracker. Find jobs near you, remote jobs, work-from-home and part-time jobs from company career pages in any country, with pay against market rates, a ghost-job risk grade, and, for US jobs, visa sponsorship history and E-Verify status. Add your resume for a match score and the skills you're missing, paste any job link to analyze it, compare jobs side by side, and see how hiring software reads your resume with the resume checker. Track applications from Saved to Offered with notes and follow-up reminders, and get daily, weekly, or monthly job alerts.",
+  "displayName": "Job by FoundRole",
+  "keywords": [
+    "remote jobs",
+    "jobs near me",
+    "work from home jobs",
+    "part time jobs",
+    "job search",
+    "visa sponsorship jobs",
+    "h1b sponsor",
+    "ghost jobs",
+    "resume checker",
+    "ats resume checker",
+    "job alerts",
+    "job application tracker",
+    "job tracker",
+    "salary",
+    "resume tailoring",
+    "job fit",
+    "resume match",
+    "cover letter",
+    "salary comparison",
+    "CV checker",
+    "application tracker",
+    "job recommendations",
+    "job comparison",
+    "follow-up reminders"
+  ],
   "logo": "assets/logo.svg",
   "name": "foundrole",
+  "suggestedPrompts": [
+    "Show me jobs near me.",
+    "Recommend jobs that match my resume.",
+    "Subscribe me to weekly alerts for remote React jobs."
+  ],
   "version": "1.2.0"
 }

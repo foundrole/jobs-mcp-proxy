@@ -1,8 +1,8 @@
-# FoundRole
+# Job by FoundRole
 
-FoundRole is a job-search backend for AI assistants. It searches live job postings,
-judges each one against real market data, and manages the candidate's application
-tracker, follow-up reminders and job alerts — all from inside the conversation.
+**Remote jobs & resume tailoring**
+
+FoundRole is an AI job search and job application tracker. Find jobs near you, remote jobs, work-from-home and part-time jobs from company career pages in any country, with pay against market rates, a ghost-job risk grade, and, for US jobs, visa sponsorship history and E-Verify status. Add your resume for a match score and the skills you're missing, paste any job link to analyze it, compare jobs side by side, and see how hiring software reads your resume with the resume checker. Track applications from Saved to Offered with notes and follow-up reminders, and get daily, weekly, or monthly job alerts.
 
 ## What it does
 
