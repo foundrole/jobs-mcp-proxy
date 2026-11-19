@@ -3,7 +3,7 @@
     "email": "dev@foundrole.com",
     "name": "FoundRole"
   },
-  "description": "FoundRole is an AI job search and job application tracker. Find jobs near you, remote jobs, work-from-home and part-time jobs from company career pages in any country, with pay against market rates, a ghost-job risk grade, and, for US jobs, visa sponsorship history and E-Verify status. Add your resume for a match score and the skills you're missing, paste any job link to analyze it, compare jobs side by side, and see how hiring software reads your resume with the resume checker. Track applications from Saved to Offered with notes and follow-up reminders, and get daily, weekly, or monthly job alerts.",
+  "description": "Search FoundRole jobs by role, employer, place and work mode. Check advertised pay, posting risk and visa sponsorship history where available. See how hiring software reads your resume, preview tailoring and fit for a job, and start a cover letter from your saved experience. Manage applications, reminders and job alerts.",
   "displayName": "FoundRole Jobs",
   "homepage": "https://www.foundrole.com/ai-search-mcp",
   "keywords": [
@@ -33,5 +33,5 @@
   "logo": "assets/logo.svg",
   "name": "foundrole",
   "repository": "https://github.com/foundrole/jobs-mcp-proxy",
-  "version": "1.0.0"
+  "version": "1.1.19"
 }

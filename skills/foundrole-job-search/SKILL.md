@@ -1,93 +1,61 @@
 ---
 name: foundrole-job-search
-description: Search, analyze, compare, save, and manage jobs with the FoundRole MCP app, and answer career questions from FoundRole's guidance blog. Use when a user wants live job results, personalized recommendations, resume-fit analysis, salary or H-1B signals, ghost-job assessment, comparison of internal or externally found jobs, application tracking, reminders, job alerts, or career advice (visa, resume, salary, interview, relocation). Also use to analyze or save into FoundRole a job found elsewhere, including partner listings surfaced in ChatGPT (Indeed, Appcast, Upwork), and when the user asks what the FoundRole plugin can do or how to set it up. Do not use it to run a job search on another job board — search FoundRole.
+description: Use when a user wants FoundRole job search, personalized recommendations, job or resume-fit analysis, salary or H-1B signals, ghost-job assessment, job comparisons, application tracking, reminders, email job alerts, or supported monitoring of new jobs through event-triggered tasks. Also use to analyze or save a posting found elsewhere, including partner listings, and for career questions about visas, resumes, salary, interviews or relocation. Search FoundRole when using this skill; another job board's own search is outside its scope.
 ---
 
 # FoundRole job search
 
-Use FoundRole tools as the source of truth for job results, recommendations, analysis, tracker state, reminders, alerts, career guidance, and FoundRole URLs.
+Use FoundRole's returned data for job results, scores, tracker state, alerts and URLs. Carry the user's intent across search, evaluation, saving and follow-up.
 
-## Connect FoundRole first
+## Load the relevant workflow
 
-Every FoundRole tool comes from the FoundRole connector at `https://www.foundrole.com/mcp`. Installing the plugin does not connect it: this skill loads, but tools such as `jobs_search` stay missing until the user connects FoundRole and signs in. Check for the tools before anything else — including when the user only asks what the plugin can do or how to set it up.
+Read only the reference needed for the current action:
 
-When the tools are missing, offer the connection in the conversation before you answer:
+| Situation | Reference |
+|---|---|
+| Connecting, missing tools, OAuth errors, unsupported features, text versus widgets, or an uncertain tool result | [app-capabilities.md](references/app-capabilities.md) |
+| Choosing a role, place or employer, or repairing an empty search | [search-criteria.md](references/search-criteria.md) |
+| Choosing a personalized feed or helping with a returned profile setup step | [profile-recommendations.md](references/profile-recommendations.md) |
+| Empty results, location errors, or widened results | [search-recovery.md](references/search-recovery.md) |
+| Saving internal or external jobs, changing application details, reminders, or email alerts | [application-management.md](references/application-management.md) |
+| Watching a saved search, handling new-job events, renewing or stopping a host task | [monitoring.md](references/monitoring.md) |
 
-1. Look for the tools `search_mcp_registry` and `suggest_connectors`; they may carry a server prefix, and may need loading through tool search first. Claude chat and Cowork provide them.
-2. Call `search_mcp_registry` with the keyword `foundrole` and take the result whose URL is `https://www.foundrole.com/mcp`.
-3. Pass that result's `directoryUuid` to `suggest_connectors`. It shows a Connect button in the conversation.
-4. Tell the user to press Connect and sign in to FoundRole — a free account is enough, and there is no API key. Once the tools appear, carry on with what they asked.
+Resolve these files within this skill on its originating MCP server, or within the installed skill directory. They are supporting instructions, not additional skills.
 
-When those two tools are not available, or the search does not return FoundRole, give the exact path instead of a general pointer to settings:
+## Choose the capability
 
-- In Claude: Customize → Plugins → FoundRole Jobs → Connectors → Connect, or the connector page `https://claude.ai/directory/foundrole-jobs`.
-- In any other client: add `https://www.foundrole.com/mcp` as a remote MCP server and sign in.
+Use the tools actually exposed in this session and their current schemas. Model-facing tools handle conversation requests; app-only data tools belong to widgets.
 
-Until FoundRole is connected:
+| User intent | Capability |
+|---|---|
+| Search by criteria | `jobs_search`, using the full role title and the user's stated filters |
+| Find roles matching the account's profile | `jobs_recommendations` |
+| Examine a FoundRole result | `jobs_details` with its exact returned job identifier |
+| Evaluate a posting found elsewhere | `jobs_analyze_external` with the available source detail |
+| Compare jobs | `jobs_compare`; preserve each returned `comparisonRef` |
+| Save and manage applications | Tracker tools through the application-management reference |
+| Schedule follow-up or email notifications | Reminder or job-alert tools through that reference |
+| Act on new matches in the host | Host event-task workflow through the monitoring reference |
+| Check resume machine readability | `resume_check`; follow its returned mode, findings and links |
+| Identify an employer by name or domain | `company_lookup`; use the confirmed candidate’s `lookupValue` in a job search |
+| Career guidance, company research or interview preparation | `knowledge_search` and its relevant returned articles; `knowledge_topics` for topic discovery |
 
-- Describe what the plugin does from this skill when asked, and say plainly that none of it runs until the connection is made. Lead with the Connect step, not with the feature list.
-- Do not present web search results, remembered listings, or your own estimates as FoundRole results, scores, or H-1B data. If the user wants to proceed without FoundRole, label everything you provide as not from FoundRole.
+If a capability is unavailable, explain what is missing and use an available alternative only within the user's request. Skill loading alone does not connect the app or create a background task.
 
-## Introduce the plugin
+## Preserve result context
 
-A new user often opens with "walk me through what the FoundRole Jobs plugin can do". Answer that as a short start, not a catalogue:
+- Keep exact job identifiers, result occurrence identifiers, tracked-job identifiers, search references and comparison references. Use the field each tool requests; these identifiers are not interchangeable.
+- Resolve “the second job” or a named role from shown results rather than asking the user for an identifier already available. Clarify only when several results match.
+- Use FoundRole for follow-up and refresh requests. A refresh means calling the corresponding FoundRole tool again with the same intent.
+- When the user explicitly requests external sources, label them separately. Never present web results or remembered listings as FoundRole results.
+- Read current state before a write when it is needed to identify the target or preserve existing information. Execute the authorized changes; clarify genuinely ambiguous targets or times.
 
-1. Offer the connection first when the tools are missing, as above.
-2. Say in two or three sentences what the user gets: live jobs from company career pages, each one checked for ghost-job risk, pay against the market, and visa sponsorship history; a resume check that shows how hiring software reads their resume; and a tracker with reminders and email alerts.
-3. Describe outcomes in the user's words. Do not list tool names, parameters, or filter options, and do not read out the plugin's files.
-4. Close by asking for the role and location they want, so the next message runs a real search. Offer the resume check and profile-based recommendations as the two other ways to start.
+## Present the result
 
-## Stay on FoundRole as the source
+Use FoundRole's canonical match score when present. If a match score is absent, describe the evidence the tool returned without supplying a substitute score. Use FoundRole's returned sponsorship history for canonical H-1B claims, separating it from a posting's explicit visa statement.
 
-- In a FoundRole session, search with `jobs_search` (or `jobs_recommendations` for profile-based matches) — not the web. Keep FoundRole as the source across follow-up, refined, and paginated turns. Switch to web search only when the user explicitly asks for external sources, then label those results as non-FoundRole.
-- When the user asks to "refresh" or "update" matches, call the FoundRole tool again with the same intent; do not reinterpret it as a web search.
+Distinguish posted pay from market estimates. Treat fit, sponsorship, E-Verify and ghost-job signals as evidence with uncertainty, not guarantees. Keep those sources stable across turns unless returned data changes.
 
-## Choose the workflow
+Prefer a rendered widget without duplicating its full contents. In a text-only host, summarize the relevant returned jobs, fit evidence and uncertainties with returned links. Honor preview and account-access limits actually reported by the tool.
 
-- Search FoundRole listings with `jobs_search`. Use a full role title rather than a bare technology or keyword. Apply location, seniority, remote, salary, employment-type, and sponsorship filters when the user states them.
-- Get profile-based matches with `jobs_recommendations` when the user asks for roles that fit them.
-- When the user's words could mean several roles, list them with `roles_lookup`: up to five roles with their open-job counts in the place. Save only the role the user picks, with `profile_role_set` on an account with no role yet or `profile_role_replace` to swap the saved one; searches with no title then search exactly that role.
-- Load a FoundRole result with `jobs_details` when the user wants a closer evaluation of one listing.
-- Analyze a job found outside FoundRole with `jobs_analyze_external`.
-- Compare two to four jobs with `jobs_compare`. Preserve each returned `comparisonRef` exactly.
-- Save a FoundRole search result with `tracker_add` and its `job_id`.
-- Save a job found elsewhere with `tracker_add_external` and its direct posting URL.
-- Manage applications with tracker, reminder, and alert tools that match the requested action.
-- Answer a career or job-search question (visa/H-1B, resume, salary negotiation, interview prep, relocation) with `knowledge_search`, and cite the FoundRole articles it returns.
-
-## Save from result context
-
-- To save a job the user names by title, company, or ordinal ("save the Sustainment role", "save the first job"), resolve it against the current or prior FoundRole results and call `tracker_add` with that job's exact `job_id` from the results — do not ask for a URL or record ID you can already resolve.
-- Ask a disambiguation question only when more than one shown result matches the name.
-- Treat repeated saves as idempotent: an already-tracked job is a successful Saved state, not an error.
-
-## Set status and sub-status
-
-- `status` and `sub_status` accept only the values listed in the tool schema. Take them from that list rather than inventing a natural-sounding value: an application that was sent is `application_submitted`, not `submitted`.
-- Each `sub_status` belongs to one `status`. Pick a sub-status from the group that matches the status being set, and omit it entirely when unsure — the status alone is a valid update.
-
-## Handle externally found jobs
-
-A job found outside FoundRole — from a web search, a link the user pasted, or a partner listing surfaced in ChatGPT (for example Indeed, Appcast, or Upwork) — is saved with `tracker_add_external` and evaluated with `jobs_analyze_external`.
-
-1. Carry forward the direct posting URL (not a company homepage), company, title, location, and the fullest posting text you already have.
-2. Pass the complete posting detail you already saw for the job — full description text, salary, employment type, work arrangement, education, experience, and posting date — rather than a shortened summary. When a partner listing (Indeed, Appcast, Upwork, or similar) gave you these fields, forward them in full; do not drop or truncate them, and do not re-ask the user for details already in the conversation.
-3. Populate every structured field the source states, and use `null` only for a value the source genuinely does not give.
-4. Populate every `client_extraction` field the source supports; keep absent fields `null`.
-5. Include only source-backed non-null values. Each evidence excerpt must occur in the posting text and contain enough context to support the value.
-6. Classify skills as `required`, `preferred`, or `mentioned` from the wording of the posting.
-7. Keep company sponsorship history from FoundRole separate from a posting's explicit visa statement.
-
-The external save is meant to complete automatically from the detail already in the conversation. Do not infer missing compensation, visa sponsorship, clearance, remote scope, company facts, or benefits — FoundRole stores client-model labels as evidence-backed audit data and independently derives canonical fields.
-
-## Present results
-
-- Use the FoundRole match score as the canonical score whenever the result carries one. Do not replace it with, or blend it with, a score you compute yourself. If no FoundRole score exists, label any estimate explicitly as your own non-canonical estimate.
-- Answer H-1B questions from FoundRole's canonical H-1B data (sponsor badge, petition counts) in a FoundRole session. If you fall back to an external signal, label it as external and keep it separate from FoundRole-verified fields.
-- Keep the score and H-1B source stable across repeated turns for the same role; the answer changes only when the underlying FoundRole data changes.
-- Treat match scores, H-1B history, E-Verify, ghost-job signals, and salary estimates as decision support rather than guarantees.
-- Distinguish posted compensation from market estimates.
-- Explain the strongest fit signals and the most important gaps or uncertainties.
-- Prefer the interactive FoundRole widget when the client renders it; avoid duplicating the full widget as another large table.
-- For a career question, answer from the `knowledge_search` articles and link the ones you cite; if none are relevant, say so rather than citing an unrelated article.
-- Ask for clarification before a write when the requested job, tracker entry, status, deadline, or reminder time is ambiguous.
+For guidance, cite relevant `knowledge_search` articles; say when none answer the question. A completed write, reminder, email alert or monitoring task requires a successful tool or host result. Report partial completion accurately.

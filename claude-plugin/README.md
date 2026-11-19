@@ -7,10 +7,11 @@ Search live jobs from Claude and see each one checked on real data: whether anyo
 - **MCP server `foundrole`** — the hosted FoundRole server at `https://www.foundrole.com/mcp`. Nothing runs on your machine.
 - **Skill `foundrole-job-search`** — how Claude searches, compares, and saves jobs, manages the application tracker, reminders, and alerts, and answers career questions from FoundRole's guides.
 - **Skill `foundrole-resume-check`** — how Claude runs the resume parse check and reports what a parser extracts and what it loses.
+- **Skill `foundrole-resume-workflows`** — how Claude reads saved resume information with permission, previews tailoring, explains fit, and starts a cover letter from the selected experience.
 
 ## Sign-in
 
-Installing the plugin adds its skills; the FoundRole connector is connected in a separate step, and that step is where you sign in (OAuth 2.1). Sign in or create a free account and approve access once. There is no API key.
+Installing the plugin adds its skills; the FoundRole connector is connected in a separate step, and that step is where you sign in (OAuth 2.1). Sign in to FoundRole and approve access. If an older connection asks for permission to read saved personal content, reconnect and review the permissions. There is no API key.
 
 - **Claude chat and Cowork** — ask for jobs and press **Connect** on the FoundRole card Claude shows, or open **Customize → Plugins → FoundRole Jobs → Connectors** and press **Connect** there.
 - **Claude Code** — the plugin reaches the server on its own, and the first tool call opens the FoundRole sign-in in your browser.
@@ -21,6 +22,8 @@ Installing the plugin adds its skills; the FoundRole connector is connected in a
 - "Is this posting real, and does the company sponsor H-1B?"
 - "Compare these two offers."
 - "Check how an ATS reads my resume."
+- "Show me which part of my saved resume supports this job requirement."
+- "Give me a cover-letter starting point for this posting."
 - "Save the second job to my tracker and remind me to follow up on Friday."
 - "Email me new data engineer jobs in Austin every week."
 

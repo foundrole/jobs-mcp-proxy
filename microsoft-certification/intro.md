@@ -6,14 +6,12 @@ tracker, follow-up reminders and job alerts — all from inside the conversation
 
 ## What it does
 
-**Search live openings in any country.** Query by job title or skill, location and
+**Search live openings.** Query by job title or skill, location and
 distance, salary floor, posting date, full-time or part-time, and remote or on-site
 work. Results carry the posting's own facts plus FoundRole's analysis of them.
 
 **Pick the right role.** When the user's words could mean several roles, FoundRole
-lists the matching roles with their open-job counts in the place searched. The role
-the user picks is saved to the account, and later searches and recommendations
-look for exactly that role.
+lists the matching roles with their open-job counts in the place searched. The user can pick a role for this search or ask to save it for later. FoundRole can also clarify an employer or place.
 
 **Check a posting before applying.** Every result is judged on data the employer
 does not provide: how the advertised pay compares with FoundRole's salary
@@ -30,6 +28,8 @@ recognized skills, sections and contact channels — and what it loses, as a
 readability band with individual findings. It runs on the resume uploaded to the
 account or on plain text passed in, and the same input always returns the same
 result.
+
+**Preview an application.** For a selected posting and saved resume, FoundRole can suggest a tailoring change, explain evidence of fit or offer a cover-letter starting point. The returned continuation opens the relevant next step on FoundRole.
 
 **Track applications.** A role can be saved to the candidate's tracker board
 without leaving the conversation, including roles found elsewhere: given a URL and

@@ -77,7 +77,7 @@
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
     "type-check": "tsc --noEmit",
-    "version": "node scripts/sync-server-json.js && git add server.json .grok-plugin/plugin.json claude-plugin/.claude-plugin/plugin.json gemini-extension.json"
+    "version": "node scripts/sync-server-json.js && git add server.json .claude-plugin/plugin.json .cursor-plugin/plugin.json .grok-plugin/plugin.json claude-plugin/.claude-plugin/plugin.json gemini-extension.json plugin.json"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

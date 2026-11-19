@@ -9,6 +9,10 @@ import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/
 import { createBrowserOAuth, openInBrowser } from "../dist/browser-oauth.js";
 
 const CATALOG_PATH = new URL("../src/server-catalog.ts", import.meta.url);
+const MICROSOFT_CATALOG_PATH = new URL(
+  "../microsoft-certification/mcptools.json",
+  import.meta.url
+);
 
 const serverUrl = process.argv[2];
 if (!serverUrl) {
@@ -78,9 +82,20 @@ writeFileSync(
   `import type { ServerCatalog } from "./server-catalog-types.js";\n\n` +
     `export const SERVER_CATALOG: ServerCatalog = ${JSON.stringify(catalog, null, 2)};\n`
 );
-execFileSync("npx", ["prettier", "--write", fileURLToPath(CATALOG_PATH)], {
-  stdio: "ignore",
-});
+writeFileSync(
+  MICROSOFT_CATALOG_PATH,
+  `${JSON.stringify(catalog.tools, null, 2)}\n`
+);
+execFileSync(
+  "npx",
+  [
+    "prettier",
+    "--write",
+    fileURLToPath(CATALOG_PATH),
+    fileURLToPath(MICROSOFT_CATALOG_PATH),
+  ],
+  { stdio: "ignore" }
+);
 process.stdout.write(
   `${serverUrl}: ${catalog.tools.tools.length} tools, ${catalog.prompts.prompts.length} prompts, ` +
     `${catalog.resources.resources.length} resources, ` +

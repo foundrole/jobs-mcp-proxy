@@ -11,14 +11,15 @@ Ask ChatGPT or Claude for jobs and get real openings back — each one checked f
 
 ## What your assistant can do
 
-- **Search live jobs by asking, in any country.** Openings straight from employers' own career pages and hiring systems across 40+ industries, most of them re-checked every hour — jobs near you within the distance you set, remote and work-from-home jobs open to your country, full-time or part-time. Natural language maps onto real filters — job title, location, company, salary range, posting date: _"remote React jobs in NYC paying over $130k posted this week."_
-- **Not sure which title to search?** Describe the work in your own words and FoundRole shows the roles that match, with how many open jobs each has where you're looking. Pick one and it's saved to your account, so later searches and recommendations look for exactly that role.
+- **Search live jobs by asking.** Openings straight from employers' own career pages and hiring systems across 40+ industries, most of them re-checked every hour — jobs near you within the distance you set, remote and work-from-home jobs open to your country, full-time or part-time. Natural language maps onto real filters — job title, location, company, salary range, posting date: _"remote React jobs in NYC paying over $130k posted this week."_
+- **Not sure which title to search?** Describe the work in your own words and FoundRole shows the roles that match, with how many open jobs each has where you're looking. Pick one for this search, or ask FoundRole to save it for future recommendations. FoundRole can also clarify which employer or place you mean.
 - **Get every posting fact-checked — free.** Before you spend an evening on an application, three questions get answered with the evidence behind each call:
   - **Is anyone actually hiring?** Ghost-posting risk — whether the posting has sat open for months, comes through a staffing agency, or reads like it's fishing for resumes.
   - **Am I being underpaid?** The posted pay against pay advertised over the last 12 months on the closest match with enough postings that state pay — the same role in the same area when there are enough, otherwise the same role statewide or nationwide, or the wider occupation — and, when a posting hides its range, an estimate from those postings that names the match it used.
   - **Would they sponsor me?** Whether the company has sponsored visas before, from the visa filings employers make with the U.S. Department of Labor, with the wages they filed.
 - **See how well you fit.** Match scoring against your resume and profile, plus personalized job recommendations ranked by fit.
-- **See what hiring software reads off your resume — free.** Ask, and you get back the version of you a parser extracts: job title, years, recognized skills, sections, contact details — plus what it loses on the way. It's the mechanical read, deterministic and repeatable, so the answer doesn't drift between asks. Paste the text into the chat, or check the resume already on your account.
+- **See what hiring software reads off your resume — free.** Ask, and you get back the version of you a parser extracts: job title, years, recognized skills, sections, contact details — plus what it loses on the way. It's the mechanical read, deterministic and repeatable, so the answer doesn't drift between asks. Paste the text into the chat, or check a saved upload or version.
+- **Get ready to apply.** For a specific FoundRole posting, preview a tailoring change, see how your saved experience supports fit, or get a cover-letter starting point. The preview leaves your resume unchanged. Follow the returned link when you want to continue on FoundRole.
 - **Research before you commit.** Dig into [companies](https://www.foundrole.com/companies), [industry sectors](https://www.foundrole.com/sectors), and [hiring by location](https://www.foundrole.com/locations) to decide where to aim.
 - **Compare roles side by side.** _"Compare these two"_ lines up fit, pay, sponsorship, and posting risk at once — so the choice stops being a feeling.
 - **Paste a job from anywhere.** LinkedIn, a careers page, a link a friend sent — paste the posting into the chat and it gets the same checks, and can sit in your tracker alongside FoundRole listings. Your assistant reads the text you provide; nothing crawls the site for you.
@@ -78,7 +79,7 @@ The first start opens FoundRole's sign-in page in your browser. After you approv
 2. Add the connector and approve the FoundRole sign-in Claude opens.
 3. Ask for jobs in any chat — no server address to copy.
 
-**Claude Code and Cowork:** install the [FoundRole Jobs plugin](https://claude.ai/customize/plugins/id/b0559743-551f-40c0-960b-89fe68d76936%40anthropic-plugin-directory) (the page opens once you are signed in to Claude). It adds the same connector plus two skills that walk Claude through a job search and a resume check; the source is in [`claude-plugin/`](claude-plugin).
+**Claude Code and Cowork:** install the [FoundRole Jobs plugin](https://claude.ai/customize/plugins/id/b0559743-551f-40c0-960b-89fe68d76936%40anthropic-plugin-directory) (the page opens once you are signed in to Claude). It adds the same connector plus skills for job search, resume checks and application previews; the source is in [`claude-plugin/`](claude-plugin).
 
 **Directory connectors switched off in your workspace?** Add a custom connector instead: **Settings → Connectors → Add custom connector**, name it `FoundRole`, paste `https://www.foundrole.com/mcp`, save, and approve the sign-in.
 
