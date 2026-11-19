@@ -9,10 +9,10 @@ For “Find remote Ruby Developer jobs at the Northwind I mean in Ontario, Canad
 1. The full occupation already fits `query`. If the person instead says “Ruby work,” `roles_lookup` with `{"words":"Ruby work","location":"Ontario, Canada"}` can return candidate roles. Confirm the intended title and use the selected `roles[].name` in `query`.
 2. Use `company_lookup` with `{"query":"Northwind"}` if the employer identity is unclear. Confirm the candidate by its returned domain or use `company_lookup` with the domain supplied by the person. The confirmed candidate's `lookupValue` goes in `company`. A missing match does not establish that the company has no jobs.
 3. Keep the location qualified. Use `Ontario, Canada` in `location`. If the search returns `locationRecovery.options`, the selected option's `location` is the retry value.
-4. If the confirmed employer's returned `lookupValue` is `northwind.example`, the search arguments are:
+4. If the confirmed employer's returned `lookupValue` is `northwind-tools`, the search arguments are:
 
 ```json
-{"query":"Ruby Developer","location":"Ontario, Canada","company":"northwind.example","remote":true,"posted_days_ago":7}
+{"query":"Ruby Developer","location":"Ontario, Canada","company":"northwind-tools","remote":true,"posted_days_ago":7}
 ```
 
 Clarification changes only the field being clarified. Keep the other search filters on the retry. An unsupported area, an ambiguous place and an empty successful search describe different outcomes. Present the result and any applicable recovery without guessing a location or changing the employer.

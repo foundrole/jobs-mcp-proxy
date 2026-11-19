@@ -319,7 +319,7 @@ export const SERVER_CATALOG: ServerCatalog = {
         title: "Foundrole job search: references/search-criteria.md",
         uri: "skill://foundrole-job-search/references/search-criteria.md",
         mimeType: "application/octet-stream",
-        size: 1993,
+        size: 1989,
       },
       {
         name: "skill://foundrole-job-search/references/search-recovery.md",
