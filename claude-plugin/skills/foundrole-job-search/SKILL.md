@@ -15,6 +15,7 @@ Read only the reference needed for the current action:
 |---|---|
 | Connecting, missing tools, OAuth errors, unsupported features, text versus widgets, or an uncertain tool result | [app-capabilities.md](references/app-capabilities.md) |
 | Choosing a role, place or employer, or repairing an empty search | [search-criteria.md](references/search-criteria.md) |
+| Choosing a personalized feed or helping with a returned profile setup step | [profile-recommendations.md](references/profile-recommendations.md) |
 | Empty results, location errors, or widened results | [search-recovery.md](references/search-recovery.md) |
 | Saving internal or external jobs, changing application details, reminders, or email alerts | [application-management.md](references/application-management.md) |
 | Watching a saved search, handling new-job events, renewing or stopping a host task | [monitoring.md](references/monitoring.md) |
@@ -51,7 +52,7 @@ If a capability is unavailable, explain what is missing and use an available alt
 
 ## Present the result
 
-Use FoundRole's canonical match score when present. Keep an assistant estimate separate and label it; an estimate cannot satisfy a condition requiring a FoundRole score. Use FoundRole's returned sponsorship history for canonical H-1B claims, separating it from a posting's explicit visa statement.
+Use FoundRole's canonical match score when present. If a match score is absent, describe the evidence the tool returned without supplying a substitute score. Use FoundRole's returned sponsorship history for canonical H-1B claims, separating it from a posting's explicit visa statement.
 
 Distinguish posted pay from market estimates. Treat fit, sponsorship, E-Verify and ghost-job signals as evidence with uncertainty, not guarantees. Keep those sources stable across turns unless returned data changes.
 

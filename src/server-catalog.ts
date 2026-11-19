@@ -277,7 +277,7 @@ export const SERVER_CATALOG: ServerCatalog = {
         title: "Foundrole job search: SKILL.md",
         uri: "skill://foundrole-job-search/SKILL.md",
         mimeType: "application/octet-stream",
-        size: 5189,
+        size: 5326,
       },
       {
         name: "skill://foundrole-job-search/agents/openai.yaml",
@@ -308,6 +308,13 @@ export const SERVER_CATALOG: ServerCatalog = {
         size: 7284,
       },
       {
+        name: "skill://foundrole-job-search/references/profile-recommendations.md",
+        title: "Foundrole job search: references/profile-recommendations.md",
+        uri: "skill://foundrole-job-search/references/profile-recommendations.md",
+        mimeType: "application/octet-stream",
+        size: 2631,
+      },
+      {
         name: "skill://foundrole-job-search/references/search-criteria.md",
         title: "Foundrole job search: references/search-criteria.md",
         uri: "skill://foundrole-job-search/references/search-criteria.md",
@@ -319,7 +326,7 @@ export const SERVER_CATALOG: ServerCatalog = {
         title: "Foundrole job search: references/search-recovery.md",
         uri: "skill://foundrole-job-search/references/search-recovery.md",
         mimeType: "application/octet-stream",
-        size: 2216,
+        size: 2561,
       },
       {
         name: "skill://foundrole-resume-check/SKILL.md",
