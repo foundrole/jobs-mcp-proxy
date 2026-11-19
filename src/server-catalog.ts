@@ -319,7 +319,7 @@ export const SERVER_CATALOG: ServerCatalog = {
         title: "Foundrole job search: references/search-criteria.md",
         uri: "skill://foundrole-job-search/references/search-criteria.md",
         mimeType: "application/octet-stream",
-        size: 1989,
+        size: 2010,
       },
       {
         name: "skill://foundrole-job-search/references/search-recovery.md",
@@ -3364,7 +3364,7 @@ export const SERVER_CATALOG: ServerCatalog = {
             company: {
               type: "string",
               description:
-                "The official company name, or the domain of one employer",
+                "Official company name, employer domain, or exact lookupValue from company_lookup",
             },
             hiring_brand: {
               type: "string",
@@ -4914,7 +4914,7 @@ export const SERVER_CATALOG: ServerCatalog = {
             company: {
               type: "string",
               description:
-                "The official company name, or the domain of one employer",
+                "Official company name, employer domain, or exact lookupValue from company_lookup",
             },
             radius: {
               type: "integer",

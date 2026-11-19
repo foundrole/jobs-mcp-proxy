@@ -2902,7 +2902,7 @@
           },
           "company": {
             "type": "string",
-            "description": "The official company name, or the domain of one employer"
+            "description": "Official company name, employer domain, or exact lookupValue from company_lookup"
           },
           "hiring_brand": {
             "type": "string",
@@ -4416,7 +4416,7 @@
           },
           "company": {
             "type": "string",
-            "description": "The official company name, or the domain of one employer"
+            "description": "Official company name, employer domain, or exact lookupValue from company_lookup"
           },
           "radius": {
             "type": "integer",
