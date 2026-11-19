@@ -1,0 +1,15 @@
+interface:
+  display_name: "FoundRole Resume Check"
+  short_description: "See what hiring software reads from a resume"
+  default_prompt: "Check my resume the way hiring software reads it, and tell me what it loses."
+
+policy:
+  allow_implicit_invocation: true
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "foundrole"
+      description: "FoundRole job search and application management MCP server"
+      transport: "streamable_http"
+      url: "https://www.foundrole.com/mcp"

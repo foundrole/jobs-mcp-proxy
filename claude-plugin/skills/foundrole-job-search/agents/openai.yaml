@@ -1,0 +1,15 @@
+interface:
+  display_name: "FoundRole Job Search"
+  short_description: "Search, analyze, compare, and track jobs with FoundRole"
+  default_prompt: "Find roles that fit me, compare the strongest options, and keep the jobs I choose in FoundRole."
+
+policy:
+  allow_implicit_invocation: true
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "foundrole"
+      description: "FoundRole job search and application management MCP server"
+      transport: "streamable_http"
+      url: "https://www.foundrole.com/mcp"
