@@ -1,6 +1,6 @@
 {
   "contextFileName": "GEMINI.md",
-  "description": "Search FoundRole jobs, check your resume, preview tailoring and fit, and manage your application tracker.",
+  "description": "Remote jobs & resume tailoring",
   "mcpServers": {
     "foundrole": {
       "httpUrl": "https://www.foundrole.com/mcp"

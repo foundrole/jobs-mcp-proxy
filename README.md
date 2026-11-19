@@ -1,6 +1,14 @@
-# FoundRole MCP Server — AI Job Search in ChatGPT, Claude & Cursor [![FoundRole — AI Job Search with Fact Checking, Application Tracker & Resume Checker MCP connector – tool definition quality and endpoint health on Glama](https://glama.ai/mcp/connectors/io.github.foundrole/jobs-mcp-proxy/badges/score.svg)](https://glama.ai/mcp/connectors/io.github.foundrole/jobs-mcp-proxy)
+# Job by FoundRole [![FoundRole — AI Job Search with Fact Checking, Application Tracker & Resume Checker MCP connector – tool definition quality and endpoint health on Glama](https://glama.ai/mcp/connectors/io.github.foundrole/jobs-mcp-proxy/badges/score.svg)](https://glama.ai/mcp/connectors/io.github.foundrole/jobs-mcp-proxy)
 
-Ask ChatGPT or Claude for jobs and get real openings back — each one checked for whether it's still real, what it actually pays, and whether the company sponsors visas. The FoundRole MCP server connects your AI assistant to [FoundRole](https://www.foundrole.com)'s live job board, application tracker, and career knowledge base, so the whole job search runs inside the chat you already use.
+**Remote jobs & resume tailoring**
+
+Tell FoundRole what kind of work you want and where you can work. Find jobs near you or remote jobs open to people in your country, straight from company career pages. Save the ones you like, or use your profile to get recommendations.
+
+Found a job on LinkedIn or another site? Share the link and posting details in chat to compare available pay with similar roles. For jobs FoundRole tracks, you can also see when the posting was last seen live. Compare up to four jobs side by side. For US jobs, you can also check the employer’s H-1B sponsorship history and E-Verify status.
+
+Pick a job and see which requirements your resume already covers and where you may have gaps. The resume checker shows which skills, dates and sections hiring software could read. Get a resume tailoring suggestion or a starting point for a cover letter, then open FoundRole to keep working on it.
+
+Keep track of where you applied, save interview notes and set a reminder to follow up. Choose daily, weekly or monthly email alerts for new matches.
 
 > **Sign in once — your assistant handles it.** The first time your AI calls FoundRole it opens a standard OAuth sign-in; approve it once in the browser and that covers everything: search, fact-checks, the tracker, reminders, and alerts. There is no API key to copy or rotate, and the account is free.
 
