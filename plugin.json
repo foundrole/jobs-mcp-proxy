@@ -3,5 +3,5 @@
   "description": "Search FoundRole jobs by role, employer, place and work mode. Check advertised pay, posting risk and visa sponsorship history where available. See how hiring software reads your resume, preview tailoring and fit for a job, and start a cover letter from your saved experience. Manage applications, reminders and job alerts.",
   "logo": "assets/logo.svg",
   "name": "foundrole",
-  "version": "1.1.19"
+  "version": "1.2.0"
 }
