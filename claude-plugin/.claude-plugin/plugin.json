@@ -8,6 +8,7 @@
   "displayName": "Jobs by FoundRole",
   "documentationUrl": "https://www.foundrole.com/ai-search-mcp",
   "homepage": "https://www.foundrole.com",
+  "icon": "./.claude-plugin/icon.svg",
   "keywords": [
     "remote jobs",
     "jobs near me",
