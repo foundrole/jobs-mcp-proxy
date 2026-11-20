@@ -1,8 +1,8 @@
-# Job by FoundRole
+# Jobs by FoundRole
 
 **Remote jobs & resume tailoring**
 
-FoundRole is an AI job search and job application tracker. Find jobs near you, remote jobs, work-from-home and part-time jobs from company career pages in any country, with pay against market rates, a ghost-job risk grade, and, for US jobs, visa sponsorship history and E-Verify status. Add your resume for a match score and the skills you're missing, paste any job link to analyze it, compare jobs side by side, and see how hiring software reads your resume with the resume checker. Track applications from Saved to Offered with notes and follow-up reminders, and get daily, weekly, or monthly job alerts.
+Find remote jobs and jobs near you, compare pay, check how your resume fits a role, and get resume tailoring suggestions. Track applications, set follow-up reminders, and get job alerts.
 
 ## What it adds
 
@@ -15,7 +15,7 @@ FoundRole is an AI job search and job application tracker. Find jobs near you, r
 
 Installing the plugin adds its skills; the FoundRole connector is connected in a separate step, and that step is where you sign in (OAuth 2.1). Sign in to FoundRole and approve access. If an older connection asks for permission to read saved personal content, reconnect and review the permissions. There is no API key.
 
-- **Claude chat and Cowork** — ask for jobs and press **Connect** on the FoundRole card Claude shows, or open **Customize → Plugins → FoundRole Jobs → Connectors** and press **Connect** there.
+- **Claude chat and Cowork** — ask for jobs and press **Connect** on the FoundRole card Claude shows, or open **Customize → Plugins → Jobs by FoundRole → Connectors** and press **Connect** there.
 - **Claude Code** — the plugin reaches the server on its own, and the first tool call opens the FoundRole sign-in in your browser.
 
 ## What you can ask
