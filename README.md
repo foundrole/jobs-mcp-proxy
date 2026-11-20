@@ -57,7 +57,7 @@ Point your client at the FoundRole MCP endpoint:
 https://www.foundrole.com/mcp
 ```
 
-Most modern clients — ChatGPT, Claude, Cursor, VS Code — speak remote MCP (Streamable HTTP) natively, so this is all the configuration there is. In ChatGPT and Claude you don't even need the address: FoundRole Jobs is listed in their directories (see below).
+Most modern clients — ChatGPT, Claude, Cursor, VS Code — speak remote MCP (Streamable HTTP) natively, so this is all the configuration there is. In ChatGPT and Claude you don't even need the address: you can find FoundRole in their directories (see below).
 
 ### Option 2 — stdio bridge (for clients without remote MCP)
 
@@ -83,11 +83,11 @@ The first start opens FoundRole's sign-in page in your browser. After you approv
 
 **Estimated time:** ~1 minute
 
-1. Open [FoundRole Jobs in Claude's connector directory](https://claude.ai/directory/foundrole-jobs).
+1. Open [Jobs by FoundRole in Claude's connector directory](https://claude.ai/directory/foundrole-jobs).
 2. Add the connector and approve the FoundRole sign-in Claude opens.
 3. Ask for jobs in any chat — no server address to copy.
 
-**Claude Code and Cowork:** install the [FoundRole Jobs plugin](https://claude.ai/customize/plugins/id/b0559743-551f-40c0-960b-89fe68d76936%40anthropic-plugin-directory) (the page opens once you are signed in to Claude). It adds the same connector plus skills for job search, resume checks and application previews; the source is in [`claude-plugin/`](claude-plugin).
+**Claude Code and Cowork:** install the [Jobs by FoundRole plugin](https://claude.ai/customize/plugins/id/b0559743-551f-40c0-960b-89fe68d76936%40anthropic-plugin-directory) (the page opens once you are signed in to Claude). It adds the same connector plus skills for job search, resume checks and application previews; the source is in [`claude-plugin/`](claude-plugin).
 
 **Directory connectors switched off in your workspace?** Add a custom connector instead: **Settings → Connectors → Add custom connector**, name it `FoundRole`, paste `https://www.foundrole.com/mcp`, save, and approve the sign-in.
 
