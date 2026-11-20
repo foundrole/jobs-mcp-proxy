@@ -1,6 +1,6 @@
 {
   "name": "@foundrole/ai-job-search-mcp",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Remote jobs & resume tailoring. Connect your MCP client to FoundRole to find openings, compare pay, check your resume and track applications.",
   "keywords": [
     "remote jobs",
