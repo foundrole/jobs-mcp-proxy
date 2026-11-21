@@ -15,8 +15,8 @@
     }
   },
   "name": {
-    "short": "Job by FoundRole",
-    "full": "Job by FoundRole"
+    "short": "Jobs by Foundrole",
+    "full": "Jobs by Foundrole"
   },
   "description": {
     "short": "Remote jobs & resume tailoring",
@@ -25,7 +25,7 @@
   "agentConnectors": [
     {
       "id": "foundrole-job-search",
-      "displayName": "Job by FoundRole",
+      "displayName": "Jobs by Foundrole",
       "description": "Find jobs, compare pay, check your resume against a posting and track your applications.",
       "toolSource": {
         "remoteMcpServer": {

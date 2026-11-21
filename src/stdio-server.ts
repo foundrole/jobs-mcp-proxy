@@ -19,7 +19,7 @@ import { SERVER_CATALOG } from "./server-catalog.js";
 
 export const BRIDGE_SERVER_INFO = {
   name: "FoundRole MCP",
-  title: "FoundRole Jobs",
+  title: "Jobs by Foundrole",
   version: PROXY_VERSION,
 };
 

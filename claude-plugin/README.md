@@ -1,4 +1,4 @@
-# Jobs by FoundRole
+# Jobs by Foundrole
 
 **Remote jobs & resume tailoring**
 
@@ -15,7 +15,7 @@ Find remote jobs and jobs near you, compare pay, check how your resume fits a ro
 
 Installing the plugin adds its skills; the FoundRole connector is connected in a separate step, and that step is where you sign in (OAuth 2.1). Sign in to FoundRole and approve access. If an older connection asks for permission to read saved personal content, reconnect and review the permissions. There is no API key.
 
-- **Claude chat and Cowork** — ask for jobs and press **Connect** on the FoundRole card Claude shows, or open **Customize → Plugins → Jobs by FoundRole → Connectors** and press **Connect** there.
+- **Claude chat and Cowork** — ask for jobs and press **Connect** on the FoundRole card Claude shows, or open **Customize → Plugins → Jobs by Foundrole → Connectors** and press **Connect** there.
 - **Claude Code** — the plugin reaches the server on its own, and the first tool call opens the FoundRole sign-in in your browser.
 
 ## What you can ask

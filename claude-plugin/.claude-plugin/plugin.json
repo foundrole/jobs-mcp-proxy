@@ -5,7 +5,7 @@
     "name": "FoundRole"
   },
   "description": "Find remote jobs and jobs near you, compare pay, check how your resume fits a role, and get resume tailoring suggestions. Track applications, set follow-up reminders, and get job alerts.",
-  "displayName": "Jobs by FoundRole",
+  "displayName": "Jobs by Foundrole",
   "documentationUrl": "https://www.foundrole.com/ai-search-mcp",
   "homepage": "https://www.foundrole.com",
   "icon": "./.claude-plugin/icon.svg",
