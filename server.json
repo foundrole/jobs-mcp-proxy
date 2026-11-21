@@ -14,7 +14,7 @@
       "transport": {
         "type": "stdio"
       },
-      "version": "1.2.3"
+      "version": "1.2.4"
     }
   ],
   "remotes": [
@@ -28,6 +28,6 @@
     "url": "https://github.com/foundrole/jobs-mcp-proxy"
   },
   "title": "Jobs by FoundRole",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "websiteUrl": "https://www.foundrole.com/ai-search-mcp"
 }
