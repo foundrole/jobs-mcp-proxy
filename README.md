@@ -1,4 +1,4 @@
-# Jobs by Foundrole [![FoundRole — AI Job Search with Fact Checking, Application Tracker & Resume Checker MCP connector – tool definition quality and endpoint health on Glama](https://glama.ai/mcp/connectors/io.github.foundrole/jobs-mcp-proxy/badges/score.svg)](https://glama.ai/mcp/connectors/io.github.foundrole/jobs-mcp-proxy)
+# Jobs by FoundRole [![FoundRole — AI Job Search with Fact Checking, Application Tracker & Resume Checker MCP connector – tool definition quality and endpoint health on Glama](https://glama.ai/mcp/connectors/io.github.foundrole/jobs-mcp-proxy/badges/score.svg)](https://glama.ai/mcp/connectors/io.github.foundrole/jobs-mcp-proxy)
 
 **Remote jobs & resume tailoring**
 
@@ -75,7 +75,7 @@ The first start opens FoundRole's sign-in page in your browser. After you approv
 
 **Estimated time:** ~1 minute
 
-1. Open [Jobs by Foundrole in ChatGPT's plugins](https://chatgpt.com/plugins/plugin_asdk_app_6a21bbefe8bc81919d395e1b9e90b91d).
+1. Open [Jobs by FoundRole in ChatGPT's plugins](https://chatgpt.com/plugins/plugin_asdk_app_6a21bbefe8bc81919d395e1b9e90b91d).
 2. Click **Install plugin** and approve the FoundRole sign-in when ChatGPT opens it.
 3. Ask for jobs in any chat — no settings to configure, nothing to paste.
 
@@ -83,11 +83,11 @@ The first start opens FoundRole's sign-in page in your browser. After you approv
 
 **Estimated time:** ~1 minute
 
-1. Open [Jobs by Foundrole in Claude's connector directory](https://claude.ai/directory/foundrole-jobs).
+1. Open [Jobs by FoundRole in Claude's connector directory](https://claude.ai/directory/foundrole-jobs).
 2. Add the connector and approve the FoundRole sign-in Claude opens.
 3. Ask for jobs in any chat — no server address to copy.
 
-**Claude Code and Cowork:** install the [Jobs by Foundrole plugin](https://claude.ai/customize/plugins/id/b0559743-551f-40c0-960b-89fe68d76936%40anthropic-plugin-directory) (the page opens once you are signed in to Claude). It adds the same connector plus skills for job search, resume checks and application previews; the source is in [`claude-plugin/`](claude-plugin).
+**Claude Code and Cowork:** install the [Jobs by FoundRole plugin](https://claude.ai/customize/plugins/id/b0559743-551f-40c0-960b-89fe68d76936%40anthropic-plugin-directory) (the page opens once you are signed in to Claude). It adds the same connector plus skills for job search, resume checks and application previews; the source is in [`claude-plugin/`](claude-plugin).
 
 **Directory connectors switched off in your workspace?** Add a custom connector instead: **Settings → Connectors → Add custom connector**, name it `FoundRole`, paste `https://www.foundrole.com/mcp`, save, and approve the sign-in.
 
@@ -97,7 +97,7 @@ The first start opens FoundRole's sign-in page in your browser. After you approv
 
 [![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=foundrole&config=eyJ1cmwiOiJodHRwczovL3d3dy5mb3VuZHJvbGUuY29tL21jcCJ9)
 
-Click the button, confirm **Install** in Cursor, and approve the FoundRole sign-in it opens. Jobs by Foundrole is also listed on [Cursor Directory](https://cursor.directory/plugins/foundrole-jobs).
+Click the button, confirm **Install** in Cursor, and approve the FoundRole sign-in it opens. Jobs by FoundRole is also listed on [Cursor Directory](https://cursor.directory/plugins/foundrole-jobs).
 
 The Cursor plugin lives in this repository — `.cursor-plugin/plugin.json` with the server declared in `mcp.json`. To load it locally, symlink this repo into `~/.cursor/plugins/local/` and reload the window.
 

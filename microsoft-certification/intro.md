@@ -1,4 +1,4 @@
-# Jobs by Foundrole
+# Jobs by FoundRole
 
 **Remote jobs & resume tailoring**
 
